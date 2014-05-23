@@ -31,6 +31,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
@@ -38,81 +39,99 @@ import android.view.Display;
 import android.view.WindowManager;
 
 public class LQDevice {
-	private String _vendor;
-	private String _deviceModel;
-	private String _systemVersion;
-	private String _deviceName;
-	private String _screenSize;
-	private String _carrier;
-	private String _internetConnectivity;
-	private String _uid;
-	private String _appBundle;
-	private String _appVersion;
-	private String _appName;
-	private String _releaseVersion;
-	private String _liquidVersion;
-	private HashMap<String, Object> _attributes;
+	private String mVendor;
+	private String mDeviceModel;
+	private String mSystemVersion;
+	private String mDeviceName;
+	private String mScreenSize;
+	private String mCarrier;
+	private String mInternetConnectivity;
+	private String mUid;
+	private String mAppBundle;
+	private String mAppVersion;
+	private String mAppName;
+	private String mReleaseVersion;
+	private String mLiquidVersion;
+	private HashMap<String, Object> mAttributes;
+	private Location mLocation;
 
-	private Context _context;
+	private Context mContext;
 
 	// Initialization
 	public LQDevice(Context context, String liquidVersion) {
-		_context = context;
-		_vendor = LQDevice.getDeviceVendor();
-		_deviceModel = LQDevice.getDeviceModel();
-		_systemVersion = LQDevice.getSystemVersion();
-		_deviceName = LQDevice.getDeviceName();
-		_screenSize = LQDevice.getScreenSize(context);
-		_carrier = LQDevice.getCarrier(context);
-		_internetConnectivity = LQDevice.getInternetConnectivity(context);
-		_uid = LQDevice.getDeviceID(context);
-		_appBundle = LQDevice.getAppBundle(context);
-		_appName = LQDevice.getAppName(context);
-		_appVersion = LQDevice.getAppVersion(context);
-		_releaseVersion = LQDevice.getReleaseVersion(context);
-		_liquidVersion = liquidVersion;
+		mAttributes = new HashMap<String,Object>();
+		mContext = context;
+		mVendor = LQDevice.getDeviceVendor();
+		mDeviceModel = LQDevice.getDeviceModel();
+		mSystemVersion = LQDevice.getSystemVersion();
+		mDeviceName = LQDevice.getDeviceName();
+		mScreenSize = LQDevice.getScreenSize(context);
+		mCarrier = LQDevice.getCarrier(context);
+		mInternetConnectivity = LQDevice.getInternetConnectivity(context);
+		mUid = LQDevice.getDeviceID(context);
+		mAppBundle = LQDevice.getAppBundle(context);
+		mAppName = LQDevice.getAppName(context);
+		mAppVersion = LQDevice.getAppVersion(context);
+		mReleaseVersion = LQDevice.getReleaseVersion(context);
+		mLiquidVersion = liquidVersion;
+	}
+
+	public LQDevice(Context context, String liquidVersion, Location location) {
+		this(context,liquidVersion);
+		setLocation(location);
 	}
 
 	// Attributes
 	public String getUID() {
-		return _uid;
+		return mUid;
 	}
 
 	public void setAttribute(Object attribute, String key) {
-		_attributes.put(key, attribute);
+		mAttributes.put(key, attribute);
 	}
 
 	public void getAttribute(String key) {
-		_attributes.get(key);
+		mAttributes.get(key);
+	}
+
+	public void setLocation(Location location) {
+		if (location == null) {
+			mAttributes.remove("_latitude");
+			mAttributes.remove("_longitude");
+		} else {
+			mLocation = location;
+			mAttributes.put("_latitude", Double.valueOf(location.getLatitude()));
+			mAttributes.put("_longitude",Double.valueOf(location.getLongitude()));
+		}
 	}
 
 	// JSON
 	public JSONObject toJSON() {
 		// Updating to avoid callbacks
-		_internetConnectivity = LQDevice.getInternetConnectivity(_context);
+		mInternetConnectivity = LQDevice.getInternetConnectivity(mContext);
 
 		HashMap<String, Object> attrs = new HashMap<String, Object>();
-		if(_attributes != null) {
-			attrs.putAll(_attributes);
+		if(mAttributes != null) {
+			attrs.putAll(mAttributes);
 		}
-		attrs.put("_vendor", _vendor);
+		attrs.put("_vendor", mVendor);
 		attrs.put("platform", "Android");
-		attrs.put("_deviceModel", _deviceModel);
+		attrs.put("_deviceModel", mDeviceModel);
 		try {
-			attrs.put("_systemVersion", Integer.parseInt(_systemVersion));
+			attrs.put("_systemVersion", Integer.parseInt(mSystemVersion));
 		} catch (NumberFormatException e) {
-			attrs.put("_systemVersion", _systemVersion);
+			attrs.put("_systemVersion", mSystemVersion);
 		}
-		attrs.put("_deviceName", _deviceName);
-		attrs.put("_screenSize", _screenSize);
-		attrs.put("_carrier", _carrier);
-		attrs.put("_internetConnectivity", _internetConnectivity);
-		attrs.put("unique_id", _uid);
-		attrs.put("_appBundle", _appBundle);
-		attrs.put("_appName", _appName);
-		attrs.put("_appVersion", _appVersion);
-		attrs.put("_releaseVersion", _releaseVersion);
-		attrs.put("_liquidVersion", _liquidVersion);
+		attrs.put("_deviceName", mDeviceName);
+		attrs.put("_screenSize", mScreenSize);
+		attrs.put("_carrier", mCarrier);
+		attrs.put("_internetConnectivity", mInternetConnectivity);
+		attrs.put("unique_id", mUid);
+		attrs.put("_appBundle", mAppBundle);
+		attrs.put("_appName", mAppName);
+		attrs.put("_appVersion", mAppVersion);
+		attrs.put("_releaseVersion", mReleaseVersion);
+		attrs.put("_liquidVersion", mLiquidVersion);
 
 		JSONObject json = new JSONObject();
 		try {

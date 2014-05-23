@@ -296,9 +296,11 @@ public class Liquid {
 	/**
 	 * Identifies the current user with a custom UUID and additional attributes.
 	 *
+	 * @deprecated Use {@link #setCurrentLocation(Location location)} instead.</p>
 	 * @param identifier The custom UUID.
 	 * @param location User Location.
 	 */
+	@Deprecated
 	public void identifyUser(String identifier, Location location) {
 		identifyUser(identifier, null, location);
 	}
@@ -306,10 +308,12 @@ public class Liquid {
 	/**
 	 * Identifies the current user with a custom UUID and additional attributes.
 	 *
+	 * @deprecated Use {@link #setCurrentLocation(Location location)} instead.</p>
 	 * @param identifier The custom UUID.
 	 * @param attributes Additional user attributes.
 	 * @param location User Location.
 	 */
+	@Deprecated
 	public void identifyUser(String identifier,	HashMap<String, Object> attributes, Location location) {
 		final String finalIdentifier = identifier;
 		if(attributes != null && !attributes.containsKey("auto_identified")) {
@@ -362,9 +366,11 @@ public class Liquid {
 
 	/**
 	 * Add or update the user location.
-	 *
+	 * 
+	 * @deprecated Use {@link #setCurrentLocation(Location location)} instead.
 	 * @param location User location.
 	 */
+	@Deprecated
 	public void setUserLocation(Location location) {
 		if (mCurrentUser == null) {
 			identifyUser();
@@ -377,6 +383,20 @@ public class Liquid {
 				}
 			});
 		}
+	}
+
+	/**
+	 * Add or update the current location.
+	 *
+	 * @param location Current location.
+	 */
+	public void setCurrentLocation(final Location location) {
+		mQueue.execute(new Runnable() {
+			@Override
+			public void run() {
+				mDevice.setLocation(location);
+			}
+		});
 	}
 
 	private void newSession(boolean runInCurrentThread) {

@@ -28,42 +28,39 @@ import org.json.JSONObject;
 import android.location.Location;
 
 public class LQUser {
-	private String _identifier;
-	private HashMap<String, Object> _attributes;
+	private String mIdentifier;
+	private HashMap<String, Object> mAttributes;
 
 	// Initializer
-	public LQUser(String identifier, HashMap<String, Object> attributes,
-			Location location) {
-		_identifier = identifier;
-		_attributes = attributes;
-		if (_attributes == null) {
-			_attributes = new HashMap<String, Object>();
+	public LQUser(String identifier, HashMap<String, Object> attributes,Location location) {
+		mIdentifier = identifier;
+		mAttributes = attributes;
+		if (mAttributes == null) {
+			mAttributes = new HashMap<String, Object>();
 		}
 		this.setLocation(location);
 	}
 
 	// Attributes
 	public String getIdentifier() {
-		return _identifier;
+		return mIdentifier;
 	}
 
 	public void setAttribute(Object attribute, String key) {
-		_attributes.put(key, attribute);
+		mAttributes.put(key, attribute);
 	}
 
 	public Object attributeForKey(String key) {
-		return _attributes.get(key);
+		return mAttributes.get(key);
 	}
 
 	public void setLocation(Location location) {
 		if (location == null) {
-			_attributes.remove("_latitude");
-			_attributes.remove("_longitude");
+			mAttributes.remove("_latitude");
+			mAttributes.remove("_longitude");
 		} else {
-			_attributes
-			.put("_latitude", Double.valueOf(location.getLatitude()));
-			_attributes.put("_longitude",
-					Double.valueOf(location.getLongitude()));
+			mAttributes.put("_latitude", Double.valueOf(location.getLatitude()));
+			mAttributes.put("_longitude",Double.valueOf(location.getLongitude()));
 		}
 	}
 
@@ -71,13 +68,13 @@ public class LQUser {
 	public JSONObject toJSON() {
 		JSONObject json = new JSONObject();
 		try {
-			json.put("unique_id", _identifier);
-			if(_attributes != null){
-				for(String key : _attributes.keySet()) {
-					if(_attributes.get(key) instanceof Date) {
-						json.put(key, LiquidTools.dateToString((Date) _attributes.get(key)));
+			json.put("unique_id", mIdentifier);
+			if(mAttributes != null){
+				for(String key : mAttributes.keySet()) {
+					if(mAttributes.get(key) instanceof Date) {
+						json.put(key, LiquidTools.dateToString((Date) mAttributes.get(key)));
 					} else {
-						json.put(key, _attributes.get(key));
+						json.put(key, mAttributes.get(key));
 					}
 				}
 			}
