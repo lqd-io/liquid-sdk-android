@@ -27,16 +27,21 @@ import org.json.JSONObject;
 
 import android.location.Location;
 
-public class LQUser {
+public class LQUser extends LQModel {
+
+	private static final long serialVersionUID = 1582937331182018907L;
+
 	private String mIdentifier;
 	private HashMap<String, Object> mAttributes;
 
 	// Initializer
 	public LQUser(String identifier, HashMap<String, Object> attributes,Location location) {
 		mIdentifier = identifier;
-		mAttributes = attributes;
-		if (mAttributes == null) {
+		if (attributes == null) {
 			mAttributes = new HashMap<String, Object>();
+		}
+		else {
+			mAttributes = attributes;
 		}
 		this.setLocation(location);
 	}
@@ -46,8 +51,15 @@ public class LQUser {
 		return mIdentifier;
 	}
 
-	public void setAttribute(Object attribute, String key) {
-		mAttributes.put(key, attribute);
+	public HashMap<String, Object> getAttributes() {
+		return new HashMap<>(mAttributes);
+	}
+
+	public Object setAttribute(Object attribute, String key) {
+		if(hasInvalidChars(key)) {
+			return mAttributes.put(key, attribute);
+		}
+		return null;
 	}
 
 	public Object attributeForKey(String key) {

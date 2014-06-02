@@ -25,34 +25,37 @@ import java.util.HashMap;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class LQEvent {
+public class LQEvent extends LQModel {
 
-	private String _name;
-	private HashMap<String,Object> _attributes;
-	private Date _date;
+	private static final long serialVersionUID = 4817275328778708775L;
+
+	private String mName;
+	private HashMap<String,Object> mAttributes;
+	private Date mDate;
 
 	// Initialization
 	public LQEvent(String name, HashMap<String,Object> attributes){
-		_name = name;
-		_attributes = attributes;
-		if(_attributes == null){
-			_attributes = new HashMap<String,Object>();
+		mName = name;
+		if(attributes == null){
+			mAttributes = new HashMap<String,Object>();
+		} else {
+			mAttributes = attributes;
 		}
-		_date = new Date();
+		mDate = new Date();
 	}
 
 	// JSON
 	public JSONObject toJSON(){
 		JSONObject json = new JSONObject();
 		try {
-			json.put("name", _name);
-			json.put("date",LiquidTools.dateToString(_date));
-			if(_attributes != null){
-				for(String key : _attributes.keySet()){
-					if(_attributes.get(key) instanceof Date) {
-						json.put(key, LiquidTools.dateToString((Date) _attributes.get(key)));
+			json.put("name", mName);
+			json.put("date",LiquidTools.dateToString(mDate));
+			if(mAttributes != null){
+				for(String key : mAttributes.keySet()){
+					if(mAttributes.get(key) instanceof Date) {
+						json.put(key, LiquidTools.dateToString((Date) mAttributes.get(key)));
 					} else {
-						json.put(key, _attributes.get(key));
+						json.put(key, mAttributes.get(key));
 					}
 				}
 			}

@@ -20,6 +20,7 @@ import io.lqd.sdk.model.LQDataPoint;
 import io.lqd.sdk.model.LQDevice;
 import io.lqd.sdk.model.LQEvent;
 import io.lqd.sdk.model.LQLiquidPackage;
+import io.lqd.sdk.model.LQModel;
 import io.lqd.sdk.model.LQQueue;
 import io.lqd.sdk.model.LQSession;
 import io.lqd.sdk.model.LQUser;
@@ -319,7 +320,8 @@ public class Liquid {
 		if(attributes != null && !attributes.containsKey("auto_identified")) {
 			attributes.put("auto_identified", false);
 		}
-		final HashMap<String, Object> finalAttributes = attributes;
+		final HashMap<String, Object> finalAttributes = sanitizeAttributes(attributes);
+
 		final Location finalLocation = location;
 
 		destroySession();
@@ -352,15 +354,22 @@ public class Liquid {
 		if (mCurrentUser == null) {
 			identifyUser();
 		} else {
-			final String finalKey = key;
-			final Object finalAttribute = attribute;
-			mQueue.execute(new Runnable() {
-				@Override
-				public void run() {
-					mCurrentUser.setAttribute(finalAttribute, finalKey);
+			if(LQModel.hasInvalidChars(key)) {
+				if(isDevelopmentMode) {
+					throw new IllegalArgumentException("Key: (" + key + ") contains invalid chars: (. $ \\0)");
+				}else {
+					LQLog.warning("Key: " + key + " contains invalid chars: (. $ \\0)");
 				}
-			});
-
+			} else {
+				final String finalKey = key;
+				final Object finalAttribute = attribute;
+				mQueue.execute(new Runnable() {
+					@Override
+					public void run() {
+						mCurrentUser.setAttribute(finalAttribute, finalKey);
+					}
+				});
+			}
 		}
 	}
 
@@ -469,9 +478,8 @@ public class Liquid {
 		if (!Liquid.assertEventAttributeTypes(attributes)) {
 			return;
 		}
-
 		final String finalEventName = eventName;
-		final HashMap<String, Object> finalAttributes = attributes;
+		final HashMap<String, Object> finalAttributes = sanitizeAttributes(attributes);
 		final LQUser finalUser = mCurrentUser;
 		final LQDevice finalDevice = mDevice;
 		final LQSession finalSession = mCurrentSession;
@@ -1068,6 +1076,25 @@ public class Liquid {
 			}
 		}
 		return true;
+	}
+
+	private HashMap<String, Object> sanitizeAttributes(HashMap<String, Object> attributes) {
+		if (attributes == null) {
+			return null;
+		}
+		HashMap<String, Object> attrs = new HashMap<String, Object>();
+		for (String key : attributes.keySet()) {
+			if (LQModel.hasInvalidChars(key)) {
+				if(isDevelopmentMode) {
+					throw new IllegalArgumentException("Key: (" + key + ") contains invalid chars: (. $ \\0)");
+				}else {
+					LQLog.warning("Key: " + key + " contains invalid chars: (. $ \\0)");
+				}
+			} else {
+				attrs.put(key, attributes.get(key));
+			}
+		}
+		return attrs;
 	}
 
 }

@@ -20,14 +20,14 @@ import android.util.Log;
 
 public class LQLog {
 
-	public static int LOG_LEVEL = 1;
+	public static int LOG_LEVEL = 2;
 
 	private static final int PATHS = 7;
 	private static final int HTTP = 6;
 	private static final int DATA = 5;
 	private static final int INFO_VERBOSE = 4;
-	private static final int WARNING = 3;
-	private static final int INFO = 2;
+	private static final int INFO = 3;
+	private static final int WARNING = 2;
 	private static final int ERROR = 1;
 
 	public static void paths(String message) {

@@ -21,58 +21,47 @@ import io.lqd.sdk.LiquidTools;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.UUID;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class LQSession {
+public class LQSession extends LQModel {
 
-	private String _identifier;
-	private Date _end;
-	private Date _start;
-	private int _timeout;
-	private HashMap<String, Object> _attributes;
+	private static final long serialVersionUID = -3586505654518525092L;
+
+	private String mId;
+	private Date mEnd;
+	private Date mStart;
+	private int mTimeout;
 
 	public LQSession(int timeout) {
-		_identifier = LQSession.newSessionIdentifier();
-		_timeout = timeout;
-		_end = null;
-		_attributes = new HashMap<String, Object>();
-		_start = new Date();
+		mId = LQSession.newSessionIdentifier();
+		mTimeout = timeout;
+		mEnd = null;
+		mStart = new Date();
 	}
+
 	public String getIdentifier(){
-		return _identifier;
+		return mId;
 	}
+
 	public Date getStart(){
-		return _start;
+		return mStart;
 	}
+
 	public void setEnd(Date end){
-		_end = end;
-	}
-
-	public void setAttribute(Object attribute, String key) {
-		_attributes.put(key, attribute);
-	}
-
-	public void getAttribute(String key) {
-		_attributes.get(key);
+		mEnd = end;
 	}
 
 	public JSONObject toJSON(){
 		JSONObject json = new JSONObject();
 		try {
-			if(_attributes != null){
-				for(String key : _attributes.keySet()){
-					json.put(key, _attributes.get(key));
-				}
-			}
-			json.put("started_at", LiquidTools.dateToString(_start));
-			json.put("timeout", _timeout);
-			json.put("unique_id", _identifier);
-			if(_end != null) {
-				json.put("ended_at", LiquidTools.dateToString(_end));
+			json.put("started_at", LiquidTools.dateToString(mStart));
+			json.put("timeout", mTimeout);
+			json.put("unique_id", mId);
+			if(mEnd != null) {
+				json.put("ended_at", LiquidTools.dateToString(mEnd));
 			}
 			return json;
 		} catch (JSONException e) {

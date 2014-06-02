@@ -53,7 +53,6 @@ public class LQDevice {
 	private String mReleaseVersion;
 	private String mLiquidVersion;
 	private HashMap<String, Object> mAttributes;
-	private Location mLocation;
 
 	private Context mContext;
 
@@ -86,20 +85,11 @@ public class LQDevice {
 		return mUid;
 	}
 
-	public void setAttribute(Object attribute, String key) {
-		mAttributes.put(key, attribute);
-	}
-
-	public void getAttribute(String key) {
-		mAttributes.get(key);
-	}
-
 	public void setLocation(Location location) {
 		if (location == null) {
 			mAttributes.remove("_latitude");
 			mAttributes.remove("_longitude");
 		} else {
-			mLocation = location;
 			mAttributes.put("_latitude", Double.valueOf(location.getLatitude()));
 			mAttributes.put("_longitude",Double.valueOf(location.getLongitude()));
 		}
