@@ -59,7 +59,7 @@ public class Liquid {
 	static final String TAG_LIQUID = "LIQUID";
 
 	private static final String LIQUID_SERVER_URL = "https://api.lqd.io/collect/";
-	protected static final String LIQUID_VERSION = "0.6.0-beta";
+	protected static final String LIQUID_VERSION = "0.7.0-beta";
 	private static final int LIQUID_QUEUE_SIZE_LIMIT = 500;
 	private static final int LIQUID_DEFAULT_FLUSH_INTERVAL = 10;
 	private static final int LIQUID_MAX_NUMBER_OF_TRIES = 10;
