@@ -34,14 +34,18 @@ public class LQEvent extends LQModel {
 	private Date mDate;
 
 	// Initialization
-	public LQEvent(String name, HashMap<String,Object> attributes){
+	public LQEvent(String name, HashMap<String,Object> attributes, Date date){
 		mName = name;
 		if(attributes == null){
 			mAttributes = new HashMap<String,Object>();
 		} else {
 			mAttributes = attributes;
 		}
-		mDate = new Date();
+		mDate = date;
+	}
+
+	public LQEvent(String name, HashMap<String,Object> attributes) {
+		this(name,attributes, new Date());
 	}
 
 	// JSON

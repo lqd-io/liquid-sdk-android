@@ -35,14 +35,17 @@ public class LQDataPoint {
 	private ArrayList<LQValue> mValues;
 	private Date mTimestamp;
 
-	public LQDataPoint(LQUser user, LQDevice device, LQSession session,
-			LQEvent event, ArrayList<LQValue> values) {
+	public LQDataPoint(LQUser user, LQDevice device, LQSession session,	LQEvent event, ArrayList<LQValue> values, Date date) {
 		mUser = user;
 		mDevice = device;
 		mSession = session;
 		mEvent = event;
 		mValues = values;
-		mTimestamp = new Date();
+		mTimestamp = date;
+	}
+
+	public LQDataPoint(LQUser user, LQDevice device, LQSession session, LQEvent event, ArrayList<LQValue> values) {
+		this(user,device,session,event,values, new Date());
 	}
 
 	// JSON

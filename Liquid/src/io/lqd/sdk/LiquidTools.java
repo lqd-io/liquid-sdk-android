@@ -22,6 +22,8 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -67,6 +69,18 @@ public class LiquidTools {
 
 	public static String colorToHex(int color) {
 		return String.format("#%06X", (0xFFFFFF & color));
+	}
+
+	public static void saveToDisk(Context c, String key, String value) {
+		SharedPreferences sharedPrefs = c.getSharedPreferences("io.lqd."+ key, Context.MODE_PRIVATE);
+		Editor editor = sharedPrefs.edit();
+		editor.putString("io.lqd."+ key, value);
+		editor.commit();
+	}
+
+	public static String loadFromDisk(Context c, String key) {
+		SharedPreferences sharedPrefs = c.getSharedPreferences("io.lqd."+ key, Context.MODE_PRIVATE);
+		return sharedPrefs.getString("io.lqd."+ key, null);
 	}
 
 }

@@ -35,23 +35,31 @@ public class LQSession extends LQModel {
 	private Date mStart;
 	private int mTimeout;
 
-	public LQSession(int timeout) {
+	public LQSession(int timeout, Date date) {
 		mId = LQSession.newSessionIdentifier();
 		mTimeout = timeout;
 		mEnd = null;
-		mStart = new Date();
+		mStart = date;
+	}
+
+	public LQSession(int timeout) {
+		this(timeout, new Date());
 	}
 
 	public String getIdentifier(){
 		return mId;
 	}
 
-	public Date getStart(){
+	public Date getStartDate(){
 		return mStart;
 	}
 
-	public void setEnd(Date end){
+	public void setEndDate(Date end){
 		mEnd = end;
+	}
+
+	public Date getEndDate() {
+		return mEnd;
 	}
 
 	public JSONObject toJSON(){

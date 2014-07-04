@@ -81,6 +81,7 @@ public class Liquid {
 	private LQLiquidPackage mAppliedLiquidPackage;
 	private HashMap<String,LQValue> mAppliedValues;
 	private HashMap<String, LiquidOnEventListener> mListeners = new HashMap<String, LiquidOnEventListener>();
+	private boolean mOnActivityTransition = false;
 	private boolean mNeedCallbackCall = false;
 	private LQNetwork mNetwork;
 	private boolean isDevelopmentMode = false;
@@ -429,8 +430,9 @@ public class Liquid {
 				if (mCurrentUser == null) {
 					identifyUser();
 				}
-				mCurrentSession = new LQSession(mSessionTimeout);
-				track("_startSession");
+				Date now = new Date();
+				mCurrentSession = new LQSession(mSessionTimeout, now);
+				track("_startSession", null, now);
 			}
 		};
 		if(runInCurrentThread){
@@ -448,9 +450,9 @@ public class Liquid {
 	}
 
 	private void destroySession(Date closeDate) {
-		if((mCurrentUser != null) && (mCurrentSession != null)) {
-			mCurrentSession.setEnd(closeDate);
-			track("_endSession");
+		if((mCurrentUser != null) && (mCurrentSession != null) && mCurrentSession.getEndDate() == null) {
+			mCurrentSession.setEndDate(closeDate);
+			track("_endSession", null, closeDate);
 		}
 	}
 
@@ -461,6 +463,9 @@ public class Liquid {
 			if (interval >= mSessionTimeout) {
 				destroySession(mEnterBackgroundtime);
 				newSession(false);
+			} else {
+				track("_resumeSession");
+				track("_pauseSession", null, mEnterBackgroundtime);
 			}
 		}
 	}
@@ -483,6 +488,10 @@ public class Liquid {
 	 * @param attributes Additional attributes of the event.
 	 */
 	public void track(String eventName, HashMap<String, Object> attributes) {
+		track(eventName, attributes, new Date());
+	}
+
+	private void track(String eventName, HashMap<String, Object> attributes, Date date) {
 		if ((mCurrentUser == null) || (mCurrentSession == null)) {
 			identifyUser();
 		}
@@ -497,19 +506,21 @@ public class Liquid {
 		final LQUser finalUser = mCurrentUser;
 		final LQDevice finalDevice = mDevice;
 		final LQSession finalSession = mCurrentSession;
+		final Date finalDate = date;
 		mQueue.execute(new Runnable() {
 			@Override
 			public void run() {
-				LQEvent event = new LQEvent(finalEventName, finalAttributes);
-				LQDataPoint dataPoint = new LQDataPoint(finalUser, finalDevice, finalSession, event, mAppliedLiquidPackage.getValues());
+				LQEvent event = new LQEvent(finalEventName, finalAttributes, finalDate);
+				LQDataPoint dataPoint = new LQDataPoint(finalUser, finalDevice, finalSession, event, mAppliedLiquidPackage.getValues(), finalDate);
 				LQLog.data(dataPoint.toJSON());
-
 				String endPoint = LIQUID_SERVER_URL + "data_points";
 				addToHttpQueue(dataPoint.toJSON(), endPoint, "POST");
 			}
 		});
-
 	}
+
+
+
 
 	/*
 	 * *******************
@@ -577,14 +588,30 @@ public class Liquid {
 		}
 	}
 
+	public void activityCreated(Activity activity) {
+		if (android.os.Build.VERSION.SDK_INT < 14) {
+			activityCreatedCallback();
+		}
+	}
+
 	private void activityDestroyedCallback() {
-		flush();
+	}
+
+	private void activityCreatedCallback() {
 	}
 
 	private void activityStopedCallback(Activity activity) {
+		mOnActivityTransition = false;
 		if(LiquidOnEventListener.class.isInstance(activity)) {
 			mInstance.detachLiquidEventListener((LiquidOnEventListener) activity);
 		}
+		requestValues();
+		mQueue.execute(new Runnable() {
+			@Override
+			public void run() {
+				LiquidTools.saveToDisk(mContext, "mEnterBackgroundtime", new Date().getTime() +"");
+			}
+		});
 	}
 
 	private void activityStartedCallback(Activity activity) {
@@ -596,14 +623,6 @@ public class Liquid {
 			notifyListeners(false);
 		}
 		loadLiquidPackage(true);
-	}
-
-	private void activityResumedCallback(Activity activity) {
-		if(LiquidOnEventListener.class.isInstance(activity)) {
-			mInstance.attachLiquidEventListener((LiquidOnEventListener) activity);
-		}
-		checkSessionTimeout();
-		startFlushTimer();
 
 		mQueue.execute(new Runnable() {
 			@Override
@@ -611,9 +630,23 @@ public class Liquid {
 				mHttpQueue = unarchiveQueue(mApiToken, mContext);
 			}
 		});
+
+		if(!mOnActivityTransition) {
+			String date = LiquidTools.loadFromDisk(mContext, "mEnterBackgroundtime");
+			mEnterBackgroundtime = date == null ? new Date() : new Date(Long.parseLong(date));
+			checkSessionTimeout();
+		}
+	}
+
+	private void activityResumedCallback(Activity activity) {
+		if(LiquidOnEventListener.class.isInstance(activity)) {
+			mInstance.attachLiquidEventListener((LiquidOnEventListener) activity);
+		}
+		startFlushTimer();
 	}
 
 	private void activityPausedCallback(Activity activity) {
+		mOnActivityTransition = true;
 		if(LiquidOnEventListener.class.isInstance(activity)) {
 			mInstance.detachLiquidEventListener((LiquidOnEventListener) activity);
 		}
@@ -621,14 +654,6 @@ public class Liquid {
 			flush();
 		}
 		stopFlushTimer();
-		requestValues();
-
-		mQueue.execute(new Runnable() {
-			@Override
-			public void run() {
-				mEnterBackgroundtime = new Date();
-			}
-		});
 	}
 
 	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
@@ -668,6 +693,7 @@ public class Liquid {
 
 			@Override
 			public void onActivityCreated(Activity activity, Bundle bundle) {
+				activityCreatedCallback();
 			}
 		});
 
@@ -927,7 +953,7 @@ public class Liquid {
 					ArrayList<LQQueue> failedQueue = new ArrayList<LQQueue>();
 					while (mHttpQueue.size() > 0) {
 						LQQueue queuedHttp = mHttpQueue.get(0);
-						LQLog.infoVerbose("Flushing " + queuedHttp.toString());
+						LQLog.infoVerbose("Flushing " + queuedHttp.getJSON());
 						String result = mNetwork.httpConnectionTo(queuedHttp.getJSON(),
 								queuedHttp.getUrl(), queuedHttp.getHttpMethod());
 						mHttpQueue.remove(queuedHttp);
