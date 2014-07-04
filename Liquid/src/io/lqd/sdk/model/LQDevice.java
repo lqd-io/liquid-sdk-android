@@ -95,6 +95,14 @@ public class LQDevice {
 		}
 	}
 
+	public void setPushId(String id) {
+		if(id == null || id.equals("")) {
+			mAttributes.remove("_pushToken");
+		} else {
+			mAttributes.put("_pushToken", id);
+		}
+	}
+
 	// JSON
 	public JSONObject toJSON() {
 		// Updating to avoid callbacks
@@ -202,7 +210,6 @@ public class LQDevice {
 			editor.putString("io.lqd.UUID", uid);
 			editor.commit();
 		}
-
 		return uid.replace("-", "");
 	}
 

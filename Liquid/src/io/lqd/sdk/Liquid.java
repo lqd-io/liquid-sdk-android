@@ -133,7 +133,6 @@ public class Liquid {
 		return mInstance;
 	}
 
-
 	public Liquid(Context context, String apiToken, boolean developmentMode) {
 		LiquidTools.checkForPermission(permission.INTERNET, context);
 		if (apiToken == null || apiToken.length() == 0) {
@@ -406,6 +405,21 @@ public class Liquid {
 				mDevice.setLocation(location);
 			}
 		});
+	}
+
+	/**
+	 * Add or update the GCM registration ID
+	 * @param id GCM identifier
+	 */
+	public void setGCMregistrationID(String id) {
+		mDevice.setPushId(id);
+	}
+
+	/**
+	 * Remove the GCM registration ID
+	 */
+	public void removeGCMregistrationID() {
+		mDevice.setPushId(null);
 	}
 
 	private void newSession(boolean runInCurrentThread) {
