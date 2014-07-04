@@ -72,7 +72,7 @@ public class LQNetwork {
 						connection.setDoOutput(true);
 						out = connection.getOutputStream();
 						bout = new BufferedOutputStream(out);
-						final StringEntity stringEntity = new StringEntity(json);
+						final StringEntity stringEntity = new StringEntity(json, "UTF-8");
 						stringEntity.writeTo(bout);
 						bout.close();
 						bout = null;
