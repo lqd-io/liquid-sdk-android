@@ -87,11 +87,11 @@ public class LQDevice {
 
 	public void setLocation(Location location) {
 		if (location == null) {
-			mAttributes.remove("_latitude");
-			mAttributes.remove("_longitude");
+			mAttributes.remove("latitude");
+			mAttributes.remove("longitude");
 		} else {
-			mAttributes.put("_latitude", Double.valueOf(location.getLatitude()));
-			mAttributes.put("_longitude",Double.valueOf(location.getLongitude()));
+			mAttributes.put("latitude", Double.valueOf(location.getLatitude()));
+			mAttributes.put("longitude",Double.valueOf(location.getLongitude()));
 		}
 	}
 
@@ -112,24 +112,24 @@ public class LQDevice {
 		if(mAttributes != null) {
 			attrs.putAll(mAttributes);
 		}
-		attrs.put("_vendor", mVendor);
+		attrs.put("vendor", mVendor);
 		attrs.put("platform", "Android");
-		attrs.put("_deviceModel", mDeviceModel);
+		attrs.put("device_model", mDeviceModel);
 		try {
-			attrs.put("_systemVersion", Integer.parseInt(mSystemVersion));
+			attrs.put("system_version", Integer.parseInt(mSystemVersion));
 		} catch (NumberFormatException e) {
-			attrs.put("_systemVersion", mSystemVersion);
+			attrs.put("system_version", mSystemVersion);
 		}
-		attrs.put("_deviceName", mDeviceName);
-		attrs.put("_screenSize", mScreenSize);
-		attrs.put("_carrier", mCarrier);
-		attrs.put("_internetConnectivity", mInternetConnectivity);
+		attrs.put("device_name", mDeviceName);
+		attrs.put("screen_size", mScreenSize);
+		attrs.put("carrier", mCarrier);
+		attrs.put("internet_connectivity", mInternetConnectivity);
 		attrs.put("unique_id", mUid);
-		attrs.put("_appBundle", mAppBundle);
-		attrs.put("_appName", mAppName);
-		attrs.put("_appVersion", mAppVersion);
-		attrs.put("_releaseVersion", mReleaseVersion);
-		attrs.put("_liquidVersion", mLiquidVersion);
+		attrs.put("app_bundle", mAppBundle);
+		attrs.put("app_name", mAppName);
+		attrs.put("app_version", mAppVersion);
+		attrs.put("release_version", mReleaseVersion);
+		attrs.put("liquid_version", mLiquidVersion);
 
 		JSONObject json = new JSONObject();
 		try {
