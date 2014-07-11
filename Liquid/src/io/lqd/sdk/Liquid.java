@@ -641,7 +641,7 @@ public class Liquid {
 	 *            Name of the event.
 	 */
 	public void track(String eventName) {
-		if (LQEvent.hasvalidName(eventName)) {
+		if (LQEvent.hasvalidName(eventName, isDevelopmentMode)) {
 			track(eventName, null, UniqueTime.newDate());
 		} else {
 			LQLog.warning("Event can't begin with \' _ \' character ");
@@ -662,10 +662,8 @@ public class Liquid {
 	 *            Additional attributes of the event.
 	 */
 	public void track(String eventName, HashMap<String, Object> attributes) {
-		if (LQEvent.hasvalidName(eventName)) {
+		if (LQEvent.hasvalidName(eventName, isDevelopmentMode)) {
 			track(eventName, attributes, UniqueTime.newDate());
-		} else {
-			LQLog.warning("Event can't begin with \' _ \' character ");
 		}
 	}
 

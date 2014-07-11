@@ -71,7 +71,11 @@ public class LQEvent extends LQModel {
 		return null;
 	}
 
-	public static boolean hasvalidName(String name) {
-		return name == null || name.length() == 0 || name.charAt(0) != '_';
+	public static boolean hasvalidName(String name, boolean raiseException) {
+		boolean isValid = name == null || name.length() == 0 || name.charAt(0) != '_';
+		if(!isValid) {
+			LiquidTools.exceptionOrLog(raiseException, "Event can't begin with \' _ \' character ");
+		}
+		return isValid;
 	}
 }

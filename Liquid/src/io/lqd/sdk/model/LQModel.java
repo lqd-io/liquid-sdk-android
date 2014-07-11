@@ -46,12 +46,10 @@ public abstract class LQModel implements Serializable {
 	 */
 	public static boolean validKey(String key, boolean raiseException) {
 		boolean isValid = (!key.contains("$") && !key.contains(".") && !key.contains("\0"));
-		if(isValid) {
-			return isValid;
-		} else {
+		if(!isValid) {
 			LiquidTools.exceptionOrLog(raiseException, "Key: (" + key + ") contains invalid chars: (. $ \\0)");
-			return isValid;
 		}
+		return isValid;
 	}
 
 	/**
@@ -64,12 +62,10 @@ public abstract class LQModel implements Serializable {
 		boolean isValid = ((attribute == null) || (attribute instanceof String) ||
 				(attribute instanceof Number) || (attribute instanceof Boolean) ||
 				(attribute instanceof Date));
-		if(isValid) {
-			return isValid;
-		} else {
+		if(!isValid) {
 			LiquidTools.exceptionOrLog(raiseException, "Key: (" + attribute + ") contains invalid chars: (. $ \\0)");
-			return isValid;
 		}
+		return isValid;
 	}
 
 	public static HashMap<String, Object> sanitizeAttributes(HashMap<String, Object> attributes, boolean raiseException) {
