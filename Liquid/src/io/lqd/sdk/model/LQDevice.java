@@ -97,9 +97,9 @@ public class LQDevice {
 
 	public void setPushId(String id) {
 		if(id == null || id.equals("")) {
-			mAttributes.remove("_pushToken");
+			mAttributes.remove("push_token");
 		} else {
-			mAttributes.put("_pushToken", id);
+			mAttributes.put("push_token", id);
 		}
 	}
 

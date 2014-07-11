@@ -16,39 +16,68 @@
 
 package io.lqd.sdk.model;
 
-import java.io.Serializable;
+import io.lqd.sdk.LQLog;
 
-public class LQQueue implements Serializable {
+import java.util.ArrayList;
+
+import android.content.Context;
+
+public class LQQueue extends LQModel {
 
 	private static final long serialVersionUID = 7456534930025458866L;
-	private String _url;
-	private String _httpMethod;
-	private String _json;
-	private int _numberOfTries;
+	private String mUrl;
+	private String mHttpMethod;
+	private String mJson;
+	private int mNumberOfTries;
 
 	// Initialization
 	public LQQueue(String url, String httpMethod, String json){
-		_url = url;
-		_httpMethod = httpMethod;
-		_json = json;
-		_numberOfTries = 0;
+		mUrl = url;
+		mHttpMethod = httpMethod;
+		mJson = json;
+		mNumberOfTries = 0;
 	}
 
 	// Getters
-	public String getUrl(){
-		return _url;
+	public String getUrl() {
+		return mUrl;
 	}
-	public String getHttpMethod(){
-		return _httpMethod;
+	public String getHttpMethod() {
+		return mHttpMethod;
 	}
 	public String getJSON(){
-		return _json;
+		return mJson;
 	}
-	public int getNumberOfTries(){
-		return _numberOfTries;
+	public int getNumberOfTries() {
+		return mNumberOfTries;
 	}
 
-	public void incrementNumberOfTries(){
-		_numberOfTries++;
+	public void incrementNumberOfTries() {
+		mNumberOfTries++;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		return (o instanceof LQQueue) &&
+				((LQQueue)o).getHttpMethod().equals(this.getHttpMethod()) &&
+				((LQQueue)o).getUrl().equals(this.getUrl()) &&
+				((LQQueue)o).getJSON().equals(this.getJSON());
+	}
+
+	// File Management
+	@SuppressWarnings("unchecked")
+	public static ArrayList<LQQueue> loadQueue(Context context, String fileName) {
+		Object result = LQModel.loadObject(context, fileName + ".queue");
+		ArrayList<LQQueue> queue = (ArrayList<LQQueue>) result;
+		if (queue == null) {
+			queue = new ArrayList<LQQueue>();
+		}
+		LQLog.infoVerbose("Loading queue with " + queue.size() + " items from disk");
+		return queue;
+	}
+
+	public static void saveQueue(Context context, ArrayList<LQQueue> queue, String fileName) {
+		LQLog.data("Saving queue with " + queue.size() + " items to disk");
+		LQModel.save(context, fileName + ".queue", queue);
 	}
 }

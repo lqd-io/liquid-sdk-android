@@ -83,4 +83,12 @@ public class LiquidTools {
 		return sharedPrefs.getString("io.lqd."+ key, null);
 	}
 
+	public static void exceptionOrLog(boolean raiseException, String message) {
+		if(raiseException) {
+			throw new IllegalArgumentException(message);
+		} else {
+			LQLog.warning(message);
+		}
+	}
+
 }

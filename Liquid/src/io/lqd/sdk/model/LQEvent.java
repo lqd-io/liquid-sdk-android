@@ -49,12 +49,10 @@ public class LQEvent extends LQModel {
 	}
 
 	// JSON
-	public JSONObject toJSON(){
+	public JSONObject toJSON() {
 		JSONObject json = new JSONObject();
 		try {
-			json.put("name", mName);
-			json.put("date",LiquidTools.dateToString(mDate));
-			if(mAttributes != null){
+			if(mAttributes != null) {
 				for(String key : mAttributes.keySet()){
 					if(mAttributes.get(key) instanceof Date) {
 						json.put(key, LiquidTools.dateToString((Date) mAttributes.get(key)));
@@ -63,11 +61,17 @@ public class LQEvent extends LQModel {
 					}
 				}
 			}
+			json.put("name", mName);
+			json.put("date",LiquidTools.dateToString(mDate));
 			return json;
 		} catch (JSONException e) {
 			LQLog.error("LQEvent toJSON: " + e.getMessage());
 		}
 
 		return null;
+	}
+
+	public static boolean hasvalidName(String name) {
+		return name == null || name.length() == 0 || name.charAt(0) != '_';
 	}
 }

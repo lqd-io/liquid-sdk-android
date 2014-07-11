@@ -25,6 +25,7 @@ import java.util.HashMap;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
 import android.location.Location;
 
 public class LQUser extends LQModel {
@@ -32,10 +33,23 @@ public class LQUser extends LQModel {
 	private static final long serialVersionUID = 1582937331182018907L;
 
 	private String mIdentifier;
+	private boolean mAutoIdentified;
 	private HashMap<String, Object> mAttributes;
 
-	// Initializer
-	public LQUser(String identifier, HashMap<String, Object> attributes,Location location) {
+
+	public LQUser(String identifier) {
+		this(identifier, new HashMap<String,Object>(), null);
+	}
+
+	public LQUser(String identifier, boolean autoIdentified) {
+		this(identifier, new HashMap<String,Object>(), null, autoIdentified);
+	}
+
+	public LQUser(String identifier, HashMap<String, Object> attributes, Location location) {
+		this(identifier, attributes, location, false);
+	}
+
+	public LQUser(String identifier, HashMap<String, Object> attributes, Location location, boolean autoIdentified) {
 		mIdentifier = identifier;
 		if (attributes == null) {
 			mAttributes = new HashMap<String, Object>();
@@ -44,6 +58,7 @@ public class LQUser extends LQModel {
 			mAttributes = attributes;
 		}
 		this.setLocation(location);
+		this.setAutoIdentified(autoIdentified);
 	}
 
 	// Attributes
@@ -51,15 +66,29 @@ public class LQUser extends LQModel {
 		return mIdentifier;
 	}
 
+	public boolean isAutoIdentified() {
+		return mAutoIdentified;
+	}
+
+	public void setAutoIdentified(boolean mAutoIdentified) {
+		this.mAutoIdentified = mAutoIdentified;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		return (o instanceof LQUser) && ( this.toJSON().toString().equals(((LQUser) o).toJSON().toString()));
+	}
+
 	public HashMap<String, Object> getAttributes() {
 		return new HashMap<>(mAttributes);
 	}
 
-	public Object setAttribute(Object attribute, String key) {
-		if(hasInvalidChars(key)) {
-			return mAttributes.put(key, attribute);
-		}
-		return null;
+	public void setAttributes(HashMap<String, Object> attributes) {
+		mAttributes = attributes;
+	}
+
+	public Object setAttribute(String key, Object attribute) {
+		return mAttributes.put(key, attribute);
 	}
 
 	public Object attributeForKey(String key) {
@@ -80,8 +109,7 @@ public class LQUser extends LQModel {
 	public JSONObject toJSON() {
 		JSONObject json = new JSONObject();
 		try {
-			json.put("unique_id", mIdentifier);
-			if(mAttributes != null){
+			if(mAttributes != null) {
 				for(String key : mAttributes.keySet()) {
 					if(mAttributes.get(key) instanceof Date) {
 						json.put(key, LiquidTools.dateToString((Date) mAttributes.get(key)));
@@ -90,11 +118,26 @@ public class LQUser extends LQModel {
 					}
 				}
 			}
+			json.put("unique_id", mIdentifier);
+			json.put("auto_identified", mAutoIdentified);
 			return json;
 		} catch (JSONException e) {
 			LQLog.error("LQUser toJSON: " + e.getMessage());
 		}
 		return null;
+	}
+
+	@Override
+	public void save(Context context, String path) {
+		super.save(context, path + ".user");
+	}
+
+	public static LQUser load(Context context, String path) {
+		LQUser user = (LQUser) LQModel.load(context, path + ".user");
+		if(user == null) {
+			user = new LQUser(LQDevice.getDeviceID(context));
+		}
+		return user;
 	}
 
 }

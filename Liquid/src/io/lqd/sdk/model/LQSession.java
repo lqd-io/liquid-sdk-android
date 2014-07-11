@@ -19,9 +19,7 @@ package io.lqd.sdk.model;
 import io.lqd.sdk.LQLog;
 import io.lqd.sdk.LiquidTools;
 
-import java.util.Calendar;
 import java.util.Date;
-import java.util.UUID;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,7 +34,7 @@ public class LQSession extends LQModel {
 	private int mTimeout;
 
 	public LQSession(int timeout, Date date) {
-		mId = LQSession.newSessionIdentifier();
+		mId = LQModel.newIdentifier();
 		mTimeout = timeout;
 		mEnd = null;
 		mStart = date;
@@ -76,14 +74,5 @@ public class LQSession extends LQModel {
 			LQLog.error("LQSession toJSON: " + e.getMessage());
 		}
 		return null;
-	}
-
-	// Session Identifier Generator
-	public static String newSessionIdentifier(){
-		UUID uid = UUID.randomUUID();
-		String uidStr = uid.toString();
-		uidStr = uidStr.replace("-", "");
-		long timeSince1970 = Calendar.getInstance().getTimeInMillis();
-		return uidStr.substring(0, 16) + "" + timeSince1970;
 	}
 }
