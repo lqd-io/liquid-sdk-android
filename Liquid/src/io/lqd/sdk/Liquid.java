@@ -21,17 +21,14 @@ import io.lqd.sdk.model.LQDevice;
 import io.lqd.sdk.model.LQEvent;
 import io.lqd.sdk.model.LQLiquidPackage;
 import io.lqd.sdk.model.LQModel;
-import io.lqd.sdk.model.LQQueue;
+import io.lqd.sdk.model.LQNetworkRequest;
 import io.lqd.sdk.model.LQSession;
 import io.lqd.sdk.model.LQUser;
 import io.lqd.sdk.model.LQValue;
 import io.lqd.sdk.model.LQVariable;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -56,24 +53,17 @@ public class Liquid {
 
 	static final String TAG_LIQUID = "LIQUID";
 
-	private static final String LIQUID_SERVER_URL = "https://api.lqd.io/collect/";
-	protected static final String LIQUID_VERSION = "0.7.0-beta";
-	private static final int LIQUID_QUEUE_SIZE_LIMIT = 500;
-	private static final int LIQUID_DEFAULT_FLUSH_INTERVAL = 15;
-	private static final int LIQUID_MAX_NUMBER_OF_TRIES = 10;
-	private static final int LIQUID_DEFAULT_SESSION_TIMEOUT = 10;
+	public static final String LIQUID_VERSION = "0.7.0-beta";
+	private static final int LIQUID_DEFAULT_SESSION_TIMEOUT = 30;
 
 	private static int mSessionTimeout;
-	private static String mApiToken;
+	private String mApiToken;
 	private LQUser mCurrentUser;
 	private LQUser mPreviousUser;
 	private LQDevice mDevice;
 	private LQSession mCurrentSession;
 	private Date mEnterBackgroundtime;
-	private ExecutorService mQueue;
-	private Timer mTimer;
-	private ArrayList<LQQueue> mHttpQueue;
-	private int mFlushInterval;
+	protected ExecutorService mQueue;
 	private boolean mAutoLoadValues;
 	private boolean mFlushOnBackground = true;
 	private Context mContext;
@@ -83,8 +73,8 @@ public class Liquid {
 	private HashMap<String, Activity> mAttachedActivities = new HashMap<String, Activity>();
 	private HashMap<String, LiquidOnEventListener> mListeners = new HashMap<String, LiquidOnEventListener>();
 	private boolean mNeedCallbackCall = false;
-	private LQNetwork mNetwork;
-	private boolean isDevelopmentMode = false;
+	private LQQueuer mHttpQueuer;
+	private boolean isDevelopmentMode;
 
 	/**
 	 * Retrieves the Liquid shared instance.
@@ -144,7 +134,7 @@ public class Liquid {
 		return mInstance;
 	}
 
-	public Liquid(Context context, String apiToken, boolean developmentMode) {
+	private Liquid(Context context, String apiToken, boolean developmentMode) {
 		LiquidTools.checkForPermission(permission.INTERNET, context);
 		if (apiToken == null || apiToken.length() == 0) {
 			throw new IllegalArgumentException("Your API Token is invalid: \'"
@@ -155,17 +145,13 @@ public class Liquid {
 			attachActivityCallbacks();
 		}
 		mSessionTimeout = LIQUID_DEFAULT_SESSION_TIMEOUT;
-		mHttpQueue = new ArrayList<LQQueue>();
 		mApiToken = apiToken;
 		mDevice = new LQDevice(context, LIQUID_VERSION);
 		mQueue = Executors.newSingleThreadExecutor();
-		mFlushInterval = LIQUID_DEFAULT_FLUSH_INTERVAL;
 		mAppliedLiquidPackage = new LQLiquidPackage();
-		startFlushTimer();
+		mHttpQueuer = new LQQueuer(mContext, mApiToken, LQNetworkRequest.loadQueue(mContext, mApiToken));
+		mHttpQueuer.startFlushTimer();
 		isDevelopmentMode = developmentMode;
-		mNetwork = new LQNetwork(mApiToken, mSessionTimeout);
-
-		mHttpQueue = LQQueue.loadQueue(mContext, mApiToken);
 
 		// Get last user and init session
 		mPreviousUser = LQUser.load(mContext, mApiToken);
@@ -290,10 +276,8 @@ public class Liquid {
 	 * @param flushInterval
 	 *            value in seconds.
 	 */
-	public synchronized void setFlushInterval(int flushInterval) {
-		stopFlushTimer();
-		mFlushInterval = flushInterval;
-		startFlushTimer();
+	public void setFlushInterval(int flushInterval) {
+		mHttpQueuer.setFlushTimer(flushInterval);
 	}
 
 	/**
@@ -301,12 +285,8 @@ public class Liquid {
 	 * 
 	 * @return value in seconds of the flush interval.
 	 */
-	public synchronized int getFlushInterval() {
-		return mFlushInterval;
-	}
-
-	public void setNetwork(LQNetwork net) {
-		mNetwork = net;
+	public int getFlushInterval() {
+		return mHttpQueuer.getFlushTimer();
 	}
 
 	/*
@@ -328,14 +308,7 @@ public class Liquid {
 		mQueue.execute(new Runnable() {
 			@Override
 			public void run() {
-				String endPoint = LIQUID_SERVER_URL + "users/" + oldID
-						+ "/alias";
-				JSONObject params = new JSONObject();
-				try {
-					params.put("new_user_id", newID);
-				} catch (JSONException e) {
-				}
-				addToHttpQueue(params.toString(), endPoint, "POST");
+				mHttpQueuer.addToHttpQueue(LQRequestFactory.createAliasRequest(oldID, newID));
 			}
 		});
 	}
@@ -692,8 +665,7 @@ public class Liquid {
 						finalSession, event, mAppliedLiquidPackage.getValues(),
 						finalDate);
 				LQLog.data(dataPoint.toJSON());
-				String endPoint = LIQUID_SERVER_URL + "data_points";
-				addToHttpQueue(dataPoint.toJSON(), endPoint, "POST");
+				mHttpQueuer.addToHttpQueue(LQRequestFactory.createDataPointRequest(dataPoint));
 			}
 		});
 	}
@@ -817,12 +789,12 @@ public class Liquid {
 
 	private void activityResumedCallback(Activity activity) {
 		mInstance.attachActivity(activity);
-		startFlushTimer();
+		mHttpQueuer.startFlushTimer();
 	}
 
 	private void activityPausedCallback(Activity activity) {
 		mInstance.detachActivity(activity);
-		stopFlushTimer();
+		mHttpQueuer.stopFlushTimer();
 	}
 
 
@@ -879,11 +851,8 @@ public class Liquid {
 			mQueue.execute(new Runnable() {
 				@Override
 				public void run() {
-					String endPoint = LIQUID_SERVER_URL + "users/"
-							+ mCurrentUser.getIdentifier() + "/devices/"
-							+ mDevice.getUID() + "/liquid_package";
-					String dataFromServer = mNetwork.httpConnectionTo(null,
-							endPoint, "GET");
+					LQNetworkRequest req = LQRequestFactory.requestLiquidPackageRequest(mCurrentUser.getIdentifier(), mDevice.getUID());
+					String dataFromServer = req.httpConnectionTo(mApiToken).getRequestResponse();
 					if (dataFromServer != null) {
 						try {
 							JSONObject jsonObject = new JSONObject(
@@ -1148,15 +1117,6 @@ public class Liquid {
 		return fallbackValue;
 	}
 
-	// Queueing
-	private void addToHttpQueue(String json, String endPoint, String httpMethod) {
-		LQQueue queuedEvent = new LQQueue(endPoint, httpMethod, json);
-		mHttpQueue.add(queuedEvent);
-		if (mHttpQueue.size() > LIQUID_QUEUE_SIZE_LIMIT) {
-			mHttpQueue.remove(0);
-		}
-		LQQueue.saveQueue(mContext, mHttpQueue, mApiToken);
-	}
 
 	/**
 	 * Force Liquid to send locally saved data.
@@ -1166,28 +1126,7 @@ public class Liquid {
 		mQueue.execute(new Runnable() {
 			@Override
 			public void run() {
-				if (LiquidTools.isNetworkAvailable(mContext)) {
-					ArrayList<LQQueue> failedQueue = new ArrayList<LQQueue>();
-					while (mHttpQueue.size() > 0) {
-						LQQueue queuedHttp = mHttpQueue.get(0);
-						// LQLog.infoVerbose("Flushing " +
-						// queuedHttp.getJSON());
-						String result = mNetwork.httpConnectionTo(
-								queuedHttp.getJSON(), queuedHttp.getUrl(),
-								queuedHttp.getHttpMethod());
-						mHttpQueue.remove(queuedHttp);
-						if (result == null) {
-							LQLog.http("Could not send data to server"
-									+ queuedHttp.toString());
-							if (queuedHttp.getNumberOfTries() < LIQUID_MAX_NUMBER_OF_TRIES) {
-								queuedHttp.incrementNumberOfTries();
-								failedQueue.add(queuedHttp);
-							}
-						}
-					}
-					mHttpQueue.addAll(failedQueue);
-					LQQueue.saveQueue(mContext, mHttpQueue, mApiToken);
-				}
+				mHttpQueuer.flush();
 			}
 		});
 	}
@@ -1197,48 +1136,10 @@ public class Liquid {
 
 			@Override
 			public void run() {
-				String httpResult = null;
 				LQLog.infoVerbose("Sending bundle variable " + variable);
-				httpResult = mNetwork.httpConnectionTo(variable.toString(),
-						LIQUID_SERVER_URL + "variables", "POST");
-
-				if (httpResult == null) {
-					LQLog.http("Server did not accept data from " + variable);
-				}
-
+				mHttpQueuer.addToHttpQueue(LQRequestFactory.createVariableRequest(variable));
 			}
 		});
-	}
-
-	// Timers
-	private void startFlushTimer() {
-		if (mFlushInterval <= 0) {
-			return;
-		}
-		if (mTimer != null) {
-			return;
-		}
-		mTimer = new Timer();
-		final Liquid instance = this;
-		TimerTask task = new TimerTask() {
-
-			@Override
-			public void run() {
-				instance.flush();
-
-			}
-		};
-		mTimer.scheduleAtFixedRate(task, 0,
-				LIQUID_DEFAULT_FLUSH_INTERVAL * 1000);
-		LQLog.infoVerbose("Started flush timer");
-	}
-
-	private void stopFlushTimer() {
-		if (mTimer != null) {
-			mTimer.cancel();
-			mTimer = null;
-			LQLog.infoVerbose("Stopped flush timer");
-		}
 	}
 
 	/**
@@ -1250,6 +1151,7 @@ public class Liquid {
 	 */
 	public void reset() {
 		mQueue.execute(new Runnable() {
+
 			@Override
 			public void run() {
 				mCurrentUser = null;
@@ -1257,10 +1159,9 @@ public class Liquid {
 				mDevice = null;
 				mApiToken = null;
 				mEnterBackgroundtime = null;
-				mTimer = null;
 				mAppliedLiquidPackage = null;
 				mAppliedValues = null;
-				mHttpQueue = new ArrayList<LQQueue>();
+				mHttpQueuer = new LQQueuer(mContext, mApiToken);
 			}
 		});
 	}
