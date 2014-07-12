@@ -33,7 +33,7 @@ public class LQUser extends LQModel {
 	private static final long serialVersionUID = 1582937331182018907L;
 
 	private String mIdentifier;
-	private boolean mAutoIdentified;
+	private boolean mIdentified;
 	private HashMap<String, Object> mAttributes;
 
 
@@ -41,15 +41,15 @@ public class LQUser extends LQModel {
 		this(identifier, new HashMap<String,Object>(), null);
 	}
 
-	public LQUser(String identifier, boolean autoIdentified) {
-		this(identifier, new HashMap<String,Object>(), null, autoIdentified);
+	public LQUser(String identifier, boolean identified) {
+		this(identifier, new HashMap<String,Object>(), null, identified);
 	}
 
 	public LQUser(String identifier, HashMap<String, Object> attributes, Location location) {
-		this(identifier, attributes, location, false);
+		this(identifier, attributes, location, true);
 	}
 
-	public LQUser(String identifier, HashMap<String, Object> attributes, Location location, boolean autoIdentified) {
+	public LQUser(String identifier, HashMap<String, Object> attributes, Location location, boolean identified) {
 		mIdentifier = identifier;
 		if (attributes == null) {
 			mAttributes = new HashMap<String, Object>();
@@ -58,7 +58,7 @@ public class LQUser extends LQModel {
 			mAttributes = attributes;
 		}
 		this.setLocation(location);
-		this.setAutoIdentified(autoIdentified);
+		this.setIdentified(identified);
 	}
 
 	// Attributes
@@ -66,12 +66,12 @@ public class LQUser extends LQModel {
 		return mIdentifier;
 	}
 
-	public boolean isAutoIdentified() {
-		return mAutoIdentified;
+	public boolean isIdentified() {
+		return mIdentified;
 	}
 
-	public void setAutoIdentified(boolean mAutoIdentified) {
-		this.mAutoIdentified = mAutoIdentified;
+	public void setIdentified(boolean mAutoIdentified) {
+		this.mIdentified = mAutoIdentified;
 	}
 
 	@Override
@@ -119,7 +119,7 @@ public class LQUser extends LQModel {
 				}
 			}
 			json.put("unique_id", mIdentifier);
-			json.put("auto_identified", mAutoIdentified);
+			json.put("identified", mIdentified);
 			return json;
 		} catch (JSONException e) {
 			LQLog.error("LQUser toJSON: " + e.getMessage());
@@ -135,7 +135,7 @@ public class LQUser extends LQModel {
 	public static LQUser load(Context context, String path) {
 		LQUser user = (LQUser) LQModel.load(context, path + ".user");
 		if(user == null) {
-			user = new LQUser(LQDevice.getDeviceID(context));
+			user = new LQUser(LQDevice.getDeviceID(context), false);
 		}
 		return user;
 	}

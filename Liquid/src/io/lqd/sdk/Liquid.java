@@ -157,7 +157,7 @@ public class Liquid {
 		mPreviousUser = LQUser.load(mContext, mApiToken);
 		identifyUser(mPreviousUser.getIdentifier(),
 				mPreviousUser.getAttributes(), null,
-				mPreviousUser.isAutoIdentified(), false);
+				mPreviousUser.isIdentified(), false);
 
 		LQLog.info("Initialized Liquid with API Token " + apiToken);
 	}
@@ -298,7 +298,7 @@ public class Liquid {
 	public void alias() {
 		final String oldID = mPreviousUser.getIdentifier();
 		final String newID = mCurrentUser.getIdentifier();
-		if (!mPreviousUser.isAutoIdentified()) {
+		if (mPreviousUser.isIdentified()) {
 			LQLog.warning("Can't alias (" + oldID
 					+ "): Isn't an anonymous user.");
 			return;
@@ -327,7 +327,7 @@ public class Liquid {
 	 */
 	public void resetUser() {
 		String automaticIdentifier = LQModel.newIdentifier();
-		identifyUser(automaticIdentifier, null, null, true, false);
+		identifyUser(automaticIdentifier, null, null, false, false);
 	}
 
 	/**
@@ -337,7 +337,7 @@ public class Liquid {
 	 *            Custom UUID.
 	 */
 	public void identifyUser(String identifier) {
-		identifyUser(identifier, null, null, false, true);
+		identifyUser(identifier, null, null, true, true);
 	}
 
 	/**
@@ -349,7 +349,7 @@ public class Liquid {
 	 *            user is anonymous.
 	 */
 	public void identifyUser(String identifier, boolean alias) {
-		identifyUser(identifier, null, null, false, alias);
+		identifyUser(identifier, null, null, true, alias);
 	}
 
 	/**
@@ -362,7 +362,7 @@ public class Liquid {
 	 */
 	public void identifyUser(String identifier,
 			HashMap<String, Object> attributes) {
-		identifyUser(identifier, attributes, null, false, true);
+		identifyUser(identifier, attributes, null, true, true);
 	}
 
 	/**
@@ -378,7 +378,7 @@ public class Liquid {
 	 */
 	public void identifyUser(String identifier,
 			HashMap<String, Object> attributes, boolean alias) {
-		identifyUser(identifier, attributes, null, false, alias);
+		identifyUser(identifier, attributes, null, true, alias);
 	}
 
 	/**
@@ -393,11 +393,11 @@ public class Liquid {
 	 */
 	@Deprecated
 	public void identifyUser(String identifier, Location location) {
-		identifyUser(identifier, null, location, false, true);
+		identifyUser(identifier, null, location, true, true);
 	}
 
 	public void identifyUser(String identifier, Location location, boolean alias) {
-		identifyUser(identifier, null, location, false, alias);
+		identifyUser(identifier, null, location, true, alias);
 	}
 
 	/**
@@ -415,17 +415,17 @@ public class Liquid {
 	@Deprecated
 	public void identifyUser(String identifier,
 			HashMap<String, Object> attributes, Location location) {
-		identifyUser(identifier, attributes, location, false, true);
+		identifyUser(identifier, attributes, location, true, true);
 	}
 
 	public void identifyUser(String identifier,
 			HashMap<String, Object> attributes, Location location, boolean alias) {
-		identifyUser(identifier, attributes, location, false, alias);
+		identifyUser(identifier, attributes, location, true, alias);
 	}
 
 	private void identifyUser(String identifier,
 			HashMap<String, Object> attributes, Location location,
-			boolean autoIdentified, boolean alias) {
+			boolean identified, boolean alias) {
 		final String finalIdentifier = identifier;
 		final HashMap<String, Object> finalAttributes = LQModel
 				.sanitizeAttributes(attributes, isDevelopmentMode);
@@ -445,7 +445,7 @@ public class Liquid {
 
 		mPreviousUser = mCurrentUser;
 		mCurrentUser = new LQUser(finalIdentifier, finalAttributes,
-				finalLocation, autoIdentified);
+				finalLocation, identified);
 		newSession(true);
 		requestValues();
 		mCurrentUser.save(mContext, mApiToken);
