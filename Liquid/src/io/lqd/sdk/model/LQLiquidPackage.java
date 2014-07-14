@@ -140,7 +140,7 @@ public class LQLiquidPackage implements Serializable{
 		} catch (ClassNotFoundException e) {
 			LQLog.infoVerbose("Could not load liquid package from file");
 		}
-		return null;
+		return new LQLiquidPackage();
 	}
 
 }

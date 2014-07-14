@@ -68,7 +68,7 @@ public class Liquid {
 	private boolean mFlushOnBackground = true;
 	private Context mContext;
 	private static Liquid mInstance;
-	private LQLiquidPackage mAppliedLiquidPackage;
+	private LQLiquidPackage mLoadedLiquidPackage;
 	private HashMap<String, LQValue> mAppliedValues;
 	private HashMap<String, Activity> mAttachedActivities = new HashMap<String, Activity>();
 	private HashMap<String, LiquidOnEventListener> mListeners = new HashMap<String, LiquidOnEventListener>();
@@ -148,7 +148,7 @@ public class Liquid {
 		mApiToken = apiToken;
 		mDevice = new LQDevice(context, LIQUID_VERSION);
 		mQueue = Executors.newSingleThreadExecutor();
-		mAppliedLiquidPackage = new LQLiquidPackage();
+		mLoadedLiquidPackage = LQLiquidPackage.loadFromDisk(mContext);
 		mHttpQueuer = new LQQueuer(mContext, mApiToken, LQNetworkRequest.loadQueue(mContext, mApiToken));
 		mHttpQueuer.startFlushTimer();
 		isDevelopmentMode = developmentMode;
@@ -662,7 +662,7 @@ public class Liquid {
 				LQEvent event = new LQEvent(finalEventName, finalAttributes,
 						finalDate);
 				LQDataPoint dataPoint = new LQDataPoint(finalUser, finalDevice,
-						finalSession, event, mAppliedLiquidPackage.getValues(),
+						finalSession, event, mLoadedLiquidPackage.getValues(),
 						finalDate);
 				LQLog.data(dataPoint.toJSON().toString());
 				mHttpQueuer.addToHttpQueue(LQRequestFactory.createDataPointRequest(dataPoint));
@@ -769,10 +769,10 @@ public class Liquid {
 			track("_pauseSession", null, UniqueTime.newDate());
 			mEnterBackgroundtime = UniqueTime.newDate();
 			flush();
+			requestValues();
 		} else {
 			mEnterBackgroundtime = null;
 		}
-		requestValues();
 	}
 
 	private void activityStartedCallback(Activity activity) {
@@ -781,10 +781,7 @@ public class Liquid {
 			mNeedCallbackCall = false;
 			notifyListeners(false);
 		}
-		loadLiquidPackage(true);
-
 		checkSessionTimeout();
-		loadLiquidPackage(true);
 	}
 
 	private void activityResumedCallback(Activity activity) {
@@ -911,17 +908,8 @@ public class Liquid {
 		Runnable runnable = new Runnable() {
 			@Override
 			public void run() {
-				LQLiquidPackage liquidPackage = LQLiquidPackage
-						.loadFromDisk(mContext);
-
-				if (liquidPackage != null) {
-					mAppliedLiquidPackage = liquidPackage;
-					mAppliedValues = LQValue
-							.convertValuesToHashMap(liquidPackage.getValues());
-				} else {
-					mAppliedLiquidPackage = new LQLiquidPackage();
-					mAppliedValues = new HashMap<String, LQValue>();
-				}
+				mLoadedLiquidPackage = LQLiquidPackage.loadFromDisk(mContext);
+				mAppliedValues = LQValue.convertValuesToHashMap(mLoadedLiquidPackage.getValues());
 				notifyListeners(false);
 			}
 		};
@@ -1159,7 +1147,7 @@ public class Liquid {
 				mDevice = null;
 				mApiToken = null;
 				mEnterBackgroundtime = null;
-				mAppliedLiquidPackage = null;
+				mLoadedLiquidPackage = null;
 				mAppliedValues = null;
 				mHttpQueuer = new LQQueuer(mContext, mApiToken);
 			}
@@ -1171,7 +1159,7 @@ public class Liquid {
 
 			@Override
 			public void run() {
-				mAppliedLiquidPackage.saveToDisk(mContext);
+				mLoadedLiquidPackage.saveToDisk(mContext);
 
 			}
 		};
@@ -1181,12 +1169,12 @@ public class Liquid {
 			@Override
 			public void run() {
 				LQLog.infoVerbose("invalidating: " + variableKey);
-				boolean removed = mAppliedLiquidPackage
+				boolean removed = mLoadedLiquidPackage
 						.invalidateTargetFromVariableKey(variableKey);
 				if (removed) {
 					LQLog.infoVerbose("invalidated: " + variableKey);
 					mAppliedValues = LQValue
-							.convertValuesToHashMap(mAppliedLiquidPackage
+							.convertValuesToHashMap(mLoadedLiquidPackage
 									.getValues());
 					notifyListeners(false);
 					mQueue.execute(save);
