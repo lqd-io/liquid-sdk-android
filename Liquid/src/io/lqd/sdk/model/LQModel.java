@@ -41,11 +41,9 @@ public abstract class LQModel implements Serializable {
 	 * @return
 	 */
 	public static String newIdentifier() {
-		UUID uid = UUID.randomUUID();
-		String uidStr = uid.toString();
-		uidStr = uidStr.replace("-", "");
+		String uid = UUID.randomUUID().toString().toUpperCase();
 		long timeSince1970 = Calendar.getInstance().getTimeInMillis();
-		return uidStr.substring(0, 16) + "" + timeSince1970;
+		return uid + "-" + String.valueOf(timeSince1970).substring(0,10);
 	}
 
 	/*
