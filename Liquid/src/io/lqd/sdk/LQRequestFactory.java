@@ -45,7 +45,7 @@ public class LQRequestFactory {
 	}
 
 	public static LQNetworkRequest createDataPointRequest(LQDataPoint datapoint) {
-		return new LQNetworkRequest(LIQUID_DATAPOINT_URL, "POST", datapoint.toJSON());
+		return new LQNetworkRequest(LIQUID_DATAPOINT_URL, "POST", datapoint.toJSON().toString());
 	}
 
 	public static LQNetworkRequest requestLiquidPackageRequest(String userId, String userDevice) {

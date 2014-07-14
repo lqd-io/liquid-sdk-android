@@ -664,7 +664,7 @@ public class Liquid {
 				LQDataPoint dataPoint = new LQDataPoint(finalUser, finalDevice,
 						finalSession, event, mAppliedLiquidPackage.getValues(),
 						finalDate);
-				LQLog.data(dataPoint.toJSON());
+				LQLog.data(dataPoint.toJSON().toString());
 				mHttpQueuer.addToHttpQueue(LQRequestFactory.createDataPointRequest(dataPoint));
 			}
 		});

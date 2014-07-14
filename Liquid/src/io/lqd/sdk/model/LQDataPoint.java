@@ -49,7 +49,7 @@ public class LQDataPoint {
 	}
 
 	// JSON
-	public String toJSON() {
+	public JSONObject toJSON() {
 		JSONObject json = new JSONObject();
 		try {
 			JSONObject userJSON = mUser.toJSON();
@@ -85,11 +85,11 @@ public class LQDataPoint {
 			}
 
 			json.put("timestamp",LiquidTools.dateToString(mTimestamp));
-			return json.toString();
+			return json;
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		return "";
+		return new JSONObject();
 	}
 
 }
