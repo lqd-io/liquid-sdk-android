@@ -909,7 +909,7 @@ public class Liquid {
 			@Override
 			public void run() {
 				mLoadedLiquidPackage = LQLiquidPackage.loadFromDisk(mContext);
-				mAppliedValues = LQValue.convertValuesToHashMap(mLoadedLiquidPackage.getValues());
+				mAppliedValues = LQValue.convertToHashMap(mLoadedLiquidPackage.getValues());
 				notifyListeners(false);
 			}
 		};
@@ -1142,28 +1142,20 @@ public class Liquid {
 
 			@Override
 			public void run() {
-				mCurrentUser = null;
 				mCurrentSession = null;
-				mDevice = null;
-				mApiToken = null;
+				mDevice = new LQDevice(mContext, LIQUID_VERSION);
 				mEnterBackgroundtime = null;
-				mLoadedLiquidPackage = null;
-				mAppliedValues = null;
+				mLoadedLiquidPackage = new LQLiquidPackage();
+				mAppliedValues = new HashMap<String, LQValue>();
 				mHttpQueuer = new LQQueuer(mContext, mApiToken);
+				resetUser();
+				newSession(true);
 			}
 		});
 	}
 
+
 	private void invalidateVariables(final String variableKey) {
-		final Runnable save = new Runnable() {
-
-			@Override
-			public void run() {
-				mLoadedLiquidPackage.saveToDisk(mContext);
-
-			}
-		};
-
 		mQueue.execute(new Runnable() {
 
 			@Override
@@ -1174,10 +1166,10 @@ public class Liquid {
 				if (removed) {
 					LQLog.infoVerbose("invalidated: " + variableKey);
 					mAppliedValues = LQValue
-							.convertValuesToHashMap(mLoadedLiquidPackage
+							.convertToHashMap(mLoadedLiquidPackage
 									.getValues());
+					mLoadedLiquidPackage.saveToDisk(mContext);
 					notifyListeners(false);
-					mQueue.execute(save);
 				}
 			}
 		});

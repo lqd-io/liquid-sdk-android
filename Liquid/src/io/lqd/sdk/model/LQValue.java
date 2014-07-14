@@ -98,7 +98,7 @@ public class LQValue implements Serializable {
 		return null;
 	}
 
-	public static HashMap<String,LQValue> convertValuesToHashMap(ArrayList<LQValue> values){
+	public static HashMap<String,LQValue> convertToHashMap(ArrayList<LQValue> values){
 		HashMap<String,LQValue> hashMap = new HashMap<String, LQValue>();
 		for(LQValue value : values) {
 			if(value.getValue() != null){
