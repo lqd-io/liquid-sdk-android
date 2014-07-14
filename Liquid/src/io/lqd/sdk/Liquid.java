@@ -1134,10 +1134,21 @@ public class Liquid {
 	 * Reset all collected data that is stored locally.
 	 * 
 	 * <p>
-	 * This includes, user, device, token, values
+	 * This includes, user, device, session, values, events
 	 * </p>
 	 */
 	public void reset() {
+		reset(false);
+	}
+
+	/**
+	 * Same as reset but preserves the tracked events that aren't in Liquid Server.
+	 */
+	public void softReset() {
+		reset(true);
+	}
+
+	private void reset(final boolean soft) {
 		mQueue.execute(new Runnable() {
 
 			@Override
@@ -1147,13 +1158,13 @@ public class Liquid {
 				mEnterBackgroundtime = null;
 				mLoadedLiquidPackage = new LQLiquidPackage();
 				mAppliedValues = new HashMap<String, LQValue>();
-				mHttpQueuer = new LQQueuer(mContext, mApiToken);
+				if(!soft) {
+					mHttpQueuer = new LQQueuer(mContext, mApiToken);
+				}
 				resetUser();
-				newSession(true);
 			}
 		});
 	}
-
 
 	private void invalidateVariables(final String variableKey) {
 		mQueue.execute(new Runnable() {
