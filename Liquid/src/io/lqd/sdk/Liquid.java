@@ -65,7 +65,6 @@ public class Liquid {
 	private Date mEnterBackgroundtime;
 	protected ExecutorService mQueue;
 	private boolean mAutoLoadValues;
-	private boolean mFlushOnBackground = true;
 	private Context mContext;
 	private static Liquid mInstance;
 	private LQLiquidPackage mLoadedLiquidPackage;
@@ -249,25 +248,6 @@ public class Liquid {
 	 */
 	public void setSessionTimeout(int sessionTimeout) {
 		mSessionTimeout = sessionTimeout;
-	}
-
-	/**
-	 * Returns whether or not Liquid flushes in background
-	 * 
-	 * @return true if Liquid flushes in the background, otherwise false.
-	 */
-	public boolean canFlushOnBackground() {
-		return mFlushOnBackground;
-	}
-
-	/**
-	 * Set the Liquid behavior to flush in background.
-	 * 
-	 * @param flushOnBackground
-	 *            whether or not Liquid will flush in background.
-	 */
-	public void setFlushOnBackground(boolean flushOnBackground) {
-		mFlushOnBackground = flushOnBackground;
 	}
 
 	/**
