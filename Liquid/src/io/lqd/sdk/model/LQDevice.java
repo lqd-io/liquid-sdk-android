@@ -114,13 +114,13 @@ public class LQDevice {
 		}
 		attrs.put("vendor", mVendor);
 		attrs.put("platform", "Android");
-		attrs.put("device_model", mDeviceModel);
+		attrs.put("model", mDeviceModel);
 		try {
 			attrs.put("system_version", Integer.parseInt(mSystemVersion));
 		} catch (NumberFormatException e) {
 			attrs.put("system_version", mSystemVersion);
 		}
-		attrs.put("device_name", mDeviceName);
+		attrs.put("name", mDeviceName);
 		attrs.put("screen_size", mScreenSize);
 		attrs.put("carrier", mCarrier);
 		attrs.put("internet_connectivity", mInternetConnectivity);
