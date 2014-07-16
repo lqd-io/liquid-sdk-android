@@ -42,7 +42,6 @@ public class LQDevice {
 	private String mVendor;
 	private String mDeviceModel;
 	private String mSystemVersion;
-	private String mDeviceName;
 	private String mScreenSize;
 	private String mCarrier;
 	private String mInternetConnectivity;
@@ -63,7 +62,6 @@ public class LQDevice {
 		mVendor = LQDevice.getDeviceVendor();
 		mDeviceModel = LQDevice.getDeviceModel();
 		mSystemVersion = LQDevice.getSystemVersion();
-		mDeviceName = LQDevice.getDeviceName();
 		mScreenSize = LQDevice.getScreenSize(context);
 		mCarrier = LQDevice.getCarrier(context);
 		mInternetConnectivity = LQDevice.getInternetConnectivity(context);
@@ -120,7 +118,6 @@ public class LQDevice {
 		} catch (NumberFormatException e) {
 			attrs.put("system_version", mSystemVersion);
 		}
-		attrs.put("name", mDeviceName);
 		attrs.put("screen_size", mScreenSize);
 		attrs.put("carrier", mCarrier);
 		attrs.put("internet_connectivity", mInternetConnectivity);
@@ -166,11 +163,6 @@ public class LQDevice {
 		int width = display.getWidth(); // deprecated
 		int height = display.getHeight(); // deprecated
 		return width + "x" + height;
-	}
-
-	// cannot get device name on android
-	private static String getDeviceName() {
-		return "";
 	}
 
 	private static String getCarrier(Context context) {
