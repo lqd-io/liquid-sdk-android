@@ -135,7 +135,7 @@ public class LQUser extends LQModel {
 	public static LQUser load(Context context, String path) {
 		LQUser user = (LQUser) LQModel.load(context, path + ".user");
 		if(user == null) {
-			user = new LQUser(LQDevice.getDeviceID(context), false);
+			user = new LQUser(LQModel.newIdentifier(), false);
 		}
 		return user;
 	}

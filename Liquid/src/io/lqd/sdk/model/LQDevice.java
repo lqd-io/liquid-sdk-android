@@ -197,12 +197,12 @@ public class LQDevice {
 				"io.lqd.UUID", Context.MODE_PRIVATE);
 		uid = sharedPrefs.getString("io.lqd.UUID", null);
 		if (uid == null) {
-			uid = UUID.randomUUID().toString();
+			uid = LQModel.newIdentifier();
 			Editor editor = sharedPrefs.edit();
 			editor.putString("io.lqd.UUID", uid);
 			editor.commit();
 		}
-		return uid.replace("-", "");
+		return uid;
 	}
 
 	private static String getAppBundle(Context context) {
