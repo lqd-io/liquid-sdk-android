@@ -279,6 +279,10 @@ public class Liquid {
 	 * *******************
 	 */
 
+	public void setupPushNotifications(String senderID) {
+		LQPushHandler.registerDevice(mContext, senderID);
+	}
+
 	public void alias() {
 		final String oldID = mPreviousUser.getIdentifier();
 		final String newID = mCurrentUser.getIdentifier();
