@@ -20,7 +20,7 @@ import io.lqd.sdk.LQLog;
 import io.lqd.sdk.LiquidTools;
 
 import java.util.HashMap;
-import java.util.UUID;
+import java.util.Locale;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,6 +54,7 @@ public class LQDevice {
 	private HashMap<String, Object> mAttributes;
 
 	private Context mContext;
+	private String mSystemLanguage;
 
 	// Initialization
 	public LQDevice(Context context, String liquidVersion) {
@@ -71,6 +72,7 @@ public class LQDevice {
 		mAppVersion = LQDevice.getAppVersion(context);
 		mReleaseVersion = LQDevice.getReleaseVersion(context);
 		mLiquidVersion = liquidVersion;
+		mSystemLanguage = LQDevice.getSystemLanguage();
 	}
 
 	public LQDevice(Context context, String liquidVersion, Location location) {
@@ -127,6 +129,7 @@ public class LQDevice {
 		attrs.put("app_version", mAppVersion);
 		attrs.put("release_version", mReleaseVersion);
 		attrs.put("liquid_version", mLiquidVersion);
+		attrs.put("system_language", mSystemLanguage);
 
 		JSONObject json = new JSONObject();
 		try {
@@ -153,6 +156,10 @@ public class LQDevice {
 
 	private static String getSystemVersion() {
 		return String.valueOf(android.os.Build.VERSION.SDK_INT);
+	}
+
+	private static String getSystemLanguage() {
+		return Locale.getDefault().toString();
 	}
 
 	@SuppressWarnings("deprecation")
