@@ -38,7 +38,6 @@ public class LQRequestFactory {
 			json = new JSONObject().put("new_user_id", newId).toString();
 			return new LQNetworkRequest(url, "POST", json);
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}

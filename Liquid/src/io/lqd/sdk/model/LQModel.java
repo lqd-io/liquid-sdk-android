@@ -28,6 +28,7 @@ import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.UUID;
 
 import android.content.Context;
@@ -41,7 +42,7 @@ public abstract class LQModel implements Serializable {
 	 * @return
 	 */
 	public static String newIdentifier() {
-		String uid = UUID.randomUUID().toString().toUpperCase();
+		String uid = UUID.randomUUID().toString().toUpperCase(Locale.ENGLISH);
 		long timeSince1970 = Calendar.getInstance().getTimeInMillis();
 		return uid + "-" + String.valueOf(timeSince1970).substring(0,10);
 	}
