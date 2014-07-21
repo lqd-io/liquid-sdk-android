@@ -30,6 +30,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.http.entity.StringEntity;
@@ -43,7 +44,10 @@ public class LQNetworkRequest extends LQModel {
 
 	private static final long serialVersionUID = 7456534930025458866L;
 
-	private static final String USER_AGENT = "Liquid/"+ Liquid.LIQUID_VERSION + "(Android; Android " + Build.VERSION.RELEASE + ")";
+	private static final String LOCAL = Locale.getDefault().toString().toLowerCase();
+	private static final String DEVICE = Build.MANUFACTURER + " " + Build.MODEL;
+
+	private static final String USER_AGENT = "Liquid/"+ Liquid.LIQUID_VERSION + " (Android; Android " + Build.VERSION.RELEASE + "; " + LOCAL + "; " + DEVICE +")";
 	private String mUrl;
 	private String mHttpMethod;
 	private String mJson;
