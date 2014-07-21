@@ -459,20 +459,16 @@ public class Liquid {
 	 *            Attribute value
 	 */
 	public void setUserAttribute(String key, Object attribute) {
-		if (mCurrentUser == null) {
-			identifyUser();
-		} else {
-			if (LQModel.validKey(key, isDevelopmentMode)) {
-				final String finalKey = key;
-				final Object finalAttribute = attribute;
-				mQueue.execute(new Runnable() {
-					@Override
-					public void run() {
-						mCurrentUser.setAttribute(finalKey, finalAttribute);
-						mCurrentUser.save(mContext, mApiToken);
-					}
-				});
-			}
+		if (LQModel.validKey(key, isDevelopmentMode)) {
+			final String finalKey = key;
+			final Object finalAttribute = attribute;
+			mQueue.execute(new Runnable() {
+				@Override
+				public void run() {
+					mCurrentUser.setAttribute(finalKey, finalAttribute);
+					mCurrentUser.save(mContext, mApiToken);
+				}
+			});
 		}
 	}
 
@@ -485,18 +481,14 @@ public class Liquid {
 	 */
 	@Deprecated
 	public void setUserLocation(Location location) {
-		if (mCurrentUser == null) {
-			identifyUser();
-		} else {
-			final Location finalLocation = location;
-			mQueue.execute(new Runnable() {
-				@Override
-				public void run() {
-					mCurrentUser.setLocation(finalLocation);
-					mCurrentUser.save(mContext, mApiToken);
-				}
-			});
-		}
+
+		final Location finalLocation = location;
+		mQueue.execute(new Runnable() {
+			@Override
+			public void run() {
+				mCurrentUser.setLocation(finalLocation);
+			}
+		});
 	}
 
 	/**
@@ -538,9 +530,6 @@ public class Liquid {
 		Runnable newSessionRunnable = new Runnable() {
 			@Override
 			public void run() {
-				if (mCurrentUser == null) {
-					identifyUser();
-				}
 				mCurrentSession = new LQSession(mSessionTimeout, now);
 				track("_startSession", null, now);
 			}
@@ -622,13 +611,10 @@ public class Liquid {
 
 	private void track(String eventName, HashMap<String, Object> attributes,
 			Date date) {
-		LQLog.infoVerbose("Tracking: " + eventName);
-		if ((mCurrentUser == null) || (mCurrentSession == null)) {
-			identifyUser();
-		}
 		if ((eventName == null) || (eventName.length() == 0)) {
 			eventName = "unnamedEvent";
 		}
+		LQLog.infoVerbose("Tracking: " + eventName);
 		final String finalEventName = eventName;
 		final HashMap<String, Object> finalAttributes = LQModel
 				.sanitizeAttributes(attributes, isDevelopmentMode);
