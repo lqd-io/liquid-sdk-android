@@ -288,7 +288,7 @@ public class Liquid {
 		mQueue.execute(new Runnable() {
 			@Override
 			public void run() {
-				mHttpQueuer.addToHttpQueue(LQRequestFactory.createAliasRequest(oldID, newID));
+				LQRequestFactory.createAliasRequest(oldID, newID).sendRequest(mApiToken);
 			}
 		});
 	}
@@ -816,7 +816,7 @@ public class Liquid {
 				@Override
 				public void run() {
 					LQNetworkRequest req = LQRequestFactory.requestLiquidPackageRequest(mCurrentUser.getIdentifier(), mDevice.getUID());
-					String dataFromServer = req.httpConnectionTo(mApiToken).getRequestResponse();
+					String dataFromServer = req.sendRequest(mApiToken).getRequestResponse();
 					if (dataFromServer != null) {
 						try {
 							JSONObject jsonObject = new JSONObject(
@@ -1092,7 +1092,7 @@ public class Liquid {
 			@Override
 			public void run() {
 				LQLog.infoVerbose("Sending bundle variable " + variable);
-				LQRequestFactory.createVariableRequest(variable).httpConnectionTo(mApiToken);
+				LQRequestFactory.createVariableRequest(variable).sendRequest(mApiToken);
 			}
 		});
 	}

@@ -81,7 +81,7 @@ public class LQQueuer {
 				LQNetworkRequest queuedHttp = mHttpQueue.remove(0);
 				if (queuedHttp.canFlush(now)) {
 					LQLog.infoVerbose("Flushing " + queuedHttp.toString());
-					result = queuedHttp.httpConnectionTo(mApiToken);
+					result = queuedHttp.sendRequest(mApiToken);
 					if (!result.hasSucceeded()) {
 						LQLog.error("HTTP (" + result.getHttpCode() + ") " + queuedHttp.toString());
 						if (queuedHttp.getNumberOfTries() < LIQUID_MAX_NUMBER_OF_TRIES) {

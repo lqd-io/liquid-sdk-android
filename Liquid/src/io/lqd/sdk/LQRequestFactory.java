@@ -25,8 +25,8 @@ import org.json.JSONObject;
 public class LQRequestFactory {
 
 	protected static final String LIQUID_SERVER_BASE_URL = "https://api.lqd.io/collect/";
-	protected static final String LIQUID_DATAPOINT_URL = LIQUID_SERVER_BASE_URL + "/data_points";
-	protected static final String LIQUID_ALIAS_URL = LIQUID_SERVER_BASE_URL + "/users/%s/alias";
+	protected static final String LIQUID_DATAPOINT_URL = LIQUID_SERVER_BASE_URL + "data_points";
+	protected static final String LIQUID_ALIAS_URL = LIQUID_SERVER_BASE_URL + "users/%s/alias";
 	protected static final String LIQUID_LQD_PACKAGE_URL = LIQUID_SERVER_BASE_URL + "users/%s/devices/%s/liquid_package";
 	protected static final String LIQUID_VARIABLES_URL = LIQUID_SERVER_BASE_URL + "variables";
 

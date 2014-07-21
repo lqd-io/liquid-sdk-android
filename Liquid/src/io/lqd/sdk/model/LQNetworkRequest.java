@@ -124,7 +124,7 @@ public class LQNetworkRequest extends LQModel {
 		LQModel.save(context, fileName + ".queue", queue);
 	}
 
-	public LQNetworkResponse httpConnectionTo(String token) {
+	public LQNetworkResponse sendRequest(String token) {
 		String response = null;
 		int responseCode = -1;
 		InputStream err = null;
