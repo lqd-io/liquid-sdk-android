@@ -27,6 +27,7 @@ import io.lqd.sdk.model.LQUser;
 import io.lqd.sdk.model.LQValue;
 import io.lqd.sdk.model.LQVariable;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
@@ -71,6 +72,7 @@ public class Liquid {
 	private HashMap<String, LQValue> mAppliedValues;
 	private HashMap<String, Activity> mAttachedActivities = new HashMap<String, Activity>();
 	private HashMap<String, LiquidOnEventListener> mListeners = new HashMap<String, LiquidOnEventListener>();
+	private ArrayList<String> mBundleVariablesSended;
 	private boolean mNeedCallbackCall = false;
 	private LQQueuer mHttpQueuer;
 	private boolean isDevelopmentMode;
@@ -151,6 +153,8 @@ public class Liquid {
 		mHttpQueuer = new LQQueuer(mContext, mApiToken, LQNetworkRequest.loadQueue(mContext, mApiToken));
 		mHttpQueuer.startFlushTimer();
 		isDevelopmentMode = developmentMode;
+		if(isDevelopmentMode)
+			mBundleVariablesSended = new ArrayList<String>();
 
 		// Get last user and init session
 		mPreviousUser = LQUser.load(mContext, mApiToken);
@@ -1087,14 +1091,17 @@ public class Liquid {
 	}
 
 	private void sendBundleVariable(final JSONObject variable) {
-		mQueue.execute(new Runnable() {
+		if(!mBundleVariablesSended.contains(variable.optString("name"))) {
+			mQueue.execute(new Runnable() {
 
-			@Override
-			public void run() {
-				LQLog.infoVerbose("Sending bundle variable " + variable);
-				LQRequestFactory.createVariableRequest(variable).sendRequest(mApiToken);
-			}
-		});
+				@Override
+				public void run() {
+					LQLog.infoVerbose("Sending bundle variable " + variable);
+					LQRequestFactory.createVariableRequest(variable).sendRequest(mApiToken);
+				}
+			});
+			mBundleVariablesSended.add(variable.optString("name"));
+		}
 	}
 
 	/**
