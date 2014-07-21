@@ -97,11 +97,11 @@ public class LQUser extends LQModel {
 
 	public void setLocation(Location location) {
 		if (location == null) {
-			mAttributes.remove("_latitude");
-			mAttributes.remove("_longitude");
+			mAttributes.remove("latitude");
+			mAttributes.remove("longitude");
 		} else {
-			mAttributes.put("_latitude", Double.valueOf(location.getLatitude()));
-			mAttributes.put("_longitude",Double.valueOf(location.getLongitude()));
+			mAttributes.put("latitude", Double.valueOf(location.getLatitude()));
+			mAttributes.put("longitude",Double.valueOf(location.getLongitude()));
 		}
 	}
 
