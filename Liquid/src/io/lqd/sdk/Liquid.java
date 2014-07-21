@@ -712,7 +712,8 @@ public class Liquid {
 	private boolean isApplicationInBackground(Activity activity) {
 		boolean configurationChanged;
 		if(android.os.Build.VERSION.SDK_INT < 11) {
-			configurationChanged = (activity.getChangingConfigurations() == Configuration.SCREENLAYOUT_LAYOUTDIR_RTL);
+			int changingConfigs = activity.getChangingConfigurations();
+			configurationChanged = (changingConfigs == Configuration.SCREENLAYOUT_LAYOUTDIR_RTL || changingConfigs == Configuration.SCREENLAYOUT_LAYOUTDIR_LTR);
 		} else {
 			configurationChanged = activity.isChangingConfigurations();
 		}
@@ -1105,7 +1106,7 @@ public class Liquid {
 			@Override
 			public void run() {
 				LQLog.infoVerbose("Sending bundle variable " + variable);
-				mHttpQueuer.addToHttpQueue(LQRequestFactory.createVariableRequest(variable));
+				LQRequestFactory.createVariableRequest(variable).httpConnectionTo(mApiToken);
 			}
 		});
 	}
