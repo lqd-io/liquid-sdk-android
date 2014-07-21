@@ -21,7 +21,6 @@ import io.lqd.sdk.Liquid;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -128,71 +127,53 @@ public class LQNetworkRequest extends LQModel {
 		String response = null;
 		int responseCode = -1;
 		InputStream err = null;
-
+		OutputStream out = null;
+		BufferedOutputStream bout = null;
+		BufferedReader boin = null;
+		HttpURLConnection connection = null;
 		try {
-
-			OutputStream out = null;
-			BufferedOutputStream bout = null;
-			HttpURLConnection connection = null;
-			try {
-				final URL url = new URL(this.getUrl());
-				connection = (HttpURLConnection) url.openConnection();
-				connection.setRequestMethod(this.getHttpMethod());
-				connection.setRequestProperty("Authorization", "Token " + token);
-				connection.setRequestProperty("User-Agent", USER_AGENT );
-				connection.setRequestProperty("Accept", "application/vnd.lqd.v1+json");
-				connection.setRequestProperty("Content-Type",
-						"application/json");
-				connection.setRequestProperty("Accept-Encoding", "gzip");
-				connection.setDoInput(true);
-				if (this.getJSON() != null) {
-					connection.setDoOutput(true);
-					out = connection.getOutputStream();
-					bout = new BufferedOutputStream(out);
-					final StringEntity stringEntity = new StringEntity(this.getJSON(), "UTF-8");
-					stringEntity.writeTo(bout);
-					bout.close();
-					bout = null;
-					out.close();
-					out = null;
-				}
-				responseCode = connection.getResponseCode();
-				err = connection.getErrorStream();
-				BufferedReader boin;
-				boin = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
-				response = boin.readLine();
-				boin.close();
-			} catch (final EOFException e) {
-				LQLog.error("Failed to connect, retrying");
-			} finally {
-				if (null != bout) {
-					try {
-						bout.close();
-					} catch (final IOException e) {
-						;
-					}
-				}
-				if (null != out) {
-					try {
-						out.close();
-					} catch (final IOException e) {
-						;
-					}
-				}
-				if (null != err) {
-					try {
-						err.close();
-					} catch (final IOException e) {
-						;
-					}
-				}
-				if (null != connection) {
-					connection.disconnect();
-				}
+			URL url = new URL(this.getUrl());
+			connection = (HttpURLConnection) url.openConnection();
+			connection.setRequestMethod(this.getHttpMethod());
+			connection.setRequestProperty("Authorization", "Token " + token);
+			connection.setRequestProperty("User-Agent", USER_AGENT);
+			connection.setRequestProperty("Accept", "application/vnd.lqd.v1+json");
+			connection.setRequestProperty("Content-Type", "application/json");
+			connection.setRequestProperty("Accept-Encoding", "gzip");
+			connection.setDoInput(true);
+			if (this.getJSON() != null) {
+				connection.setDoOutput(true);
+				out = connection.getOutputStream();
+				bout = new BufferedOutputStream(out);
+				final StringEntity stringEntity = new StringEntity(this.getJSON(), "UTF-8");
+				stringEntity.writeTo(bout);
 			}
-		} catch (Exception e) {
-			LQLog.http("Failed due to " + e + " responseCode "	+ responseCode);
+			responseCode = connection.getResponseCode();
+			err = connection.getErrorStream();
+			boin = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
+			response = boin.readLine();
+		} catch (IOException e) {
+			LQLog.http("Failed due to " + e + " responseCode " + responseCode);
 			LQLog.http("Error " + inputStreamToString(err));
+		} finally {
+			if(connection != null)
+				connection.disconnect();
+			try {
+				if(out != null)
+					out.close();
+			} catch (IOException e) {}
+			try {
+				if(err != null)
+					err.close();
+			} catch (IOException e) {}
+			try {
+				if(bout != null)
+					bout.close();
+			} catch (IOException e) {}
+			try {
+				if (boin != null)
+					boin.close();
+			} catch (IOException e) {}
 		}
 		if ((response != null) || ((responseCode >= 200) && (responseCode < 300))) {
 			LQLog.http("HTTP Success " + response);
