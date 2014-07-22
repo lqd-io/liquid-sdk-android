@@ -54,6 +54,7 @@ public class LQDevice {
 	private HashMap<String, Object> mAttributes;
 
 	private Context mContext;
+	private String mLocale;
 	private String mSystemLanguage;
 
 	// Initialization
@@ -72,6 +73,7 @@ public class LQDevice {
 		mAppVersion = LQDevice.getAppVersion(context);
 		mReleaseVersion = LQDevice.getReleaseVersion(context);
 		mLiquidVersion = liquidVersion;
+		mLocale = LQDevice.getLocale();
 		mSystemLanguage = LQDevice.getSystemLanguage();
 	}
 
@@ -129,6 +131,7 @@ public class LQDevice {
 		attrs.put("app_version", mAppVersion);
 		attrs.put("release_version", mReleaseVersion);
 		attrs.put("liquid_version", mLiquidVersion);
+		attrs.put("locale", mLocale);
 		attrs.put("system_language", mSystemLanguage);
 
 		JSONObject json = new JSONObject();
@@ -159,6 +162,10 @@ public class LQDevice {
 	}
 
 	private static String getSystemLanguage() {
+		return Locale.getDefault().getLanguage();
+	}
+
+	private static String getLocale() {
 		return Locale.getDefault().toString();
 	}
 
