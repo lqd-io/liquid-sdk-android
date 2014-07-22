@@ -43,7 +43,7 @@ public class LQNetworkRequest extends LQModel {
 
 	private static final long serialVersionUID = 7456534930025458866L;
 
-	private static final String LOCAL = Locale.getDefault().toString().toLowerCase(Locale.ENGLISH);
+	private static final String LOCAL = Locale.getDefault().toString();
 	private static final String DEVICE = Build.MANUFACTURER + " " + Build.MODEL;
 
 	private static final String USER_AGENT = "Liquid/"+ Liquid.LIQUID_VERSION + " (Android; Android " + Build.VERSION.RELEASE + "; " + LOCAL + "; " + DEVICE +")";
