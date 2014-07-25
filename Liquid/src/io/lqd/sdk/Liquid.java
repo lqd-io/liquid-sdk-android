@@ -69,7 +69,7 @@ public class Liquid {
 	private Context mContext;
 	private static Liquid mInstance;
 	private LQLiquidPackage mLoadedLiquidPackage;
-	private HashMap<String, LQValue> mAppliedValues;
+	private HashMap<String, LQValue> mAppliedValues = new HashMap<String, LQValue>();
 	private HashMap<String, Activity> mAttachedActivities = new HashMap<String, Activity>();
 	private HashMap<String, LiquidOnEventListener> mListeners = new HashMap<String, LiquidOnEventListener>();
 	private ArrayList<String> mBundleVariablesSended;
