@@ -54,7 +54,7 @@ public class Liquid {
 
 	static final String TAG_LIQUID = "LIQUID";
 
-	public static final String LIQUID_VERSION = "0.8.1-beta";
+	public static final String LIQUID_VERSION = "0.8.2-beta";
 	private static final int LIQUID_DEFAULT_SESSION_TIMEOUT = 30;
 
 	private static int mSessionTimeout;
@@ -142,7 +142,7 @@ public class Liquid {
 					+ apiToken + "\'.");
 		}
 		mContext = context;
-		if (android.os.Build.VERSION.SDK_INT >= 14) {
+		if (Build.VERSION.SDK_INT >= 14) {
 			attachActivityCallbacks();
 		}
 		mSessionTimeout = LIQUID_DEFAULT_SESSION_TIMEOUT;
@@ -372,7 +372,7 @@ public class Liquid {
 	/**
 	 * Identifies the current user with a custom UUID and additional attributes.
 	 * 
-	 * @deprecated Use {@link #setCurrentLocation(Location location)}
+	 * @deprecated Use {@link #setCurrentLocation(android.location.Location location)}
 	 *             instead.</p>
 	 * @param identifier
 	 *            The custom UUID.
@@ -391,7 +391,7 @@ public class Liquid {
 	/**
 	 * Identifies the current user with a custom UUID and additional attributes.
 	 * 
-	 * @deprecated Use {@link #setCurrentLocation(Location location)}
+	 * @deprecated Use {@link #setCurrentLocation(android.location.Location location)}
 	 *             instead.</p>
 	 * @param identifier
 	 *            The custom UUID.
@@ -483,7 +483,7 @@ public class Liquid {
 	/**
 	 * Add or update the user location.
 	 * 
-	 * @deprecated Use {@link #setCurrentLocation(Location location)} instead.
+	 * @deprecated Use {@link #setCurrentLocation(android.location.Location location)} instead.
 	 * @param location
 	 *            User location.
 	 */
@@ -658,7 +658,7 @@ public class Liquid {
 	 *            the resumed activity
 	 */
 	public void activityResumed(Activity activity) {
-		if (android.os.Build.VERSION.SDK_INT < 14) {
+		if (Build.VERSION.SDK_INT < 14) {
 			activityResumedCallback(activity);
 		}
 	}
@@ -671,7 +671,7 @@ public class Liquid {
 	 *            the paused activity
 	 */
 	public void activityPaused(Activity activity) {
-		if (android.os.Build.VERSION.SDK_INT < 14) {
+		if (Build.VERSION.SDK_INT < 14) {
 			activityPausedCallback(activity);
 		}
 	}
@@ -684,7 +684,7 @@ public class Liquid {
 	 *            the stopped activity
 	 */
 	public void activityStopped(Activity activity) {
-		if (android.os.Build.VERSION.SDK_INT < 14) {
+		if (Build.VERSION.SDK_INT < 14) {
 			activityStopedCallback(activity);
 		}
 	}
@@ -697,7 +697,7 @@ public class Liquid {
 	 *            the started activity
 	 */
 	public void activityStarted(Activity activity) {
-		if (android.os.Build.VERSION.SDK_INT < 14) {
+		if (Build.VERSION.SDK_INT < 14) {
 			activityStartedCallback(activity);
 		}
 	}
@@ -705,7 +705,7 @@ public class Liquid {
 	@SuppressLint("NewApi")
 	private boolean isApplicationInBackground(Activity activity) {
 		boolean configurationChanged;
-		if(android.os.Build.VERSION.SDK_INT < 11) {
+		if(Build.VERSION.SDK_INT < 11) {
 			int changingConfigs = activity.getChangingConfigurations();
 			configurationChanged = (changingConfigs == Configuration.SCREENLAYOUT_LAYOUTDIR_RTL || changingConfigs == Configuration.SCREENLAYOUT_LAYOUTDIR_LTR);
 		} else {
@@ -722,13 +722,13 @@ public class Liquid {
 	 *            the destroyed activity
 	 */
 	public void activityDestroyed(Activity activity) {
-		if (android.os.Build.VERSION.SDK_INT < 14) {
+		if (Build.VERSION.SDK_INT < 14) {
 			activityDestroyedCallback(activity);
 		}
 	}
 
 	public void activityCreated(Activity activity) {
-		if (android.os.Build.VERSION.SDK_INT < 14) {
+		if (Build.VERSION.SDK_INT < 14) {
 			activityCreatedCallback(activity);
 		}
 	}

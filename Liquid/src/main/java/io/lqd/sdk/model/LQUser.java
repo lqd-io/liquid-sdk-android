@@ -34,7 +34,7 @@ public class LQUser extends LQModel {
 
 	private String mIdentifier;
 	private boolean mIdentified;
-	private HashMap<String, Object> mAttributes;
+	private HashMap<String, Object> mAttributes = new HashMap<String, Object>();
 
 
 	public LQUser(String identifier) {
@@ -51,12 +51,8 @@ public class LQUser extends LQModel {
 
 	public LQUser(String identifier, HashMap<String, Object> attributes, Location location, boolean identified) {
 		mIdentifier = identifier;
-		if (attributes == null) {
-			mAttributes = new HashMap<String, Object>();
-		}
-		else {
-			mAttributes = attributes;
-		}
+        if(attributes != null)
+		    mAttributes = attributes;
 		this.setLocation(location);
 		this.setIdentified(identified);
 	}
@@ -80,7 +76,7 @@ public class LQUser extends LQModel {
 	}
 
 	public HashMap<String, Object> getAttributes() {
-		return new HashMap<>(mAttributes);
+		return new HashMap<String, Object>(mAttributes);
 	}
 
 	public void setAttributes(HashMap<String, Object> attributes) {

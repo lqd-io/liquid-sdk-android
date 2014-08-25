@@ -130,11 +130,14 @@ public abstract class LQModel implements Serializable {
 			Object result = objectInputStream.readObject();
 			objectInputStream.close();
 			return result;
-		} catch (IOException | ClassNotFoundException e) {
+		} catch (IOException e) {
+			LQLog.infoVerbose("Could not load queue from file " + path);
+			return null;
+		} catch (ClassNotFoundException e) {
 			LQLog.infoVerbose("Could not load queue from file " + path);
 			return null;
 		}
-	}
+    }
 
 	protected static LQModel load(Context context, String path) {
 		return (LQModel) loadObject(context, path);

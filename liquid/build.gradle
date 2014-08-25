@@ -1,0 +1,127 @@
+apply plugin: 'com.android.library'
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.12.2'
+    }
+}
+
+android {
+    compileSdkVersion 20
+    buildToolsVersion "20.0.0"
+
+    defaultConfig {
+        minSdkVersion 8
+        targetSdkVersion 20
+
+        lintOptions {
+            abortOnError false
+            warningsAsErrors false
+        }
+    }
+
+}
+android.libraryVariants.all { variant ->
+    task("generate${variant.name}Javadoc", type: Javadoc) {
+        description "Generates Javadoc for $variant.name."
+        source = variant.javaCompile.source
+            ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+        classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
+        exclude '**/R.*', '**/BuildConfig.java'
+        options {
+            encoding = 'UTF-8'
+            docEncoding = 'UTF-8'
+            charSet = 'UTF-8'
+        }
+    }
+}
+
+def isReleaseVersion() {
+    return !version.endsWith("SNAPSHOT");
+}
+
+configurations {
+    archives {
+        extendsFrom configurations.default
+    }
+}
+
+if (isReleaseVersion()) {
+    signing {
+        required { gradle.taskGraph.hasTask("uploadArchives") }
+        sign configurations.archives
+    }
+}
+
+task androidJavadocs(type: Javadoc) {
+    source = android.sourceSets.main.java
+    classpath += project.files(android.plugin.getBootClasspath().join(File.pathSeparator))
+}
+
+task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
+        classifier = 'javadoc'
+    from androidJavadocs.destinationDir
+}
+
+task androidSourcesJar(type: Jar) {
+    classifier = 'sources'
+    //basename = artifact_id
+    from android.sourceSets.main.java
+}
+
+task jarJar(type: Jar) {
+    //basename = artifact_id
+    from android.sourceSets.main.java
+}
+
+
+uploadArchives {
+    configuration = configurations.archives
+
+    repositories.mavenDeployer {
+        pom.project {
+            name project.name
+            packaging 'aar'
+            description 'Liquid Android SDK \n' +
+                    'http://lqd.io/'
+            url 'https://github.com/lqd-io/liquid-sdk-android'
+            scm {
+                url 'https://github.com/lqd-io/liquid-sdk-android'
+                connection 'scm:git:https://github.com/lqd-io/liquid-sdk-android'
+                developerConnection 'scm:git:git@github.com:lqd-io/liquid-sdk-android.git'
+            }
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/license/LICENSE-2.0.txt'
+                    distribution 'repo'
+                }
+            }
+            developers {
+                developer {
+                    id 'letz'
+                    name 'Ricardo Leitão'
+                    email 'rleitao@lqd.io'
+                }
+            }
+        }
+
+        if (isReleaseVersion()) {
+
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
+
+        } else {
+            snapshotRepository(url: 'file://' + new File(System.getProperty('user.home'), '.m2/repository').absolutePath)
+        }
+
+    }
+}
