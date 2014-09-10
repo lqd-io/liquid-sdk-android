@@ -50,6 +50,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 
+
 public class Liquid {
 
 	static final String TAG_LIQUID = "LIQUID";
@@ -82,10 +83,10 @@ public class Liquid {
 	 * <p>
 	 * You can use this method across all your activities.
 	 * </p>
-	 * 
+	 *
 	 * @throws IllegalStateException
 	 *             if you didn't call initialize() previously.
-	 * 
+	 *
 	 * @return A Liquid instance.
 	 */
 	public static Liquid getInstance() {
@@ -97,12 +98,12 @@ public class Liquid {
 
 	/**
 	 * Call this method to initialize Liquid.
-	 * 
+	 *
 	 * @param context
 	 *            The Android context of your application.
 	 * @param apiToken
 	 *            The Liquid ApiToken of your app.
-	 * 
+	 *
 	 * @return A Liquid instance.
 	 */
 	public static Liquid initialize(Context context, String apiToken) {
@@ -115,7 +116,7 @@ public class Liquid {
 
 	/**
 	 * Call this method to initialize Liquid.
-	 * 
+	 *
 	 * @param context
 	 *            The Android context of your application.
 	 * @param apiToken
@@ -123,7 +124,7 @@ public class Liquid {
 	 * @param developmentMode
 	 *            The flag to send to Liquid server the variables used in
 	 *            methods with <b>fallbackVariable</b> param.
-	 * 
+	 *
 	 * @return The Liquid instance.
 	 */
 	public static Liquid initialize(Context context, String apiToken,
@@ -138,8 +139,7 @@ public class Liquid {
 	private Liquid(Context context, String apiToken, boolean developmentMode) {
 		LiquidTools.checkForPermission(permission.INTERNET, context);
 		if (apiToken == null || apiToken.length() == 0) {
-			throw new IllegalArgumentException("Your API Token is invalid: \'"
-					+ apiToken + "\'.");
+			throw new IllegalArgumentException("Your API Token is invalid: \'" + apiToken + "\'.");
 		}
 		mContext = context;
 		if (Build.VERSION.SDK_INT >= 14) {
@@ -174,9 +174,9 @@ public class Liquid {
 	/**
 	 * Attach a listener to be notified of Liquid Events
 	 * {@link LiquidOnEventListener}
-	 * 
+	 *
 	 * @see LiquidOnEventListener
-	 * 
+	 *
 	 * @param l Listener to be attached.
 	 */
 	public void attachLiquidEventListener(LiquidOnEventListener l) {
@@ -186,9 +186,9 @@ public class Liquid {
 	/**
 	 * Detach a listener to stop being notified by Liquid Events
 	 * {@link LiquidOnEventListener}
-	 * 
+	 *
 	 * @see LiquidOnEventListener
-	 * 
+	 *
 	 * @param l Listener to be detached.
 	 */
 	public void detachLiquidEventListener(LiquidOnEventListener l) {
@@ -213,7 +213,7 @@ public class Liquid {
 	/**
 	 * Returns whether or not the {@link LiquidOnEventListener#onValuesLoaded()}
 	 * will be called after {@link LiquidOnEventListener#onValuesReceived()}.
-	 * 
+	 *
 	 * @see LiquidOnEventListener
 	 * @return true if is auto loading variables, otherwise false.
 	 */
@@ -223,9 +223,9 @@ public class Liquid {
 
 	/**
 	 * By default Liquid will not auto load variables.
-	 * 
+	 *
 	 * Set Liquid behavior to auto load variables.
-	 * 
+	 *
 	 * @param autoloadVariables
 	 *            whether or not Liquid will auto load the variables.
 	 */
@@ -236,7 +236,7 @@ public class Liquid {
 	/**
 	 * Get the timeout value that Liquid is using to close automatically a
 	 * session.
-	 * 
+	 *
 	 * @return In seconds the value of the timeout.
 	 */
 	public int getSessionTimeout() {
@@ -246,7 +246,7 @@ public class Liquid {
 	/**
 	 * Set the timeout value that Liquid will use to close automatically a
 	 * session.
-	 * 
+	 *
 	 * @param sessionTimeout
 	 *            value in seconds of the timeout
 	 */
@@ -256,7 +256,7 @@ public class Liquid {
 
 	/**
 	 * Set the flush interval
-	 * 
+	 *
 	 * @param flushInterval
 	 *            value in seconds.
 	 */
@@ -266,7 +266,7 @@ public class Liquid {
 
 	/**
 	 * Get the flush interval
-	 * 
+	 *
 	 * @return value in seconds of the flush interval.
 	 */
 	public int getFlushInterval() {
@@ -287,12 +287,10 @@ public class Liquid {
 		final String oldID = mPreviousUser.getIdentifier();
 		final String newID = mCurrentUser.getIdentifier();
 		if (mPreviousUser.isIdentified()) {
-			LQLog.warning("Can't alias (" + oldID
-					+ "): Isn't an anonymous user.");
+			LQLog.warning("Can't alias (" + oldID + "): Isn't an anonymous user.");
 			return;
 		}
-		LQLog.infoVerbose("Making alias between (" + oldID + ") and (" + newID
-				+ ").");
+		LQLog.infoVerbose("Making alias between (" + oldID + ") and (" + newID + ").");
 		mQueue.execute(new Runnable() {
 			@Override
 			public void run() {
@@ -303,7 +301,7 @@ public class Liquid {
 
 	/**
 	 * Identifies the current user with a generated UUID.
-	 * 
+	 *
 	 */
 	@Deprecated
 	public void identifyUser() {
@@ -320,7 +318,7 @@ public class Liquid {
 
 	/**
 	 * Identifies the current user with a custom UUID.
-	 * 
+	 *
 	 * @param identifier
 	 *            Custom UUID.
 	 */
@@ -330,7 +328,7 @@ public class Liquid {
 
 	/**
 	 * Identifies the current user with a custom UUID.
-	 * 
+	 *
 	 * @param identifier
 	 * @param alias
 	 *            if true, will make an alias with previous user if previous
@@ -342,20 +340,19 @@ public class Liquid {
 
 	/**
 	 * Identifies the current user with a custom UUID and additional attributes.
-	 * 
+	 *
 	 * @param identifier
 	 *            The custom UUID.
 	 * @param attributes
 	 *            Additional user attributes.
 	 */
-	public void identifyUser(String identifier,
-			HashMap<String, Object> attributes) {
+	public void identifyUser(String identifier, HashMap<String, Object> attributes) {
 		identifyUser(identifier, attributes, null, true, true);
 	}
 
 	/**
 	 * Identifies the current user with a custom UUID and additional attributes.
-	 * 
+	 *
 	 * @param identifier
 	 *            The custom UUID.
 	 * @param attributes
@@ -364,14 +361,13 @@ public class Liquid {
 	 *            if true, will make an alias with previous user if previous
 	 *            user is anonymous.
 	 */
-	public void identifyUser(String identifier,
-			HashMap<String, Object> attributes, boolean alias) {
+	public void identifyUser(String identifier, HashMap<String, Object> attributes, boolean alias) {
 		identifyUser(identifier, attributes, null, true, alias);
 	}
 
 	/**
 	 * Identifies the current user with a custom UUID and additional attributes.
-	 * 
+	 *
 	 * @deprecated Use {@link #setCurrentLocation(android.location.Location location)}
 	 *             instead.</p>
 	 * @param identifier
@@ -390,7 +386,7 @@ public class Liquid {
 
 	/**
 	 * Identifies the current user with a custom UUID and additional attributes.
-	 * 
+	 *
 	 * @deprecated Use {@link #setCurrentLocation(android.location.Location location)}
 	 *             instead.</p>
 	 * @param identifier
@@ -401,39 +397,30 @@ public class Liquid {
 	 *            User Location.
 	 */
 	@Deprecated
-	public void identifyUser(String identifier,
-			HashMap<String, Object> attributes, Location location) {
+	public void identifyUser(String identifier,	HashMap<String, Object> attributes, Location location) {
 		identifyUser(identifier, attributes, location, true, true);
 	}
 
-	public void identifyUser(String identifier,
-			HashMap<String, Object> attributes, Location location, boolean alias) {
+	public void identifyUser(String identifier,	HashMap<String, Object> attributes, Location location, boolean alias) {
 		identifyUser(identifier, attributes, location, true, alias);
 	}
 
-	private void identifyUser(String identifier,
-			HashMap<String, Object> attributes, Location location,
-			boolean identified, boolean alias) {
+	private void identifyUser(String identifier, HashMap<String, Object> attributes, Location location, boolean identified, boolean alias) {
 		final String finalIdentifier = identifier;
-		final HashMap<String, Object> finalAttributes = LQModel
-				.sanitizeAttributes(attributes, isDevelopmentMode);
-
+		final HashMap<String, Object> finalAttributes = LQModel.sanitizeAttributes(attributes, isDevelopmentMode);
 		final Location finalLocation = location;
 
 		// same id -> just update attributes
-		if (mCurrentUser != null
-				&& mCurrentUser.getIdentifier().equals(identifier)) {
+		if (mCurrentUser != null && mCurrentUser.getIdentifier().equals(identifier)) {
 			mCurrentUser.setAttributes(finalAttributes);
 			mCurrentUser.save(mContext, mApiToken);
-			LQLog.infoVerbose("Already identified with user " + finalIdentifier
-					+ ". Not identifying again.");
+			LQLog.infoVerbose("Already identified with user " + finalIdentifier + ". Not identifying again.");
 			return;
 		}
 		destroySession(UniqueTime.newDate());
 
 		mPreviousUser = mCurrentUser;
-		mCurrentUser = new LQUser(finalIdentifier, finalAttributes,
-				finalLocation, identified);
+		mCurrentUser = new LQUser(finalIdentifier, finalAttributes, finalLocation, identified);
 		newSession(true);
 		requestValues();
 		mCurrentUser.save(mContext, mApiToken);
@@ -442,13 +429,12 @@ public class Liquid {
 			alias();
 		}
 
-		LQLog.info("From now on we're identifying the User by the identifier '"
-				+ finalIdentifier + "'");
+		LQLog.info("From now on we're identifying the User by the identifier '"	+ finalIdentifier + "'");
 	}
 
 	/**
 	 * Get the user UUID
-	 * 
+	 *
 	 * @return the user UUID, null if the user isn't identified.
 	 */
 	public String getUserIdentifier() {
@@ -460,7 +446,7 @@ public class Liquid {
 
 	/**
 	 * Add or update an additional attribute to the user.
-	 * 
+	 *
 	 * @param key
 	 *            Attribute key
 	 * @param attribute
@@ -482,7 +468,7 @@ public class Liquid {
 
 	/**
 	 * Add or update the user location.
-	 * 
+	 *
 	 * @deprecated Use {@link #setCurrentLocation(android.location.Location location)} instead.
 	 * @param location
 	 *            User location.
@@ -501,7 +487,7 @@ public class Liquid {
 
 	/**
 	 * Add or update the current location.
-	 * 
+	 *
 	 * @param location
 	 *            Current location.
 	 */
@@ -517,7 +503,7 @@ public class Liquid {
 
 	/**
 	 * Add or update the GCM registration ID
-	 * 
+	 *
 	 * @param id
 	 *            GCM identifier
 	 */
@@ -581,12 +567,12 @@ public class Liquid {
 
 	/**
 	 * Track an event.
-	 * 
+	 *
 	 * <p>
 	 * If the <b>eventName</b> is a empty string or null, the event will be
 	 * tracked with name <b>unnamedEvent</b>
 	 * </p>
-	 * 
+	 *
 	 * @param eventName
 	 *            Name of the event.
 	 */
@@ -600,12 +586,12 @@ public class Liquid {
 
 	/**
 	 * Track an event.
-	 * 
+	 *
 	 * <p>
 	 * If the <b>eventName</b> is a empty string or null, the event will be
 	 * tracked with name <b>unnamedEvent</b>
 	 * </p>
-	 * 
+	 *
 	 * @param eventName
 	 *            Name of the event.
 	 * @param attributes
@@ -617,15 +603,13 @@ public class Liquid {
 		}
 	}
 
-	private void track(String eventName, HashMap<String, Object> attributes,
-			Date date) {
+	private void track(String eventName, HashMap<String, Object> attributes, Date date) {
 		if ((eventName == null) || (eventName.length() == 0)) {
 			eventName = "unnamedEvent";
 		}
 		LQLog.infoVerbose("Tracking: " + eventName);
 		final String finalEventName = eventName;
-		final HashMap<String, Object> finalAttributes = LQModel
-				.sanitizeAttributes(attributes, isDevelopmentMode);
+		final HashMap<String, Object> finalAttributes = LQModel.sanitizeAttributes(attributes, isDevelopmentMode);
 		final LQUser finalUser = mCurrentUser;
 		final LQDevice finalDevice = mDevice;
 		final LQSession finalSession = mCurrentSession;
@@ -633,11 +617,8 @@ public class Liquid {
 		mQueue.execute(new Runnable() {
 			@Override
 			public void run() {
-				LQEvent event = new LQEvent(finalEventName, finalAttributes,
-						finalDate);
-				LQDataPoint dataPoint = new LQDataPoint(finalUser, finalDevice,
-						finalSession, event, mLoadedLiquidPackage.getValues(),
-						finalDate);
+				LQEvent event = new LQEvent(finalEventName, finalAttributes, finalDate);
+				LQDataPoint dataPoint = new LQDataPoint(finalUser, finalDevice,	finalSession, event, mLoadedLiquidPackage.getValues(), finalDate);
 				LQLog.data(dataPoint.toJSON().toString());
 				mHttpQueuer.addToHttpQueue(LQRequestFactory.createDataPointRequest(dataPoint));
 			}
@@ -653,7 +634,7 @@ public class Liquid {
 	/**
 	 * Override this method to the Activity onResume() You only need to do this
 	 * if your android minSDK is < 14
-	 * 
+	 *
 	 * @param activity
 	 *            the resumed activity
 	 */
@@ -666,7 +647,7 @@ public class Liquid {
 	/**
 	 * Override this method to the Activity onPaused() You only need to do this
 	 * if your android minSDK is < 14
-	 * 
+	 *
 	 * @param activity
 	 *            the paused activity
 	 */
@@ -679,7 +660,7 @@ public class Liquid {
 	/**
 	 * Override this method to the Activity onStopped() You only need to do this
 	 * if your android minSDK is < 14
-	 * 
+	 *
 	 * @param activity
 	 *            the stopped activity
 	 */
@@ -692,7 +673,7 @@ public class Liquid {
 	/**
 	 * Override this method to the Activity onStart() You only need to do this
 	 * if your android minSDK is < 14
-	 * 
+	 *
 	 * @param activity
 	 *            the started activity
 	 */
@@ -717,7 +698,7 @@ public class Liquid {
 	/**
 	 * Override this method to the Activity onDestroy() You only need to do this
 	 * if your android minSDK is < 14
-	 * 
+	 *
 	 * @param activity
 	 *            the destroyed activity
 	 */
@@ -903,7 +884,7 @@ public class Liquid {
 
 	/**
 	 * Get a variable value.
-	 * 
+	 *
 	 * @param variableKey
 	 *            Variable Key of the Value.
 	 * @param fallbackValue
@@ -914,21 +895,17 @@ public class Liquid {
 	 */
 	public Date getDateVariable(String variableKey, Date fallbackValue) {
 		if (isDevelopmentMode) {
-			sendBundleVariable(LQVariable.buildJsonObject(variableKey,
-					fallbackValue, LQVariable.DATE_TYPE));
+			sendBundleVariable(LQVariable.buildJsonObject(variableKey, fallbackValue, LQVariable.DATE_TYPE));
 		}
 		if (!mAppliedValues.containsKey(variableKey)) {
 			return fallbackValue;
 		}
-		if (mAppliedValues.get(variableKey).getDataType()
-				.equals(LQVariable.DATE_TYPE)) {
+		if (mAppliedValues.get(variableKey).getDataType().equals(LQVariable.DATE_TYPE)) {
 			try {
 				Object value = mAppliedValues.get(variableKey).getValue();
-				return value == null ? null : LiquidTools
-						.stringToDate((String) value);
+				return value == null ? null : LiquidTools.stringToDate((String) value);
 			} catch (IllegalArgumentException e) {
-				LQLog.error("Error parsing Date with key: \"" + variableKey
-						+ "\"");
+				LQLog.error("Error parsing Date with key: \"" + variableKey + "\"");
 			}
 		}
 		invalidateVariables(variableKey);
@@ -937,7 +914,7 @@ public class Liquid {
 
 	/**
 	 * Get a variable value.
-	 * 
+	 *
 	 * @param variableKey
 	 *            Variable Key of the Value.
 	 * @param fallbackValue
@@ -948,9 +925,7 @@ public class Liquid {
 	 */
 	public int getColorVariable(String variableKey, int fallbackValue) {
 		if (isDevelopmentMode) {
-			sendBundleVariable(LQVariable.buildJsonObject(variableKey,
-					LiquidTools.colorToHex(fallbackValue),
-					LQVariable.COLOR_TYPE));
+			sendBundleVariable(LQVariable.buildJsonObject(variableKey, LiquidTools.colorToHex(fallbackValue), LQVariable.COLOR_TYPE));
 		}
 		if (!mAppliedValues.containsKey(variableKey)) {
 			return fallbackValue;
@@ -958,11 +933,9 @@ public class Liquid {
 		if (mAppliedValues.get(variableKey).getDataType()
 				.equals(LQVariable.COLOR_TYPE)) {
 			try {
-				return Color.parseColor(mAppliedValues.get(variableKey)
-						.getValue().toString());
+				return Color.parseColor(mAppliedValues.get(variableKey).getValue().toString());
 			} catch (IllegalArgumentException e) {
-				LQLog.error("Error parsing Color with key: \"" + variableKey
-						+ "\"");
+				LQLog.error("Error parsing Color with key: \"" + variableKey + "\"");
 			}
 		}
 		invalidateVariables(variableKey);
@@ -971,7 +944,7 @@ public class Liquid {
 
 	/**
 	 * Get a variable value.
-	 * 
+	 *
 	 * @param variableKey
 	 *            Variable Key of the Value.
 	 * @param fallbackValue
@@ -982,14 +955,12 @@ public class Liquid {
 	 */
 	public String getStringVariable(String variableKey, String fallbackValue) {
 		if (isDevelopmentMode) {
-			sendBundleVariable(LQVariable.buildJsonObject(variableKey,
-					fallbackValue, LQVariable.STRING_TYPE));
+			sendBundleVariable(LQVariable.buildJsonObject(variableKey, fallbackValue, LQVariable.STRING_TYPE));
 		}
 		if (!mAppliedValues.containsKey(variableKey)) {
 			return fallbackValue;
 		}
-		if (mAppliedValues.get(variableKey).getDataType()
-				.equals(LQVariable.STRING_TYPE)) {
+		if (mAppliedValues.get(variableKey).getDataType().equals(LQVariable.STRING_TYPE)) {
 			Object value = mAppliedValues.get(variableKey).getValue();
 			return value == null ? null : value.toString();
 		}
@@ -999,7 +970,7 @@ public class Liquid {
 
 	/**
 	 * Get a variable value.
-	 * 
+	 *
 	 * @param variableKey
 	 *            Variable Key of the Value.
 	 * @param fallbackValue
@@ -1010,20 +981,16 @@ public class Liquid {
 	 */
 	public int getIntVariable(String variableKey, int fallbackValue) {
 		if (isDevelopmentMode) {
-			sendBundleVariable(LQVariable.buildJsonObject(variableKey,
-					fallbackValue, LQVariable.INT_TYPE));
+			sendBundleVariable(LQVariable.buildJsonObject(variableKey,fallbackValue, LQVariable.INT_TYPE));
 		}
 		if (!mAppliedValues.containsKey(variableKey)) {
 			return fallbackValue;
 		}
-		if (mAppliedValues.get(variableKey).getDataType()
-				.equals(LQVariable.INT_TYPE)) {
+		if (mAppliedValues.get(variableKey).getDataType().equals(LQVariable.INT_TYPE)) {
 			try {
-				return Integer.parseInt(mAppliedValues.get(variableKey)
-						.getValue().toString());
+				return Integer.parseInt(mAppliedValues.get(variableKey).getValue().toString());
 			} catch (NumberFormatException e) {
-				LQLog.error("Error parsing Integer with key: \"" + variableKey
-						+ "\"");
+				LQLog.error("Error parsing Integer with key: \"" + variableKey + "\"");
 			}
 		}
 		invalidateVariables(variableKey);
@@ -1032,7 +999,7 @@ public class Liquid {
 
 	/**
 	 * Get a variable value.
-	 * 
+	 *
 	 * @param variableKey
 	 *            Variable Key of the Value.
 	 * @param fallbackValue
@@ -1043,20 +1010,16 @@ public class Liquid {
 	 */
 	public float getFloatVariable(String variableKey, float fallbackValue) {
 		if (isDevelopmentMode) {
-			sendBundleVariable(LQVariable.buildJsonObject(variableKey,
-					fallbackValue, LQVariable.FLOAT_TYPE));
+			sendBundleVariable(LQVariable.buildJsonObject(variableKey, fallbackValue, LQVariable.FLOAT_TYPE));
 		}
 		if (!mAppliedValues.containsKey(variableKey)) {
 			return fallbackValue;
 		}
-		if (mAppliedValues.get(variableKey).getDataType()
-				.equals(LQVariable.FLOAT_TYPE)) {
+		if (mAppliedValues.get(variableKey).getDataType().equals(LQVariable.FLOAT_TYPE)) {
 			try {
-				return Float.parseFloat(mAppliedValues.get(variableKey)
-						.getValue().toString());
+				return Float.parseFloat(mAppliedValues.get(variableKey).getValue().toString());
 			} catch (NumberFormatException e) {
-				LQLog.error("Error parsing Float with key: \"" + variableKey
-						+ "\"");
+				LQLog.error("Error parsing Float with key: \"" + variableKey + "\"");
 			}
 		}
 		invalidateVariables(variableKey);
@@ -1065,16 +1028,13 @@ public class Liquid {
 
 	public boolean getBooleanVariable(String variableKey, boolean fallbackValue) {
 		if (isDevelopmentMode) {
-			sendBundleVariable(LQVariable.buildJsonObject(variableKey,
-					fallbackValue, LQVariable.BOOLEAN_TYPE));
+			sendBundleVariable(LQVariable.buildJsonObject(variableKey, fallbackValue, LQVariable.BOOLEAN_TYPE));
 		}
 		if (!mAppliedValues.containsKey(variableKey)) {
 			return fallbackValue;
 		}
-		if (mAppliedValues.get(variableKey).getDataType()
-				.equals(LQVariable.BOOLEAN_TYPE)) {
-			return Boolean.parseBoolean(mAppliedValues.get(variableKey)
-					.getValue().toString());
+		if (mAppliedValues.get(variableKey).getDataType().equals(LQVariable.BOOLEAN_TYPE)) {
+			return Boolean.parseBoolean(mAppliedValues.get(variableKey).getValue().toString());
 		}
 		invalidateVariables(variableKey);
 		return fallbackValue;
@@ -1110,7 +1070,7 @@ public class Liquid {
 
 	/**
 	 * Reset all collected data that is stored locally.
-	 * 
+	 *
 	 * <p>
 	 * This includes, user, device, session, values, events
 	 * </p>
@@ -1150,13 +1110,10 @@ public class Liquid {
 			@Override
 			public void run() {
 				LQLog.infoVerbose("invalidating: " + variableKey);
-				boolean removed = mLoadedLiquidPackage
-						.invalidateTargetFromVariableKey(variableKey);
+				boolean removed = mLoadedLiquidPackage.invalidateTargetFromVariableKey(variableKey);
 				if (removed) {
 					LQLog.infoVerbose("invalidated: " + variableKey);
-					mAppliedValues = LQValue
-							.convertToHashMap(mLoadedLiquidPackage
-									.getValues());
+					mAppliedValues = LQValue.convertToHashMap(mLoadedLiquidPackage.getValues());
 					mLoadedLiquidPackage.saveToDisk(mContext);
 					notifyListeners(false);
 				}

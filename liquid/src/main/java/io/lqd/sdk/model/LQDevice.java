@@ -187,12 +187,9 @@ public class LQDevice {
 
 	private static String getInternetConnectivity(Context context) {
 		if (LiquidTools.checkForPermission(permission.ACCESS_NETWORK_STATE, context)) {
-			ConnectivityManager connManager = (ConnectivityManager) context
-					.getSystemService(Context.CONNECTIVITY_SERVICE);
-			NetworkInfo mWifi = connManager
-					.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-			NetworkInfo mNetwork = connManager
-					.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+			ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+			NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+			NetworkInfo mNetwork = connManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
 			if (mWifi.isConnected()) {
 				return "WiFi";
 			} else if (mNetwork.isConnected()) {
@@ -200,7 +197,7 @@ public class LQDevice {
 			} else {
 				return "No Connectivity";
 			}
-		}else{
+		}else {
 			return "No ACCESS_NETWORK_STATE permission";
 		}
 	}

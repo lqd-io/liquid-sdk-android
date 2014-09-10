@@ -42,8 +42,7 @@ public class LQQueuer {
 		this(context, token, new ArrayList<LQNetworkRequest>());
 	}
 
-	public LQQueuer(Context context, String token,
-			ArrayList<LQNetworkRequest> queue) {
+	public LQQueuer(Context context, String token, ArrayList<LQNetworkRequest> queue) {
 		mContext = context;
 		mHttpQueue = queue;
 		mApiToken = token;
