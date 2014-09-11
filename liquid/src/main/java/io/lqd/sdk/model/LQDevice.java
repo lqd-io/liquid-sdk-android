@@ -39,6 +39,7 @@ import android.view.Display;
 import android.view.WindowManager;
 
 public class LQDevice {
+
 	private String mVendor;
 	private String mDeviceModel;
 	private String mSystemVersion;
@@ -190,9 +191,9 @@ public class LQDevice {
 			ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 			NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 			NetworkInfo mNetwork = connManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-			if (mWifi.isConnected()) {
+			if (mWifi != null && mWifi.isConnected()) {
 				return "WiFi";
-			} else if (mNetwork.isConnected()) {
+			} else if (mNetwork != null && mNetwork.isConnected()) {
 				return "Cellular";
 			} else {
 				return "No Connectivity";
