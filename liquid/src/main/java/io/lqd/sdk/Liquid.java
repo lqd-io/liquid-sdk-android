@@ -608,19 +608,15 @@ public class Liquid {
 			eventName = "unnamedEvent";
 		}
 		LQLog.infoVerbose("Tracking: " + eventName);
-		final String finalEventName = eventName;
-		final HashMap<String, Object> finalAttributes = LQModel.sanitizeAttributes(attributes, isDevelopmentMode);
-		final LQUser finalUser = mCurrentUser;
-		final LQDevice finalDevice = mDevice;
-		final LQSession finalSession = mCurrentSession;
-		final Date finalDate = date;
+
+        LQEvent event = new LQEvent(eventName, LQModel.sanitizeAttributes(attributes, isDevelopmentMode), date);
+        final String datapoint = new LQDataPoint(mCurrentUser, mDevice, mCurrentSession, event, mLoadedLiquidPackage.getValues(), date).toJSON().toString();
+        LQLog.data(datapoint);
+
 		mQueue.execute(new Runnable() {
 			@Override
 			public void run() {
-				LQEvent event = new LQEvent(finalEventName, finalAttributes, finalDate);
-				LQDataPoint dataPoint = new LQDataPoint(finalUser, finalDevice,	finalSession, event, mLoadedLiquidPackage.getValues(), finalDate);
-				LQLog.data(dataPoint.toJSON().toString());
-				mHttpQueuer.addToHttpQueue(LQRequestFactory.createDataPointRequest(dataPoint));
+				mHttpQueuer.addToHttpQueue(LQRequestFactory.createDataPointRequest(datapoint));
 			}
 		});
 	}
