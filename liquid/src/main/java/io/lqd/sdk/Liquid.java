@@ -55,7 +55,7 @@ public class Liquid {
 
     static final String TAG_LIQUID = "LIQUID";
 
-    public static final String LIQUID_VERSION = "0.8.2-beta";
+    public static final String LIQUID_VERSION = "0.8.3-beta";
     private static final int LIQUID_DEFAULT_SESSION_TIMEOUT = 30;
 
     private static int mSessionTimeout;

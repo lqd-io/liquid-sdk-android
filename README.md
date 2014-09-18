@@ -1,3 +1,6 @@
+# Liquid Android SDK
+![Maven Central](http://img.shields.io/maven-central/v/io.lqd/liquid-android.svg?style=flat)
+
 # Quick Start to Liquid SDK for Android
 
 This document is just a quick start introduction to Liquid SDK for Android. We recommend you to read the full documentation at [https://www.lqd.io/documentation/android](https://www.lqd.io/documentation/android).
@@ -18,7 +21,7 @@ To integrate Liquid in your app, just follow these simple steps below.
 // build.gradle file
 dependencies {
   // Your Dependencies
-  compile 'io.lqd:liquid-android:0.8.2-beta@aar'
+  compile 'io.lqd:liquid-android:0.8.3-beta@aar'
 }
 ```
 
@@ -29,7 +32,7 @@ dependencies {
 <dependency>
     <groupId>io.lqd</groupId>
     <artifactId>liquid-android</artifactId>
-    <version>0.8.2-beta</version>
+    <version>0.8.3-beta</version>
 </dependency>
 ```
 
