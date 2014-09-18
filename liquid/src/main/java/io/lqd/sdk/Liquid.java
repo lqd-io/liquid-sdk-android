@@ -410,6 +410,11 @@ public class Liquid {
         final HashMap<String, Object> finalAttributes = LQModel.sanitizeAttributes(attributes, isDevelopmentMode);
         final Location finalLocation = location;
 
+        // invalid identifier, keeps the current user
+        if(identifier == null && identifier.length() == 0) {
+            return;
+        }
+
         // same id -> just update attributes
         if (mCurrentUser != null && mCurrentUser.getIdentifier().equals(identifier)) {
             mCurrentUser.setAttributes(finalAttributes);
