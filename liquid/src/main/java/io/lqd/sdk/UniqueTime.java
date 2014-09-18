@@ -21,13 +21,13 @@ import java.util.Date;
 
 public class UniqueTime {
 
-	private static int mIncrement = 1;
+    private static int mIncrement = 1;
 
-	public static synchronized Date newDate() {
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.MILLISECOND, mIncrement);
-		mIncrement = (mIncrement + 1) % 200;
-		return cal.getTime();
-	}
+    public static synchronized Date newDate() {
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.MILLISECOND, mIncrement);
+        mIncrement = (mIncrement + 1) % 200;
+        return cal.getTime();
+    }
 
 }

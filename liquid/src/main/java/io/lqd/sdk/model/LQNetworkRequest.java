@@ -39,167 +39,167 @@ import android.os.Build;
 
 public class LQNetworkRequest extends LQModel {
 
-	public static final int HALF_HOUR = 30 * 60 * 1000;
+    public static final int HALF_HOUR = 30 * 60 * 1000;
 
-	private static final long serialVersionUID = 7456534930025458866L;
+    private static final long serialVersionUID = 7456534930025458866L;
 
-	private static final String LOCAL = Locale.getDefault().toString();
-	private static final String DEVICE = Build.MANUFACTURER + " " + Build.MODEL;
+    private static final String LOCAL = Locale.getDefault().toString();
+    private static final String DEVICE = Build.MANUFACTURER + " " + Build.MODEL;
 
-	private static final String USER_AGENT = "Liquid/"+ Liquid.LIQUID_VERSION + " (Android; Android " + Build.VERSION.RELEASE + "; " + LOCAL + "; " + DEVICE +")";
-	private String mUrl;
-	private String mHttpMethod;
-	private String mJson;
-	private int mNumberOfTries;
-	private Date mLastTry;
+    private static final String USER_AGENT = "Liquid/"+ Liquid.LIQUID_VERSION + " (Android; Android " + Build.VERSION.RELEASE + "; " + LOCAL + "; " + DEVICE +")";
+    private String mUrl;
+    private String mHttpMethod;
+    private String mJson;
+    private int mNumberOfTries;
+    private Date mLastTry;
 
-	public LQNetworkRequest(String url, String httpMethod, String json){
-		mUrl = url;
-		mHttpMethod = httpMethod;
-		mJson = json;
-		mNumberOfTries = 0;
-		mLastTry = null;
-	}
+    public LQNetworkRequest(String url, String httpMethod, String json){
+        mUrl = url;
+        mHttpMethod = httpMethod;
+        mJson = json;
+        mNumberOfTries = 0;
+        mLastTry = null;
+    }
 
-	public String getUrl() {
-		return mUrl;
-	}
-	public String getHttpMethod() {
-		return mHttpMethod;
-	}
-	public String getJSON(){
-		return mJson;
-	}
-	public int getNumberOfTries() {
-		return mNumberOfTries;
-	}
+    public String getUrl() {
+        return mUrl;
+    }
+    public String getHttpMethod() {
+        return mHttpMethod;
+    }
+    public String getJSON(){
+        return mJson;
+    }
+    public int getNumberOfTries() {
+        return mNumberOfTries;
+    }
 
-	public void incrementNumberOfTries() {
-		mNumberOfTries++;
-	}
+    public void incrementNumberOfTries() {
+        mNumberOfTries++;
+    }
 
-	public void setLastTry(Date lastTry) {
-		mLastTry = lastTry;
-	}
+    public void setLastTry(Date lastTry) {
+        mLastTry = lastTry;
+    }
 
-	public Date getLastTry() {
-		return mLastTry;
-	}
+    public Date getLastTry() {
+        return mLastTry;
+    }
 
-	public boolean willFlushAndSet(Date now) {
-		boolean willflush = canFlush(now);
-		if(!willflush) {
-			mLastTry = now;
-		}
-		return willflush;
-	}
+    public boolean willFlushAndSet(Date now) {
+        boolean willflush = canFlush(now);
+        if(!willflush) {
+            mLastTry = now;
+        }
+        return willflush;
+    }
 
-	public boolean canFlush(Date now) {
-		return mLastTry == null ||  now.getTime() - mLastTry.getTime() >= HALF_HOUR;
-	}
+    public boolean canFlush(Date now) {
+        return mLastTry == null ||  now.getTime() - mLastTry.getTime() >= HALF_HOUR;
+    }
 
-	@Override
-	public boolean equals(Object o) {
-		return (o instanceof LQNetworkRequest) &&
-				((LQNetworkRequest)o).getHttpMethod().equals(this.getHttpMethod()) &&
-				((LQNetworkRequest)o).getUrl().equals(this.getUrl()) &&
-				((LQNetworkRequest)o).getJSON().equals(this.getJSON());
-	}
+    @Override
+    public boolean equals(Object o) {
+        return (o instanceof LQNetworkRequest) &&
+                ((LQNetworkRequest)o).getHttpMethod().equals(this.getHttpMethod()) &&
+                ((LQNetworkRequest)o).getUrl().equals(this.getUrl()) &&
+                ((LQNetworkRequest)o).getJSON().equals(this.getJSON());
+    }
 
-	// File Management
-	@SuppressWarnings("unchecked")
-	public static ArrayList<LQNetworkRequest> loadQueue(Context context, String fileName) {
-		Object result = LQModel.loadObject(context, fileName + ".queue");
-		ArrayList<LQNetworkRequest> queue = (ArrayList<LQNetworkRequest>) result;
-		if (queue == null) {
-			queue = new ArrayList<LQNetworkRequest>();
-		}
-		LQLog.infoVerbose("Loading queue with " + queue.size() + " items from disk");
-		return queue;
-	}
+    // File Management
+    @SuppressWarnings("unchecked")
+    public static ArrayList<LQNetworkRequest> loadQueue(Context context, String fileName) {
+        Object result = LQModel.loadObject(context, fileName + ".queue");
+        ArrayList<LQNetworkRequest> queue = (ArrayList<LQNetworkRequest>) result;
+        if (queue == null) {
+            queue = new ArrayList<LQNetworkRequest>();
+        }
+        LQLog.infoVerbose("Loading queue with " + queue.size() + " items from disk");
+        return queue;
+    }
 
-	public static void saveQueue(Context context, ArrayList<LQNetworkRequest> queue, String fileName) {
-		LQLog.data("Saving queue with " + queue.size() + " items to disk");
-		LQModel.save(context, fileName + ".queue", queue);
-	}
+    public static void saveQueue(Context context, ArrayList<LQNetworkRequest> queue, String fileName) {
+        LQLog.data("Saving queue with " + queue.size() + " items to disk");
+        LQModel.save(context, fileName + ".queue", queue);
+    }
 
-	public LQNetworkResponse sendRequest(String token) {
-		String response = null;
-		int responseCode = -1;
-		InputStream err = null;
-		OutputStream out = null;
-		BufferedOutputStream bout = null;
-		BufferedReader boin = null;
-		HttpURLConnection connection = null;
-		try {
-			URL url = new URL(this.getUrl());
-			connection = (HttpURLConnection) url.openConnection();
-			connection.setRequestMethod(this.getHttpMethod());
-			connection.setRequestProperty("Authorization", "Token " + token);
-			connection.setRequestProperty("User-Agent", USER_AGENT);
-			connection.setRequestProperty("Accept", "application/vnd.lqd.v1+json");
-			connection.setRequestProperty("Content-Type", "application/json");
-			connection.setRequestProperty("Accept-Encoding", "gzip");
-			connection.setDoInput(true);
-			if (this.getJSON() != null) {
-				connection.setDoOutput(true);
-				out = connection.getOutputStream();
-				bout = new BufferedOutputStream(out);
-				final StringEntity stringEntity = new StringEntity(this.getJSON(), "UTF-8");
-				stringEntity.writeTo(bout);
-			}
-			responseCode = connection.getResponseCode();
-			err = connection.getErrorStream();
-			boin = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
-			response = boin.readLine();
-		} catch (IOException e) {
-			LQLog.http("Failed due to " + e + " responseCode " + responseCode);
-			LQLog.http("Error " + inputStreamToString(err));
-		} finally {
-			if(connection != null)
-				connection.disconnect();
-			try {
-				if(out != null)
-					out.close();
-			} catch (IOException e) {}
-			try {
-				if(err != null)
-					err.close();
-			} catch (IOException e) {}
-			try {
-				if(bout != null)
-					bout.close();
-			} catch (IOException e) {}
-			try {
-				if (boin != null)
-					boin.close();
-			} catch (IOException e) {}
-		}
-		if ((response != null) || ((responseCode >= 200) && (responseCode < 300))) {
-			LQLog.http("HTTP Success " + response);
-			return new LQNetworkResponse(responseCode, response);
-		}
-		return new LQNetworkResponse(responseCode);
-	}
+    public LQNetworkResponse sendRequest(String token) {
+        String response = null;
+        int responseCode = -1;
+        InputStream err = null;
+        OutputStream out = null;
+        BufferedOutputStream bout = null;
+        BufferedReader boin = null;
+        HttpURLConnection connection = null;
+        try {
+            URL url = new URL(this.getUrl());
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod(this.getHttpMethod());
+            connection.setRequestProperty("Authorization", "Token " + token);
+            connection.setRequestProperty("User-Agent", USER_AGENT);
+            connection.setRequestProperty("Accept", "application/vnd.lqd.v1+json");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Accept-Encoding", "gzip");
+            connection.setDoInput(true);
+            if (this.getJSON() != null) {
+                connection.setDoOutput(true);
+                out = connection.getOutputStream();
+                bout = new BufferedOutputStream(out);
+                final StringEntity stringEntity = new StringEntity(this.getJSON(), "UTF-8");
+                stringEntity.writeTo(bout);
+            }
+            responseCode = connection.getResponseCode();
+            err = connection.getErrorStream();
+            boin = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
+            response = boin.readLine();
+        } catch (IOException e) {
+            LQLog.http("Failed due to " + e + " responseCode " + responseCode);
+            LQLog.http("Error " + inputStreamToString(err));
+        } finally {
+            if(connection != null)
+                connection.disconnect();
+            try {
+                if(out != null)
+                    out.close();
+            } catch (IOException e) {}
+            try {
+                if(err != null)
+                    err.close();
+            } catch (IOException e) {}
+            try {
+                if(bout != null)
+                    bout.close();
+            } catch (IOException e) {}
+            try {
+                if (boin != null)
+                    boin.close();
+            } catch (IOException e) {}
+        }
+        if ((response != null) || ((responseCode >= 200) && (responseCode < 300))) {
+            LQLog.http("HTTP Success " + response);
+            return new LQNetworkResponse(responseCode, response);
+        }
+        return new LQNetworkResponse(responseCode);
+    }
 
-	private static String inputStreamToString(final InputStream stream) {
-		if(stream == null) {
-			return "";
-		}
-		try {
-			BufferedReader br = new BufferedReader(new InputStreamReader(
-					new GZIPInputStream(stream)));
-			StringBuilder sb = new StringBuilder();
-			String line = null;
-			while ((line = br.readLine()) != null) {
-				sb.append(line + "\n");
-			}
-			br.close();
-			return sb.toString();
-		} catch (IOException e) {
-			return "";
-		}
-	}
+    private static String inputStreamToString(final InputStream stream) {
+        if(stream == null) {
+            return "";
+        }
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(
+                    new GZIPInputStream(stream)));
+            StringBuilder sb = new StringBuilder();
+            String line = null;
+            while ((line = br.readLine()) != null) {
+                sb.append(line + "\n");
+            }
+            br.close();
+            return sb.toString();
+        } catch (IOException e) {
+            return "";
+        }
+    }
 }
 
 

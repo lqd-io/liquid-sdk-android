@@ -17,36 +17,36 @@ package io.lqd.sdk.model;
 
 public class LQNetworkResponse {
 
-	private int mHttpCode;
-	private String mData;
+    private int mHttpCode;
+    private String mData;
 
-	public LQNetworkResponse() {
-		this(-1);
-	}
+    public LQNetworkResponse() {
+        this(-1);
+    }
 
-	public LQNetworkResponse(int httpCode) {
-		this(httpCode, null);
-	}
+    public LQNetworkResponse(int httpCode) {
+        this(httpCode, null);
+    }
 
-	public LQNetworkResponse(int httpCode, String response) {
-		mHttpCode = httpCode;
-		mData = response;
-	}
+    public LQNetworkResponse(int httpCode, String response) {
+        mHttpCode = httpCode;
+        mData = response;
+    }
 
-	public int getHttpCode() {
-		return mHttpCode;
-	}
+    public int getHttpCode() {
+        return mHttpCode;
+    }
 
-	public String getRequestResponse() {
-		return mData;
-	}
+    public String getRequestResponse() {
+        return mData;
+    }
 
-	public boolean hasSucceeded() {
-		return mHttpCode >= 200 && mHttpCode < 300;
-	}
+    public boolean hasSucceeded() {
+        return mHttpCode >= 200 && mHttpCode < 300;
+    }
 
-	public boolean hasForbidden() {
-		return mHttpCode == 401 || mHttpCode == 403;
-	}
+    public boolean hasForbidden() {
+        return mHttpCode == 401 || mHttpCode == 403;
+    }
 
 }

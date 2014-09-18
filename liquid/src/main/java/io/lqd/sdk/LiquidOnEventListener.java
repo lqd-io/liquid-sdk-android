@@ -21,13 +21,13 @@ package io.lqd.sdk;
  */
 public interface LiquidOnEventListener {
 
-	/**
-	 * Callback method to be invoked when values arrive from the server.
-	 */
-	public void onValuesReceived();
+    /**
+     * Callback method to be invoked when values arrive from the server.
+     */
+    public void onValuesReceived();
 
-	/**
-	 * Callback method to be invoked when values are ready to be loaded.
-	 */
-	public void onValuesLoaded();
+    /**
+     * Callback method to be invoked when values are ready to be loaded.
+     */
+    public void onValuesLoaded();
 }

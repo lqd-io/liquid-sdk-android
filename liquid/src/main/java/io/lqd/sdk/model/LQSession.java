@@ -26,53 +26,53 @@ import org.json.JSONObject;
 
 public class LQSession extends LQModel {
 
-	private static final long serialVersionUID = -3586505654518525092L;
+    private static final long serialVersionUID = -3586505654518525092L;
 
-	private String mId;
-	private Date mEnd;
-	private Date mStart;
-	private int mTimeout;
+    private String mId;
+    private Date mEnd;
+    private Date mStart;
+    private int mTimeout;
 
-	public LQSession(int timeout, Date date) {
-		mId = LQModel.newIdentifier();
-		mTimeout = timeout;
-		mEnd = null;
-		mStart = date;
-	}
+    public LQSession(int timeout, Date date) {
+        mId = LQModel.newIdentifier();
+        mTimeout = timeout;
+        mEnd = null;
+        mStart = date;
+    }
 
-	public LQSession(int timeout) {
-		this(timeout, new Date());
-	}
+    public LQSession(int timeout) {
+        this(timeout, new Date());
+    }
 
-	public String getIdentifier(){
-		return mId;
-	}
+    public String getIdentifier(){
+        return mId;
+    }
 
-	public Date getStartDate(){
-		return mStart;
-	}
+    public Date getStartDate(){
+        return mStart;
+    }
 
-	public void setEndDate(Date end){
-		mEnd = end;
-	}
+    public void setEndDate(Date end){
+        mEnd = end;
+    }
 
-	public Date getEndDate() {
-		return mEnd;
-	}
+    public Date getEndDate() {
+        return mEnd;
+    }
 
-	public JSONObject toJSON(){
-		JSONObject json = new JSONObject();
-		try {
-			json.put("started_at", LiquidTools.dateToString(mStart));
-			json.put("timeout", mTimeout);
-			json.put("unique_id", mId);
-			if(mEnd != null) {
-				json.put("ended_at", LiquidTools.dateToString(mEnd));
-			}
-			return json;
-		} catch (JSONException e) {
-			LQLog.error("LQSession toJSON: " + e.getMessage());
-		}
-		return null;
-	}
+    public JSONObject toJSON(){
+        JSONObject json = new JSONObject();
+        try {
+            json.put("started_at", LiquidTools.dateToString(mStart));
+            json.put("timeout", mTimeout);
+            json.put("unique_id", mId);
+            if(mEnd != null) {
+                json.put("ended_at", LiquidTools.dateToString(mEnd));
+            }
+            return json;
+        } catch (JSONException e) {
+            LQLog.error("LQSession toJSON: " + e.getMessage());
+        }
+        return null;
+    }
 }

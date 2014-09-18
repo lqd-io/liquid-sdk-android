@@ -28,102 +28,102 @@ import android.content.Context;
 
 public class LQQueuer {
 
-	private static final int LIQUID_QUEUE_SIZE_LIMIT = 500;
-	private static final int LIQUID_DEFAULT_FLUSH_INTERVAL = 15;
-	private static final int LIQUID_MAX_NUMBER_OF_TRIES = 10;
+    private static final int LIQUID_QUEUE_SIZE_LIMIT = 500;
+    private static final int LIQUID_DEFAULT_FLUSH_INTERVAL = 15;
+    private static final int LIQUID_MAX_NUMBER_OF_TRIES = 10;
 
-	private int mFlushInterval;
-	private Context mContext;
-	private ArrayList<LQNetworkRequest> mHttpQueue;
-	private Timer mTimer;
-	private String mApiToken;
+    private int mFlushInterval;
+    private Context mContext;
+    private ArrayList<LQNetworkRequest> mHttpQueue;
+    private Timer mTimer;
+    private String mApiToken;
 
-	public LQQueuer(Context context, String token) {
-		this(context, token, new ArrayList<LQNetworkRequest>());
-	}
+    public LQQueuer(Context context, String token) {
+        this(context, token, new ArrayList<LQNetworkRequest>());
+    }
 
-	public LQQueuer(Context context, String token, ArrayList<LQNetworkRequest> queue) {
-		mContext = context;
-		mHttpQueue = queue;
-		mApiToken = token;
-	}
+    public LQQueuer(Context context, String token, ArrayList<LQNetworkRequest> queue) {
+        mContext = context;
+        mHttpQueue = queue;
+        mApiToken = token;
+    }
 
-	public boolean addToHttpQueue(LQNetworkRequest queuedEvent) {
-		mHttpQueue.add(queuedEvent);
-		if (mHttpQueue.size() > LIQUID_QUEUE_SIZE_LIMIT) {
-			mHttpQueue.remove(0);
-			return true;
-		}
-		return false;
-	}
+    public boolean addToHttpQueue(LQNetworkRequest queuedEvent) {
+        mHttpQueue.add(queuedEvent);
+        if (mHttpQueue.size() > LIQUID_QUEUE_SIZE_LIMIT) {
+            mHttpQueue.remove(0);
+            return true;
+        }
+        return false;
+    }
 
-	public synchronized void setFlushTimer(int seconds) {
-		stopFlushTimer();
-		mFlushInterval = seconds;
-		startFlushTimer();
-	}
+    public synchronized void setFlushTimer(int seconds) {
+        stopFlushTimer();
+        mFlushInterval = seconds;
+        startFlushTimer();
+    }
 
-	public synchronized int getFlushTimer() {
-		return mFlushInterval;
-	}
+    public synchronized int getFlushTimer() {
+        return mFlushInterval;
+    }
 
-	public ArrayList<LQNetworkRequest> getQueue() {
-		return mHttpQueue;
-	}
+    public ArrayList<LQNetworkRequest> getQueue() {
+        return mHttpQueue;
+    }
 
-	public void flush() {
-		if (LiquidTools.isNetworkAvailable(mContext)) {
-			Date now = Calendar.getInstance().getTime();
-			ArrayList<LQNetworkRequest> failedQueue = new ArrayList<LQNetworkRequest>();
-			LQNetworkResponse result = new LQNetworkResponse();
-			while (mHttpQueue.size() > 0) {
-				LQNetworkRequest queuedHttp = mHttpQueue.remove(0);
-				if (queuedHttp.canFlush(now)) {
-					LQLog.infoVerbose("Flushing " + queuedHttp.toString());
-					result = queuedHttp.sendRequest(mApiToken);
-					if (!result.hasSucceeded()) {
-						LQLog.error("HTTP (" + result.getHttpCode() + ") " + queuedHttp.toString());
-						if (queuedHttp.getNumberOfTries() < LIQUID_MAX_NUMBER_OF_TRIES) {
-							if (!result.hasForbidden()) {
-								queuedHttp.setLastTry(now);
-							}
-							queuedHttp.incrementNumberOfTries();
-							failedQueue.add(queuedHttp);
-						}
-					}
-				} else {
-					failedQueue.add(queuedHttp);
-				}
-			}
-			mHttpQueue.addAll(failedQueue);
-			LQNetworkRequest.saveQueue(mContext, mHttpQueue, mApiToken);
-		}
-	}
+    public void flush() {
+        if (LiquidTools.isNetworkAvailable(mContext)) {
+            Date now = Calendar.getInstance().getTime();
+            ArrayList<LQNetworkRequest> failedQueue = new ArrayList<LQNetworkRequest>();
+            LQNetworkResponse result = new LQNetworkResponse();
+            while (mHttpQueue.size() > 0) {
+                LQNetworkRequest queuedHttp = mHttpQueue.remove(0);
+                if (queuedHttp.canFlush(now)) {
+                    LQLog.infoVerbose("Flushing " + queuedHttp.toString());
+                    result = queuedHttp.sendRequest(mApiToken);
+                    if (!result.hasSucceeded()) {
+                        LQLog.error("HTTP (" + result.getHttpCode() + ") " + queuedHttp.toString());
+                        if (queuedHttp.getNumberOfTries() < LIQUID_MAX_NUMBER_OF_TRIES) {
+                            if (!result.hasForbidden()) {
+                                queuedHttp.setLastTry(now);
+                            }
+                            queuedHttp.incrementNumberOfTries();
+                            failedQueue.add(queuedHttp);
+                        }
+                    }
+                } else {
+                    failedQueue.add(queuedHttp);
+                }
+            }
+            mHttpQueue.addAll(failedQueue);
+            LQNetworkRequest.saveQueue(mContext, mHttpQueue, mApiToken);
+        }
+    }
 
-	public void startFlushTimer() {
-		if (mFlushInterval <= 0 || mTimer != null) {
-			return;
-		}
-		mTimer = new Timer();
-		TimerTask task = new TimerTask() {
-			Liquid instance = Liquid.getInstance();
-			@Override
-			public void run() {
-				instance.flush();
+    public void startFlushTimer() {
+        if (mFlushInterval <= 0 || mTimer != null) {
+            return;
+        }
+        mTimer = new Timer();
+        TimerTask task = new TimerTask() {
+            Liquid instance = Liquid.getInstance();
+            @Override
+            public void run() {
+                instance.flush();
 
-			}
-		};
-		mTimer.scheduleAtFixedRate(task, 0,
-				LIQUID_DEFAULT_FLUSH_INTERVAL * 1000);
-		LQLog.infoVerbose("Started flush timer");
-	}
+            }
+        };
+        mTimer.scheduleAtFixedRate(task, 0,
+            LIQUID_DEFAULT_FLUSH_INTERVAL * 1000);
+        LQLog.infoVerbose("Started flush timer");
+    }
 
-	public void stopFlushTimer() {
-		if (mTimer != null) {
-			mTimer.cancel();
-			mTimer = null;
-			LQLog.infoVerbose("Stopped flush timer");
-		}
-	}
+    public void stopFlushTimer() {
+        if (mTimer != null) {
+            mTimer.cancel();
+            mTimer = null;
+            LQLog.infoVerbose("Stopped flush timer");
+        }
+    }
 
 }

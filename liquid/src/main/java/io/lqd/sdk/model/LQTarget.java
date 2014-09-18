@@ -25,35 +25,35 @@ import org.json.JSONObject;
 
 public class LQTarget implements Serializable {
 
-	private static final long serialVersionUID = -8930972810546846549L;
-	private String mId;
+    private static final long serialVersionUID = -8930972810546846549L;
+    private String mId;
 
-	public LQTarget(String id) {
-		mId = id;
-	}
+    public LQTarget(String id) {
+        mId = id;
+    }
 
-	public LQTarget(JSONObject jsonObject){
-		try {
-			mId = jsonObject.getString("id");
-		} catch (JSONException e) {
-			LQLog.error("Parsing LQTarget: " + e.getMessage());
-		}
-	}
+    public LQTarget(JSONObject jsonObject){
+        try {
+            mId = jsonObject.getString("id");
+        } catch (JSONException e) {
+            LQLog.error("Parsing LQTarget: " + e.getMessage());
+        }
+    }
 
-	public JSONObject toJSON(){
-		JSONObject json = new JSONObject();
-		try {
-			json.put("id", getId());
-			return json;
-		} catch (JSONException e) {
-			LQLog.error("LQTarget toJSON: " + e.getMessage());
-		}
-		return null;
-	}
+    public JSONObject toJSON(){
+        JSONObject json = new JSONObject();
+        try {
+            json.put("id", getId());
+            return json;
+        } catch (JSONException e) {
+            LQLog.error("LQTarget toJSON: " + e.getMessage());
+        }
+        return null;
+    }
 
-	public String getId() {
-		return mId;
-	}
+    public String getId() {
+        return mId;
+    }
 
 
 }

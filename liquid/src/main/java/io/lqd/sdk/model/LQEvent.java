@@ -27,55 +27,55 @@ import org.json.JSONObject;
 
 public class LQEvent extends LQModel {
 
-	private static final long serialVersionUID = 4817275328778708775L;
+    private static final long serialVersionUID = 4817275328778708775L;
 
-	private String mName;
-	private HashMap<String,Object> mAttributes;
-	private Date mDate;
+    private String mName;
+    private HashMap<String,Object> mAttributes;
+    private Date mDate;
 
-	// Initialization
-	public LQEvent(String name, HashMap<String,Object> attributes, Date date){
-		mName = name;
-		if(attributes == null){
-			mAttributes = new HashMap<String,Object>();
-		} else {
-			mAttributes = attributes;
-		}
-		mDate = date;
-	}
+    // Initialization
+    public LQEvent(String name, HashMap<String,Object> attributes, Date date){
+        mName = name;
+        if(attributes == null){
+            mAttributes = new HashMap<String,Object>();
+        } else {
+            mAttributes = attributes;
+        }
+        mDate = date;
+    }
 
-	public LQEvent(String name, HashMap<String,Object> attributes) {
-		this(name,attributes, new Date());
-	}
+    public LQEvent(String name, HashMap<String,Object> attributes) {
+        this(name,attributes, new Date());
+    }
 
-	// JSON
-	public JSONObject toJSON() {
-		JSONObject json = new JSONObject();
-		try {
-			if(mAttributes != null) {
-				for(String key : mAttributes.keySet()){
-					if(mAttributes.get(key) instanceof Date) {
-						json.put(key, LiquidTools.dateToString((Date) mAttributes.get(key)));
-					} else {
-						json.put(key, mAttributes.get(key));
-					}
-				}
-			}
-			json.put("name", mName);
-			json.put("date",LiquidTools.dateToString(mDate));
-			return json;
-		} catch (JSONException e) {
-			LQLog.error("LQEvent toJSON: " + e.getMessage());
-		}
+    // JSON
+    public JSONObject toJSON() {
+        JSONObject json = new JSONObject();
+        try {
+            if(mAttributes != null) {
+                for(String key : mAttributes.keySet()){
+                    if(mAttributes.get(key) instanceof Date) {
+                        json.put(key, LiquidTools.dateToString((Date) mAttributes.get(key)));
+                    } else {
+                        json.put(key, mAttributes.get(key));
+                    }
+                }
+            }
+            json.put("name", mName);
+            json.put("date",LiquidTools.dateToString(mDate));
+            return json;
+        } catch (JSONException e) {
+            LQLog.error("LQEvent toJSON: " + e.getMessage());
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	public static boolean hasvalidName(String name, boolean raiseException) {
-		boolean isValid = name == null || name.length() == 0 || name.charAt(0) != '_';
-		if(!isValid) {
-			LiquidTools.exceptionOrLog(raiseException, "Event can't begin with \' _ \' character ");
-		}
-		return isValid;
-	}
+    public static boolean hasvalidName(String name, boolean raiseException) {
+        boolean isValid = name == null || name.length() == 0 || name.charAt(0) != '_';
+        if(!isValid) {
+            LiquidTools.exceptionOrLog(raiseException, "Event can't begin with \' _ \' character ");
+        }
+        return isValid;
+    }
 }
