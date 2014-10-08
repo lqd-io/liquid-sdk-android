@@ -51,8 +51,8 @@ public class LQUser extends LQModel {
 
     public LQUser(String identifier, HashMap<String, Object> attributes, Location location, boolean identified) {
         mIdentifier = identifier;
-        if(attributes != null)
-            mAttributes = attributes;
+        mAttributes = attributes;
+        attributesCheck();
         this.setLocation(location);
         this.setIdentified(identified);
     }
@@ -81,6 +81,7 @@ public class LQUser extends LQModel {
 
     public void setAttributes(HashMap<String, Object> attributes) {
         mAttributes = attributes;
+        attributesCheck();
     }
 
     public Object setAttribute(String key, Object attribute) {
@@ -123,6 +124,12 @@ public class LQUser extends LQModel {
         return null;
     }
 
+    protected void attributesCheck() {
+        if(mAttributes == null) {
+            mAttributes = new HashMap<String, Object>();
+        }
+    }
+
     @Override
     public void save(Context context, String path) {
         super.save(context, path + ".user");
@@ -133,6 +140,7 @@ public class LQUser extends LQModel {
         if(user == null) {
             user = new LQUser(LQModel.newIdentifier(), false);
         }
+        user.attributesCheck();
         return user;
     }
 
