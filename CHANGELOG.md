@@ -1,6 +1,10 @@
 # Liquid Android SDK Change Log
 
+## 0.8.4-beta: Minor Issues
 
+* **[bugfix]** Fix NPE when user is loaded without attributes Hashmap
+
+<br>
 ## 0.8.3-beta: Minor Issues
 
 * **[bugfix]** Fix minor concurrency issue in **track();** method.
