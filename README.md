@@ -9,7 +9,7 @@ To integrate Liquid in your app, just follow these simple steps below.
 
 ## Setup
 
-##### Eclipse
+#### Eclipse
 
 1. Clone [Liquid SDK for android](https://github.com/lqd-io/liquid-sdk-android/).
 2. Import the project to Eclipse (or other IDE).
