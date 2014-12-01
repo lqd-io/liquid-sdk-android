@@ -5,6 +5,7 @@ import io.lqd.sdk.factory.FactoryGirl;
 import java.util.Date;
 
 import org.json.JSONObject;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -22,17 +23,30 @@ public class LQSessionTest {
     private LQSession session;
     private JSONObject json;
 
-    @Test
-    public void testJSONCreationWithoutAttributes() {
+    @Before
+    public void before() {
         session = FactoryGirl.createSession();
         session.setEndDate(new Date());
         json = session.toJSON();
-
-        assertTrue(json.has("started_at"));
-        assertTrue(json.has("timeout"));
-        assertTrue(json.has("unique_id"));
-        assertTrue(json.has("ended_at"));
     }
 
+    @Test
+    public void testSessionHaveStartedAt() {
+        assertTrue(json.has("started_at"));
+    }
 
+    @Test
+    public void testSessionHaveTimeout() {
+        assertTrue(json.has("timeout"));
+    }
+
+    @Test
+    public void testSessionHaveUniqueID() {
+        assertTrue(json.has("unique_id"));
+    }
+
+    @Test
+    public void testSessionHaveEndedAt() {
+        assertTrue(json.has("ended_at"));
+    }
 }

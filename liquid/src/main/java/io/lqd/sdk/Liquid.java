@@ -563,7 +563,7 @@ public class Liquid {
             long interval = (now.getTime() - mEnterBackgroundtime.getTime()) / 1000;
             if (interval >= mSessionTimeout) {
                 destroySession(mEnterBackgroundtime);
-                newSession(false);
+                newSession(true);
             } else {
                 track("_resumeSession", null, UniqueTime.newDate());
             }

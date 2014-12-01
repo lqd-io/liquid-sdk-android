@@ -25,21 +25,16 @@ import static org.junit.Assert.*;
 public class LQUserTest {
 
     private LQUser user;
-    private Location l;
     private HashMap<String, Object> attrs;
 
     @Before
     public void setUp() {
         user = FactoryGirl.createUser();
         attrs = new HashMap<String, Object>();
-        l = new Location("test");
 
         attrs.put("teste1", 1);
         attrs.put("teste2", 1);
         attrs.put("teste3", 1);
-
-        l.setLatitude(12.2);
-        l.setLongitude(123.43);
     }
 
     // User with unique_id only
@@ -48,8 +43,6 @@ public class LQUserTest {
         JSONObject json = user.toJSON();
 
         assertTrue(json.has("unique_id"));
-        assertFalse(json.has("_latitude"));
-        assertFalse(json.has("_longitude"));
     }
 
     // User with custom attrs
@@ -62,8 +55,6 @@ public class LQUserTest {
         assertTrue(json.has("teste1"));
         assertTrue(json.has("teste2"));
         assertTrue(json.has("teste3"));
-        assertFalse(json.has("_latitude"));
-        assertFalse(json.has("_longitude"));
     }
 
     @Test

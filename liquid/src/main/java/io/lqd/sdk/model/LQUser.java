@@ -52,9 +52,10 @@ public class LQUser extends LQModel {
     public LQUser(String identifier, HashMap<String, Object> attributes, Location location, boolean identified) {
         mIdentifier = identifier;
         mAttributes = attributes;
-        attributesCheck();
         this.setLocation(location);
         this.setIdentified(identified);
+        attributesCheck();
+
     }
 
     // Attributes
