@@ -183,7 +183,7 @@ public class LQDevice {
     private static String getCarrier(Context context) {
         TelephonyManager telephonyManager = ((TelephonyManager) context
                 .getSystemService(Context.TELEPHONY_SERVICE));
-        return telephonyManager.getNetworkOperatorName();
+        return "" + telephonyManager.getNetworkOperatorName();
     }
 
     private static String getInternetConnectivity(Context context) {
@@ -223,7 +223,8 @@ public class LQDevice {
 
     private static String getAppName(Context context) {
         int stringId = context.getApplicationInfo().labelRes;
-        return context.getString(stringId);
+        return stringId == 0 ? "(unknown)" : context.getString(stringId);
+
     }
 
     private static String getAppVersion(Context context) {

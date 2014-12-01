@@ -113,8 +113,7 @@ public class LQQueuer {
 
             }
         };
-        mTimer.scheduleAtFixedRate(task, 0,
-            LIQUID_DEFAULT_FLUSH_INTERVAL * 1000);
+        mTimer.scheduleAtFixedRate(task, 0,  LIQUID_DEFAULT_FLUSH_INTERVAL * 1000);
         LQLog.infoVerbose("Started flush timer");
     }
 
