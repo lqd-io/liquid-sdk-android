@@ -1,4 +1,3 @@
-apply plugin: 'com.android.library'
 apply plugin: 'maven'
 apply plugin: 'signing'
 
@@ -9,6 +8,7 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:0.12.+'
+        classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.+'
         classpath 'org.robolectric:robolectric-gradle-plugin:0.11.+'
     }
 }
@@ -19,6 +19,8 @@ allprojects {
     }
 }
 
+apply plugin: 'android-sdk-manager'
+apply plugin: 'com.android.library'
 apply plugin: 'robolectric'
 
 android {
@@ -128,14 +130,7 @@ if (isReleaseVersion()) {
         sign configurations.archives
     }
 }
-task androidJavadocs(type: Javadoc) {
-    source = android.sourceSets.main.java
-    classpath += project.files(android.plugin.getBootClasspath().join(File.pathSeparator))
-}
-task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
-    classifier = 'javadoc'
-    from androidJavadocs.destinationDir
-}
+
 task androidSourcesJar(type: Jar) {
     classifier = 'sources'
     //basename = artifact_id
