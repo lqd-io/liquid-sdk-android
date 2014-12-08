@@ -46,6 +46,7 @@ public class LQQueuer {
         mContext = context;
         mHttpQueue = queue;
         mApiToken = token;
+        mFlushInterval = LIQUID_DEFAULT_FLUSH_INTERVAL;
     }
 
     public boolean addToHttpQueue(LQNetworkRequest queuedEvent) {
@@ -113,7 +114,7 @@ public class LQQueuer {
 
             }
         };
-        mTimer.scheduleAtFixedRate(task, 0,  LIQUID_DEFAULT_FLUSH_INTERVAL * 1000);
+        mTimer.scheduleAtFixedRate(task, 0,  mFlushInterval * 1000);
         LQLog.infoVerbose("Started flush timer");
     }
 
