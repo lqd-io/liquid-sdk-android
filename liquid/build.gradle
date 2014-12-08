@@ -7,9 +7,9 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.12.+'
+        classpath 'com.android.tools.build:gradle:1.0.0'
         classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.+'
-        classpath 'org.robolectric:robolectric-gradle-plugin:0.11.+'
+        classpath 'org.robolectric:robolectric-gradle-plugin:0.14.+'
     }
 }
 
@@ -39,11 +39,6 @@ android {
         versionCode 1
         versionName "1.0.0-SNAPSHOT"
         testInstrumentationRunner "com.google.android.apps.common.testing.testrunner.GoogleInstrumentationTestRunner"
-    }
-    buildTypes {
-        release {
-            runProguard false
-        }
     }
 
     sourceSets {
