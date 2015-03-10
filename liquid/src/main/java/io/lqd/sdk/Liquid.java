@@ -810,15 +810,12 @@ public class Liquid {
                     String dataFromServer = req.sendRequest(mApiToken).getRequestResponse();
                     if (dataFromServer != null) {
                         try {
-                            JSONObject jsonObject = new JSONObject(
-                                    dataFromServer);
-                            LQLiquidPackage liquidPackage = new LQLiquidPackage(
-                                    jsonObject);
+                            JSONObject jsonObject = new JSONObject(dataFromServer);
+                            LQLiquidPackage liquidPackage = new LQLiquidPackage(jsonObject);
                             LQLog.http(jsonObject.toString());
                             liquidPackage.saveToDisk(mContext);
                         } catch (JSONException e) {
-                            LQLog.error("Could not parse JSON "
-                                    + dataFromServer);
+                            LQLog.error("Could not parse JSON (Liquid Variables):" + dataFromServer);
                         }
                         notifyListeners(true);
                         if (mAutoLoadValues) {
