@@ -37,6 +37,7 @@ public class LQQueuer {
     private ArrayList<LQNetworkRequest> mHttpQueue;
     private Timer mTimer;
     private String mApiToken;
+    private Liquid mLiquidInstance;
 
     public LQQueuer(Context context, String token) {
         this(context, token, new ArrayList<LQNetworkRequest>());
@@ -62,6 +63,10 @@ public class LQQueuer {
         stopFlushTimer();
         mFlushInterval = seconds;
         startFlushTimer();
+    }
+
+    public void setLiquidInstance(Liquid instance) {
+        mLiquidInstance = instance;
     }
 
     public synchronized int getFlushTimer() {
@@ -107,10 +112,9 @@ public class LQQueuer {
         }
         mTimer = new Timer();
         TimerTask task = new TimerTask() {
-            Liquid instance = Liquid.getInstance();
             @Override
             public void run() {
-                instance.flush();
+                mLiquidInstance.flush();
 
             }
         };

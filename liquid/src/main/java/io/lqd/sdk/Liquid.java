@@ -151,6 +151,7 @@ public class Liquid {
         mQueue = Executors.newSingleThreadExecutor();
         mLoadedLiquidPackage = LQLiquidPackage.loadFromDisk(mContext);
         mHttpQueuer = new LQQueuer(mContext, mApiToken, LQNetworkRequest.loadQueue(mContext, mApiToken));
+        mHttpQueuer.setLiquidInstance(this);
         mHttpQueuer.startFlushTimer();
         isDevelopmentMode = developmentMode;
         if(isDevelopmentMode)
