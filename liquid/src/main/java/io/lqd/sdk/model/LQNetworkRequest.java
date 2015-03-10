@@ -150,7 +150,8 @@ public class LQNetworkRequest extends LQModel {
             }
             responseCode = connection.getResponseCode();
             err = connection.getErrorStream();
-            boin = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
+            GZIPInputStream gzip = new GZIPInputStream(connection.getInputStream());
+            boin = new BufferedReader(new InputStreamReader(gzip, "UTF-8"));
             response = boin.readLine();
         } catch (IOException e) {
             LQLog.http("Failed due to " + e + " responseCode " + responseCode);
