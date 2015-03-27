@@ -94,6 +94,7 @@ public class LQUser extends LQModel {
     }
 
     public void setLocation(Location location) {
+        attributesCheck();
         if (location == null) {
             mAttributes.remove("latitude");
             mAttributes.remove("longitude");
