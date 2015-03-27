@@ -42,7 +42,7 @@ public class LQDevice {
 
     private String mVendor;
     private String mDeviceModel;
-    private String mSystemVersion;
+    private int mSystemVersion;
     private String mScreenSize;
     private String mCarrier;
     private String mInternetConnectivity;
@@ -50,7 +50,7 @@ public class LQDevice {
     private String mAppBundle;
     private String mAppVersion;
     private String mAppName;
-    private String mReleaseVersion;
+    private int mReleaseVersion;
     private String mLiquidVersion;
     private HashMap<String, Object> mAttributes;
 
@@ -79,7 +79,7 @@ public class LQDevice {
     }
 
     public LQDevice(Context context, String liquidVersion, Location location) {
-        this(context,liquidVersion);
+        this(context, liquidVersion);
         setLocation(location);
     }
 
@@ -118,11 +118,7 @@ public class LQDevice {
         attrs.put("vendor", mVendor);
         attrs.put("platform", "Android");
         attrs.put("model", mDeviceModel);
-        try {
-            attrs.put("system_version", Integer.parseInt(mSystemVersion));
-        } catch (NumberFormatException e) {
-            attrs.put("system_version", mSystemVersion);
-        }
+        attrs.put("system_version", mSystemVersion);
         attrs.put("screen_size", mScreenSize);
         attrs.put("carrier", mCarrier);
         attrs.put("internet_connectivity", mInternetConnectivity);
@@ -158,8 +154,8 @@ public class LQDevice {
         return android.os.Build.MODEL;
     }
 
-    private static String getSystemVersion() {
-        return String.valueOf(android.os.Build.VERSION.SDK_INT);
+    private static int getSystemVersion() {
+        return android.os.Build.VERSION.SDK_INT;
     }
 
     private static String getSystemLanguage() {
@@ -172,8 +168,7 @@ public class LQDevice {
 
     @SuppressWarnings("deprecation")
     private static String getScreenSize(Context context) {
-        WindowManager windowManager = (WindowManager) context
-                .getSystemService(Context.WINDOW_SERVICE);
+        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display display = windowManager.getDefaultDisplay();
         int width = display.getWidth(); // deprecated
         int height = display.getHeight(); // deprecated
@@ -181,8 +176,7 @@ public class LQDevice {
     }
 
     private static String getCarrier(Context context) {
-        TelephonyManager telephonyManager = ((TelephonyManager) context
-                .getSystemService(Context.TELEPHONY_SERVICE));
+        TelephonyManager telephonyManager = ((TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE));
         return "" + telephonyManager.getNetworkOperatorName();
     }
 
@@ -205,8 +199,7 @@ public class LQDevice {
 
     public synchronized static String getDeviceID(Context context) {
         String uid;
-        SharedPreferences sharedPrefs = context.getSharedPreferences(
-                "io.lqd.UUID", Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs = context.getSharedPreferences("io.lqd.UUID", Context.MODE_PRIVATE);
         uid = sharedPrefs.getString("io.lqd.UUID", null);
         if (uid == null) {
             uid = LQModel.newIdentifier();
@@ -230,8 +223,7 @@ public class LQDevice {
     private static String getAppVersion(Context context) {
         try {
             PackageInfo pInfo;
-            pInfo = context.getPackageManager().getPackageInfo(
-                    context.getPackageName(), 0);
+            pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
             return pInfo.versionName;
         } catch (NameNotFoundException e) {
             e.printStackTrace();
@@ -240,16 +232,15 @@ public class LQDevice {
 
     }
 
-    private static String getReleaseVersion(Context context) {
+    private static int getReleaseVersion(Context context) {
         try {
             PackageInfo pInfo;
-            pInfo = context.getPackageManager().getPackageInfo(
-                    context.getPackageName(), 0);
-            return String.valueOf(pInfo.versionCode);
+            pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            return pInfo.versionCode;
         } catch (NameNotFoundException e) {
             e.printStackTrace();
         }
-        return "";
+        return 0;
 
     }
 }
