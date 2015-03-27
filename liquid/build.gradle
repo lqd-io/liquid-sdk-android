@@ -87,6 +87,7 @@ dependencies {
     }
     androidTestCompile 'com.squareup:fest-android:1.0.+'
     androidTestCompile 'org.mockito:mockito-all:1.10.5'
+    compile 'com.google.android.gms:play-services:3.1.+'
 }
 
 apply plugin: 'idea'
