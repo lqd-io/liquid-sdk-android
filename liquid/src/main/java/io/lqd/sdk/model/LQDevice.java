@@ -16,15 +16,6 @@
 
 package io.lqd.sdk.model;
 
-import io.lqd.sdk.LQLog;
-import io.lqd.sdk.LiquidTools;
-
-import java.util.HashMap;
-import java.util.Locale;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.Manifest.permission;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -37,6 +28,15 @@ import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
 import android.view.Display;
 import android.view.WindowManager;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Locale;
+
+import io.lqd.sdk.LQLog;
+import io.lqd.sdk.LiquidTools;
 
 public class LQDevice {
 

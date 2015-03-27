@@ -16,26 +16,6 @@
 
 package io.lqd.sdk;
 
-import io.lqd.sdk.model.LQDataPoint;
-import io.lqd.sdk.model.LQDevice;
-import io.lqd.sdk.model.LQEvent;
-import io.lqd.sdk.model.LQLiquidPackage;
-import io.lqd.sdk.model.LQModel;
-import io.lqd.sdk.model.LQNetworkRequest;
-import io.lqd.sdk.model.LQSession;
-import io.lqd.sdk.model.LQUser;
-import io.lqd.sdk.model.LQValue;
-import io.lqd.sdk.model.LQVariable;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.Manifest.permission;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -49,6 +29,26 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import io.lqd.sdk.model.LQDataPoint;
+import io.lqd.sdk.model.LQDevice;
+import io.lqd.sdk.model.LQEvent;
+import io.lqd.sdk.model.LQLiquidPackage;
+import io.lqd.sdk.model.LQModel;
+import io.lqd.sdk.model.LQNetworkRequest;
+import io.lqd.sdk.model.LQSession;
+import io.lqd.sdk.model.LQUser;
+import io.lqd.sdk.model.LQValue;
+import io.lqd.sdk.model.LQVariable;
 
 
 public class Liquid {
@@ -280,24 +280,25 @@ public class Liquid {
      * *******************
      */
 
-    public void setupPushNotifications(String senderID) {
+    public void setupPushNotifications(final String senderID) {
+        LQLog.infoVerbose("Requesting device push token");
         LQPushHandler.registerDevice(mContext, senderID);
-    }
-
-    public void alias() {
-        final String oldID = mPreviousUser.getIdentifier();
-        final String newID = mCurrentUser.getIdentifier();
-        if (mPreviousUser.isIdentified()) {
-            LQLog.warning("Can't alias (" + oldID + "): Isn't an anonymous user.");
-            return;
         }
-        LQLog.infoVerbose("Making alias between (" + oldID + ") and (" + newID + ").");
-        mQueue.execute(new Runnable() {
-            @Override
-            public void run() {
-                LQRequestFactory.createAliasRequest(oldID, newID).sendRequest(mApiToken);
+
+        public void alias() {
+            final String oldID = mPreviousUser.getIdentifier();
+            final String newID = mCurrentUser.getIdentifier();
+            if (mPreviousUser.isIdentified()) {
+                LQLog.warning("Can't alias (" + oldID + "): Isn't an anonymous user.");
+                return;
             }
-        });
+            LQLog.infoVerbose("Making alias between (" + oldID + ") and (" + newID + ").");
+            mQueue.execute(new Runnable() {
+                @Override
+                public void run() {
+                    LQRequestFactory.createAliasRequest(oldID, newID).sendRequest(mApiToken);
+                }
+            });
     }
 
     /**

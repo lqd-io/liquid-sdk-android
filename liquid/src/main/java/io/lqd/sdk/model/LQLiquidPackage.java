@@ -16,7 +16,11 @@
 
 package io.lqd.sdk.model;
 
-import io.lqd.sdk.LQLog;
+import android.content.Context;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -26,11 +30,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import android.content.Context;
+import io.lqd.sdk.LQLog;
 
 public class LQLiquidPackage implements Serializable{
 

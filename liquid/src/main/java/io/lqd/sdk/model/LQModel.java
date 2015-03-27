@@ -16,8 +16,7 @@
 
 package io.lqd.sdk.model;
 
-import io.lqd.sdk.LQLog;
-import io.lqd.sdk.LiquidTools;
+import android.content.Context;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -31,7 +30,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.UUID;
 
-import android.content.Context;
+import io.lqd.sdk.LQLog;
+import io.lqd.sdk.LiquidTools;
 
 public abstract class LQModel implements Serializable {
 

@@ -16,13 +16,13 @@
 
 package io.lqd.sdk.model;
 
-import io.lqd.sdk.LQLog;
-import io.lqd.sdk.LiquidTools;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Date;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import io.lqd.sdk.LQLog;
+import io.lqd.sdk.LiquidTools;
 
 public class LQSession extends LQModel {
 

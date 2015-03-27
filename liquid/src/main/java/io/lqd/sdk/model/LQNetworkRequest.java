@@ -16,8 +16,10 @@
 
 package io.lqd.sdk.model;
 
-import io.lqd.sdk.LQLog;
-import io.lqd.sdk.Liquid;
+import android.content.Context;
+import android.os.Build;
+
+import org.apache.http.entity.StringEntity;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -32,10 +34,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.zip.GZIPInputStream;
 
-import org.apache.http.entity.StringEntity;
-
-import android.content.Context;
-import android.os.Build;
+import io.lqd.sdk.LQLog;
+import io.lqd.sdk.Liquid;
 
 public class LQNetworkRequest extends LQModel {
 

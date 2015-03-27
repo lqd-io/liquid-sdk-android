@@ -15,8 +15,7 @@
  */
 package io.lqd.sdk;
 
-import io.lqd.sdk.model.LQNetworkRequest;
-import io.lqd.sdk.model.LQNetworkResponse;
+import android.content.Context;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -24,7 +23,8 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import android.content.Context;
+import io.lqd.sdk.model.LQNetworkRequest;
+import io.lqd.sdk.model.LQNetworkResponse;
 
 public class LQQueuer {
 

@@ -16,17 +16,17 @@
 
 package io.lqd.sdk.model;
 
-import io.lqd.sdk.LQLog;
-import io.lqd.sdk.LiquidTools;
-
-import java.util.Date;
-import java.util.HashMap;
+import android.content.Context;
+import android.location.Location;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.content.Context;
-import android.location.Location;
+import java.util.Date;
+import java.util.HashMap;
+
+import io.lqd.sdk.LQLog;
+import io.lqd.sdk.LiquidTools;
 
 public class LQUser extends LQModel {
 
