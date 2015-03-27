@@ -1,13 +1,5 @@
 package io.lqd.sdk.model;
 
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
-import io.lqd.sdk.LQQueuer;
-import io.lqd.sdk.factory.FactoryGirl;
-
-import java.util.ArrayList;
-import java.util.Date;
-
 import android.util.Log;
 
 import org.junit.Before;
@@ -17,8 +9,16 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
+import java.util.ArrayList;
+import java.util.Date;
+
+import io.lqd.sdk.LQQueuer;
+import io.lqd.sdk.factory.FactoryGirl;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 
 @Config(manifest = "../AndroidManifest.xml")

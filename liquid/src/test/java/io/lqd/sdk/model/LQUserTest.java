@@ -1,10 +1,5 @@
 package io.lqd.sdk.model;
 
-import android.location.Location;
-
-import io.lqd.sdk.factory.FactoryGirl;
-import io.lqd.sdk.model.LQUser;
-
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
@@ -16,8 +11,11 @@ import org.robolectric.annotation.Config;
 
 import java.util.HashMap;
 
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
+import io.lqd.sdk.factory.FactoryGirl;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
 
 
 @Config(manifest = "../AndroidManifest.xml")

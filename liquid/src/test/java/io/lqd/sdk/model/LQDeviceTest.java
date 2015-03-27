@@ -1,6 +1,6 @@
 package io.lqd.sdk.model;
 
-import io.lqd.sdk.factory.FactoryGirl;
+import android.location.Location;
 
 import org.json.JSONObject;
 import org.junit.Before;
@@ -10,9 +10,10 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import android.location.Location;
+import io.lqd.sdk.factory.FactoryGirl;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 
 @Config(manifest = "../AndroidManifest.xml")

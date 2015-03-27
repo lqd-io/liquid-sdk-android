@@ -1,5 +1,12 @@
 package io.lqd.sdk.factory;
 
+import android.content.Context;
+
+import java.math.BigInteger;
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import io.lqd.sdk.Liquid;
 import io.lqd.sdk.model.LQDataPoint;
 import io.lqd.sdk.model.LQDevice;
@@ -8,13 +15,6 @@ import io.lqd.sdk.model.LQNetworkRequest;
 import io.lqd.sdk.model.LQSession;
 import io.lqd.sdk.model.LQUser;
 import io.lqd.sdk.model.LQValue;
-
-import java.math.BigInteger;
-import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import android.content.Context;
 
 public class FactoryGirl {
 

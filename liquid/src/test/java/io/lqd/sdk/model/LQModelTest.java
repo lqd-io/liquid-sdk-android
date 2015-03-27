@@ -1,16 +1,17 @@
 package io.lqd.sdk.model;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import static org.junit.Assert.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 
 @Config(manifest = "../AndroidManifest.xml")

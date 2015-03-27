@@ -1,6 +1,6 @@
 package io.lqd.sdk.model;
 
-import java.io.IOException;
+import android.test.AndroidTestCase;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -9,11 +9,9 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import android.test.AndroidTestCase;
+import java.io.IOException;
 
 import io.lqd.sdk.Examples;
-
-import static org.junit.Assert.*;
 
 
 @Config(manifest = "../AndroidManifest.xml")

@@ -1,12 +1,5 @@
 package io.lqd.sdk.model;
 
-import io.lqd.sdk.LiquidTools;
-import io.lqd.sdk.factory.FactoryGirl;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -14,7 +7,16 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import static org.junit.Assert.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+
+import io.lqd.sdk.LiquidTools;
+import io.lqd.sdk.factory.FactoryGirl;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
 
 
 @Config(manifest = "../AndroidManifest.xml")

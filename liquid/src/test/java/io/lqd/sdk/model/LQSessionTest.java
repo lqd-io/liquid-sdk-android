@@ -1,9 +1,5 @@
 package io.lqd.sdk.model;
 
-import io.lqd.sdk.factory.FactoryGirl;
-
-import java.util.Date;
-
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,9 +7,11 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import java.util.Date;
 
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
+import io.lqd.sdk.factory.FactoryGirl;
+
+import static org.junit.Assert.assertTrue;
 
 
 @Config(manifest = "../AndroidManifest.xml")
