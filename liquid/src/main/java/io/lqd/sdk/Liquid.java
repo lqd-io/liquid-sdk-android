@@ -159,9 +159,7 @@ public class Liquid {
 
         // Get last user and init session
         mPreviousUser = LQUser.load(mContext, mApiToken);
-        identifyUser(mPreviousUser.getIdentifier(),
-                mPreviousUser.getAttributes(), null,
-                mPreviousUser.isIdentified(), false);
+        identifyUser(mPreviousUser.getIdentifier(), mPreviousUser.getAttributes(), mPreviousUser.isIdentified(), false);
 
         LQLog.info("Initialized Liquid with API Token " + apiToken);
     }
@@ -302,20 +300,11 @@ public class Liquid {
     }
 
     /**
-     * Identifies the current user with a generated UUID.
-     *
-     */
-    @Deprecated
-    public void identifyUser() {
-        resetUser();
-    }
-
-    /**
      * Create a new User with a new UUID
      */
     public void resetUser() {
         String automaticIdentifier = LQModel.newIdentifier();
-        identifyUser(automaticIdentifier, null, null, false, false);
+        identifyUser(automaticIdentifier, null, false, false);
     }
 
     /**
@@ -325,7 +314,7 @@ public class Liquid {
      *            Custom UUID.
      */
     public void identifyUser(String identifier) {
-        identifyUser(identifier, null, null, true, true);
+        identifyUser(identifier, null, true, true);
     }
 
     /**
@@ -337,7 +326,7 @@ public class Liquid {
      *            user is anonymous.
      */
     public void identifyUser(String identifier, boolean alias) {
-        identifyUser(identifier, null, null, true, alias);
+        identifyUser(identifier, null, true, alias);
     }
 
     /**
@@ -349,7 +338,7 @@ public class Liquid {
      *            Additional user attributes.
      */
     public void identifyUser(String identifier, HashMap<String, Object> attributes) {
-        identifyUser(identifier, attributes, null, true, true);
+        identifyUser(identifier, attributes, true, true);
     }
 
     /**
@@ -364,53 +353,13 @@ public class Liquid {
      *            user is anonymous.
      */
     public void identifyUser(String identifier, HashMap<String, Object> attributes, boolean alias) {
-        identifyUser(identifier, attributes, null, true, alias);
+        identifyUser(identifier, attributes, true, alias);
     }
 
-    /**
-     * Identifies the current user with a custom UUID and additional attributes.
-     *
-     * @deprecated Use {@link #setCurrentLocation(android.location.Location location)}
-     *             instead.</p>
-     * @param identifier
-     *            The custom UUID.
-     * @param location
-     *            User Location.
-     */
-    @Deprecated
-    public void identifyUser(String identifier, Location location) {
-        identifyUser(identifier, null, location, true, true);
-    }
 
-    public void identifyUser(String identifier, Location location, boolean alias) {
-        identifyUser(identifier, null, location, true, alias);
-    }
-
-    /**
-     * Identifies the current user with a custom UUID and additional attributes.
-     *
-     * @deprecated Use {@link #setCurrentLocation(android.location.Location location)}
-     *             instead.</p>
-     * @param identifier
-     *            The custom UUID.
-     * @param attributes
-     *            Additional user attributes.
-     * @param location
-     *            User Location.
-     */
-    @Deprecated
-    public void identifyUser(String identifier, HashMap<String, Object> attributes, Location location) {
-        identifyUser(identifier, attributes, location, true, true);
-    }
-
-    public void identifyUser(String identifier, HashMap<String, Object> attributes, Location location, boolean alias) {
-        identifyUser(identifier, attributes, location, true, alias);
-    }
-
-    private void identifyUser(String identifier, HashMap<String, Object> attributes, Location location, boolean identified, boolean alias) {
+    private void identifyUser(String identifier, HashMap<String, Object> attributes, boolean identified, boolean alias) {
         final String finalIdentifier = identifier;
         final HashMap<String, Object> finalAttributes = LQModel.sanitizeAttributes(attributes, isDevelopmentMode);
-        final Location finalLocation = location;
 
         // invalid identifier, keeps the current user
         if(identifier == null && identifier.length() == 0) {
@@ -427,7 +376,7 @@ public class Liquid {
         destroySession(UniqueTime.newDate());
 
         mPreviousUser = mCurrentUser;
-        mCurrentUser = new LQUser(finalIdentifier, finalAttributes, finalLocation, identified);
+        mCurrentUser = new LQUser(finalIdentifier, finalAttributes, identified);
         newSession(true);
         requestValues();
         mCurrentUser.save(mContext, mApiToken);
@@ -471,25 +420,6 @@ public class Liquid {
                 }
             });
         }
-    }
-
-    /**
-     * Add or update the user location.
-     *
-     * @deprecated Use {@link #setCurrentLocation(android.location.Location location)} instead.
-     * @param location
-     *            User location.
-     */
-    @Deprecated
-    public void setUserLocation(Location location) {
-
-        final Location finalLocation = location;
-        mQueue.execute(new Runnable() {
-            @Override
-            public void run() {
-                mCurrentUser.setLocation(finalLocation);
-            }
-        });
     }
 
     /**
@@ -1121,5 +1051,4 @@ public class Liquid {
         });
 
     }
-
 }
