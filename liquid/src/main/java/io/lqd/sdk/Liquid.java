@@ -127,8 +127,7 @@ public class Liquid {
      *
      * @return The Liquid instance.
      */
-    public static Liquid initialize(Context context, String apiToken,
-            boolean developmentMode) {
+    public static Liquid initialize(Context context, String apiToken, boolean developmentMode) {
         if (mInstance == null) {
             mInstance = new Liquid(context, apiToken, developmentMode);
         }
@@ -281,22 +280,22 @@ public class Liquid {
     public void setupPushNotifications(final String senderID) {
         LQLog.infoVerbose("Requesting device push token");
         LQPushHandler.registerDevice(mContext, senderID);
-        }
+    }
 
-        public void alias() {
-            final String oldID = mPreviousUser.getIdentifier();
-            final String newID = mCurrentUser.getIdentifier();
-            if (mPreviousUser.isIdentified()) {
-                LQLog.warning("Can't alias (" + oldID + "): Isn't an anonymous user.");
-                return;
+    public void alias() {
+        final String oldID = mPreviousUser.getIdentifier();
+        final String newID = mCurrentUser.getIdentifier();
+        if (mPreviousUser.isIdentified()) {
+            LQLog.warning("Can't alias (" + oldID + "): Isn't an anonymous user.");
+            return;
+        }
+        LQLog.infoVerbose("Making alias between (" + oldID + ") and (" + newID + ").");
+        mQueue.execute(new Runnable() {
+            @Override
+            public void run() {
+                LQRequestFactory.createAliasRequest(oldID, newID).sendRequest(mApiToken);
             }
-            LQLog.infoVerbose("Making alias between (" + oldID + ") and (" + newID + ").");
-            mQueue.execute(new Runnable() {
-                @Override
-                public void run() {
-                    LQRequestFactory.createAliasRequest(oldID, newID).sendRequest(mApiToken);
-                }
-            });
+        });
     }
 
     /**
@@ -657,11 +656,9 @@ public class Liquid {
         }
     }
 
-    private void activityDestroyedCallback(Activity activity) {
-    }
+    private void activityDestroyedCallback(Activity activity) { }
 
-    private void activityCreatedCallback(Activity activity) {
-    }
+    private void activityCreatedCallback(Activity activity) { }
 
     private void activityStopedCallback(Activity activity) {
         if (isApplicationInBackground(activity)) {
@@ -711,14 +708,11 @@ public class Liquid {
             }
 
             @Override
-            public void onActivitySaveInstanceState(Activity activity,
-                    Bundle bundle) {
-            }
+            public void onActivitySaveInstanceState(Activity activity, Bundle bundle) { }
 
             @Override
             public void onActivityResumed(Activity activity) {
                 activityResumedCallback(activity);
-
             }
 
             @Override
@@ -736,7 +730,6 @@ public class Liquid {
                 activityCreatedCallback(activity);
             }
         });
-
     }
 
     /**
@@ -763,7 +756,6 @@ public class Liquid {
                             loadLiquidPackage(false);
                         }
                     }
-
                 }
 
             });

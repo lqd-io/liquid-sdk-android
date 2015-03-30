@@ -37,8 +37,7 @@ public class LiquidTools {
         if (pm.checkPermission(permission, context.getPackageName()) == PackageManager.PERMISSION_GRANTED) {
             return true;
         } else {
-            LQLog.warning( "Requesting permission " + permission
-                    + " but it is not on the AndroidManifest.xml");
+            LQLog.warning( "Requesting permission " + permission + " but it is not on the AndroidManifest.xml");
             return false;
         }
     }
