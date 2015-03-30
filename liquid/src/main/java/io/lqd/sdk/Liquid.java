@@ -293,7 +293,7 @@ public class Liquid {
         mQueue.execute(new Runnable() {
             @Override
             public void run() {
-                LQRequestFactory.createAliasRequest(oldID, newID).sendRequest(mApiToken);
+                mHttpQueuer.addToHttpQueue(LQRequestFactory.createAliasRequest(oldID, newID));
             }
         });
     }
