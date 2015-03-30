@@ -15,6 +15,7 @@ import io.lqd.sdk.LiquidTools;
 import io.lqd.sdk.factory.FactoryGirl;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 
@@ -34,6 +35,7 @@ public class LQEventTest {
         assertTrue(json.has("name"));
         assertTrue(json.has("date"));
     }
+
     @Test
     public void testJSONCreationWithAttributes() throws JSONException {
         HashMap<String, Object> attrs = new HashMap<String, Object>();
@@ -67,5 +69,44 @@ public class LQEventTest {
     }
 
 
+    // #hasValidName
+    @Test
+    public void testValidName() {
+        assertTrue(
+                "Should be valid name",
+                LQEvent.hasValidName("custom_event", false)
+        );
+    }
 
+    @Test
+    public void testInvalidEventNameUnderscore() {
+        assertFalse(
+                "( _ )in the beginning of the event name",
+                LQEvent.hasValidName("_custom_event", false)
+         );
+    }
+
+    @Test
+    public void testInvalidEventNameDollar() {
+        assertFalse(
+                "Event name with $",
+                LQEvent.hasValidName("custo$m_event", false)
+        );
+    }
+
+    @Test
+    public void testInvalidEventNameDot() {
+        assertFalse(
+                "Event name with .",
+                LQEvent.hasValidName("custo$m_event", false)
+        );
+    }
+
+    @Test
+    public void testInvalidEventNameNullChar() {
+        assertFalse(
+                "Event name with \0",
+                LQEvent.hasValidName("_custom_\0event", false)
+        );
+    }
 }

@@ -46,7 +46,7 @@ public class LQUserTest {
     // User with custom attrs
     @Test
     public void testToJSONAttrs() {
-        user = new LQUser("123", attrs, null);
+        user = new LQUser("123", attrs);
         JSONObject json = user.toJSON();
 
         assertTrue(json.has("unique_id"));

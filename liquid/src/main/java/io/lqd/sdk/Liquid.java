@@ -433,7 +433,6 @@ public class Liquid {
             @Override
             public void run() {
                 mDevice.setLocation(location);
-                mCurrentUser.save(mContext, mApiToken);
             }
         });
     }
@@ -444,15 +443,26 @@ public class Liquid {
      * @param id
      *            GCM identifier
      */
-    public void setGCMregistrationID(String id) {
-        mDevice.setPushId(id);
+    public void setGCMregistrationID(final String id) {
+        mQueue.execute(new Runnable() {
+            @Override
+            public void run() {
+                mDevice.setPushId(id);
+            }
+        });
     }
 
     /**
      * Remove the GCM registration ID
      */
     public void removeGCMregistrationID() {
-        mDevice.setPushId(null);
+        mQueue.execute(new Runnable() {
+            @Override
+            public void run() {
+                mDevice.setPushId(null);
+            }
+        });
+
     }
 
     private void newSession(boolean runInCurrentThread) {
@@ -514,7 +524,7 @@ public class Liquid {
      *            Name of the event.
      */
     public void track(String eventName) {
-        if (LQEvent.hasvalidName(eventName, isDevelopmentMode)) {
+        if (LQEvent.hasValidName(eventName, isDevelopmentMode)) {
             track(eventName, null, UniqueTime.newDate());
         } else {
             LQLog.warning("Event can't begin with \' _ \' character ");
@@ -535,7 +545,7 @@ public class Liquid {
      *            Additional attributes of the event.
      */
     public void track(String eventName, HashMap<String, Object> attributes) {
-        if (LQEvent.hasvalidName(eventName, isDevelopmentMode)) {
+        if (LQEvent.hasValidName(eventName, isDevelopmentMode)) {
             track(eventName, attributes, UniqueTime.newDate());
         }
     }
