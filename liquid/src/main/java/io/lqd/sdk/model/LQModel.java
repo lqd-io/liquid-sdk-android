@@ -78,7 +78,7 @@ public abstract class LQModel implements Serializable {
                 (attribute instanceof Number) || (attribute instanceof Boolean) ||
                 (attribute instanceof Date));
         if(!isValid) {
-            LiquidTools.exceptionOrLog(raiseException, "Key: (" + attribute + ") contains invalid chars: (. $ \\0)");
+            LiquidTools.exceptionOrLog(raiseException, "Value (" + attribute + ") with unsupported type. Supported: (String, Number, Boolean, Date)");
         }
         return isValid;
     }
