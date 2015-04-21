@@ -25,6 +25,7 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.provider.Settings;
@@ -47,8 +48,9 @@ public class LQPushHandler extends BroadcastReceiver {
     private static final String SEND_REGISTRATION_TO_GOOGLE = "com.google.android.c2dm.intent.REGISTER";
     private static final String PROPERTY_REG_ID = "registration_id";
     private static final String LIQUID_MESSAGE_EXTRA = "lqd_message";
-    private static final String LIQUID_PUSH_ID_EXTRA = "lqd_push_id";
+    private static final String LIQUID_PUSH_ID_EXTRA = "lqd_id";
     private static final String LIQUID_SOUND_EXTRA = "lqd_sound";
+    private static final String LIQUID_TITLE_EXTRA = "lqd_title";
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -62,15 +64,16 @@ public class LQPushHandler extends BroadcastReceiver {
 
     private void handleNotification(Context context, Intent intent) {
         String message = intent.getStringExtra(LIQUID_MESSAGE_EXTRA);
-        int push_id = intent.getIntExtra(LIQUID_PUSH_ID_EXTRA, 0);
+        int push_id = getPushId(intent);
         int icon = getAppIconInt(context);
-        String title = getAppName(context);
+        Uri sound = getPushSound(intent, context);
+        String title = getPushTitle(intent, context);
         Intent appIntent = getIntent(context);
         PendingIntent contentIntent = PendingIntent.getActivity(context.getApplicationContext(), 0, appIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         if(Build.VERSION.SDK_INT < 11) {
-            sendNotification8(context, contentIntent, icon, push_id, title, message);
+            sendNotification8(context, contentIntent, icon, push_id, title, message, sound);
         } else {
-            sendNotification11(context, contentIntent, icon, push_id, title, message);
+            sendNotification11(context, contentIntent, icon, push_id, title, message, sound);
         }
 
     }
@@ -128,7 +131,7 @@ public class LQPushHandler extends BroadcastReceiver {
 
     @SuppressWarnings("deprecation")
     @TargetApi(16)
-    private void sendNotification11(Context c, PendingIntent intent, int icon, int push_id, String title, String body) {
+    private void sendNotification11(Context c, PendingIntent intent, int icon, int push_id, String title, String body, Uri sound) {
         NotificationManager nm = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
         Notification.Builder builder = new Notification.Builder(c);
         builder.setSmallIcon(icon);
@@ -137,7 +140,8 @@ public class LQPushHandler extends BroadcastReceiver {
         builder.setWhen(System.currentTimeMillis());
         builder.setContentTitle(title);
         builder.setContentIntent(intent);
-        builder.setSound(Settings.System.DEFAULT_NOTIFICATION_URI);
+        if(sound != null)
+            builder.setSound(sound);
         Notification n;
         if (Build.VERSION.SDK_INT < 16) {
             n = builder.getNotification();
@@ -150,13 +154,38 @@ public class LQPushHandler extends BroadcastReceiver {
 
     @SuppressWarnings("deprecation")
     @TargetApi(8)
-    private void sendNotification8(Context c, PendingIntent intent, int icon, int push_id, String title, String body) {
+    private void sendNotification8(Context c, PendingIntent intent, int icon, int push_id, String title, String body, Uri sound) {
         NotificationManager nm = (NotificationManager)c.getSystemService(Context.NOTIFICATION_SERVICE);
         Notification n = new Notification(icon, body, System.currentTimeMillis());
         n.flags |= Notification.FLAG_AUTO_CANCEL;
         n.setLatestEventInfo(c, title, body, intent);
-        n.sound = Settings.System.DEFAULT_NOTIFICATION_URI;
+        if(sound != null)
+            n.sound = sound;
         nm.notify(push_id, n);
+    }
+
+    private static int getPushId(Intent intent) {
+        try {
+            return Integer.parseInt(intent.getStringExtra(LIQUID_PUSH_ID_EXTRA));
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    private static String getPushTitle(Intent intent, Context context) {
+        String title = intent.getStringExtra(LIQUID_TITLE_EXTRA);
+        if(title == null)
+            return getAppName(context);
+        return title;
+    }
+
+    private static Uri getPushSound(Intent intent, Context context) {
+        String sound = intent.getStringExtra(LIQUID_SOUND_EXTRA);
+        if(sound == null)
+            return null;
+        if(sound.equals("default"))
+            return Settings.System.DEFAULT_NOTIFICATION_URI;
+        return Uri.parse("android.resource://" + context.getPackageName() + "/raw/" + sound);
     }
 
 
