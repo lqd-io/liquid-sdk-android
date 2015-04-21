@@ -20,15 +20,33 @@ import android.util.Log;
 
 public class LQLog {
 
-    public static int LOG_LEVEL = 2;
+    private static int LOG_LEVEL = 2;
 
-    private static final int PATHS = 7;
-    private static final int HTTP = 6;
-    private static final int DATA = 5;
-    private static final int INFO_VERBOSE = 4;
-    private static final int INFO = 3;
-    private static final int WARNING = 2;
-    private static final int ERROR = 1;
+    public static final int PATHS = 7;
+    public static final int HTTP = 6;
+    public static final int DATA = 5;
+    public static final int INFO_VERBOSE = 4;
+    public static final int INFO = 3;
+    public static final int WARNING = 2;
+    public static final int ERROR = 1;
+
+    /**
+     * Changes the current Log level (Debugging proposes)
+     * @param level LogLevel
+     */
+    public static void setLevel(int level) {
+        if( level < 1 || level > 7)
+            throw new IllegalArgumentException("Log levels are between 1 and 7");
+        LOG_LEVEL = level;
+    }
+
+    /**
+     * Gets the current log level
+     * @return the log level
+     */
+    public static int getLevel() {
+        return LOG_LEVEL;
+    }
 
     public static void paths(String message) {
         if(LOG_LEVEL >= PATHS) {

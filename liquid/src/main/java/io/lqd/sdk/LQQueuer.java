@@ -15,8 +15,7 @@
  */
 package io.lqd.sdk;
 
-import io.lqd.sdk.model.LQNetworkRequest;
-import io.lqd.sdk.model.LQNetworkResponse;
+import android.content.Context;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -24,7 +23,8 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import android.content.Context;
+import io.lqd.sdk.model.LQNetworkRequest;
+import io.lqd.sdk.model.LQNetworkResponse;
 
 public class LQQueuer {
 
@@ -37,6 +37,7 @@ public class LQQueuer {
     private ArrayList<LQNetworkRequest> mHttpQueue;
     private Timer mTimer;
     private String mApiToken;
+    private Liquid mLiquidInstance;
 
     public LQQueuer(Context context, String token) {
         this(context, token, new ArrayList<LQNetworkRequest>());
@@ -46,6 +47,7 @@ public class LQQueuer {
         mContext = context;
         mHttpQueue = queue;
         mApiToken = token;
+        mFlushInterval = LIQUID_DEFAULT_FLUSH_INTERVAL;
     }
 
     public boolean addToHttpQueue(LQNetworkRequest queuedEvent) {
@@ -61,6 +63,10 @@ public class LQQueuer {
         stopFlushTimer();
         mFlushInterval = seconds;
         startFlushTimer();
+    }
+
+    public void setLiquidInstance(Liquid instance) {
+        mLiquidInstance = instance;
     }
 
     public synchronized int getFlushTimer() {
@@ -106,15 +112,13 @@ public class LQQueuer {
         }
         mTimer = new Timer();
         TimerTask task = new TimerTask() {
-            Liquid instance = Liquid.getInstance();
             @Override
             public void run() {
-                instance.flush();
+                mLiquidInstance.flush();
 
             }
         };
-        mTimer.scheduleAtFixedRate(task, 0,
-            LIQUID_DEFAULT_FLUSH_INTERVAL * 1000);
+        mTimer.scheduleAtFixedRate(task, 0,  mFlushInterval * 1000);
         LQLog.infoVerbose("Started flush timer");
     }
 

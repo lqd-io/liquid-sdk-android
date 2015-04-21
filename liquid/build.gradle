@@ -1,29 +1,103 @@
-apply plugin: 'com.android.library'
 apply plugin: 'maven'
 apply plugin: 'signing'
+
 buildscript {
     repositories {
         mavenCentral()
     }
+
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.12.2'
+        classpath 'com.android.tools.build:gradle:1.0.0'
+        classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.+'
+        classpath 'org.robolectric:robolectric-gradle-plugin:0.14.+'
     }
 }
+
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+}
+
+apply plugin: 'android-sdk-manager'
+apply plugin: 'com.android.library'
+apply plugin: 'robolectric'
+
 android {
+    packagingOptions {
+        exclude 'LICENSE.txt'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE'
+    }
     compileSdkVersion 19
-    buildToolsVersion '20.0.0'
+    buildToolsVersion "19.1.0"
 
     defaultConfig {
         minSdkVersion 8
-        targetSdkVersion 20
-
-        lintOptions {
-            abortOnError false
-            warningsAsErrors false
-        }
+        targetSdkVersion 18
+        versionCode 1
+        versionName "1.0.0-SNAPSHOT"
+        testInstrumentationRunner "com.google.android.apps.common.testing.testrunner.GoogleInstrumentationTestRunner"
     }
 
+    sourceSets {
+        androidTest {
+            setRoot('src/test')
+        }
+    }
 }
+
+robolectric {
+    include '**/*Test.class'
+    exclude '**/espresso/**/*.class'
+}
+
+dependencies {
+    repositories {
+        mavenCentral()
+    }
+    // Espresso
+    androidTestCompile files('lib/espresso-1.1.jar', 'lib/testrunner-1.1.jar', 'lib/testrunner-runtime-1.1.jar')
+    androidTestCompile 'com.google.guava:guava:14.0.1'
+    androidTestCompile 'com.squareup.dagger:dagger:1.1.0'
+    androidTestCompile 'org.hamcrest:hamcrest-integration:1.1'
+    androidTestCompile 'org.hamcrest:hamcrest-core:1.1'
+    androidTestCompile 'org.hamcrest:hamcrest-library:1.1'
+
+    androidTestCompile('junit:junit:4.11') {
+        exclude module: 'hamcrest-core'
+    }
+    androidTestCompile('org.robolectric:robolectric:2.3') {
+        exclude module: 'classworlds'
+        exclude module: 'commons-logging'
+        exclude module: 'httpclient'
+        exclude module: 'maven-artifact'
+        exclude module: 'maven-artifact-manager'
+        exclude module: 'maven-error-diagnostics'
+        exclude module: 'maven-model'
+        exclude module: 'maven-project'
+        exclude module: 'maven-settings'
+        exclude module: 'plexus-container-default'
+        exclude module: 'plexus-interpolation'
+        exclude module: 'plexus-utils'
+        exclude module: 'wagon-file'
+        exclude module: 'wagon-http-lightweight'
+        exclude module: 'wagon-provider-api'
+    }
+    androidTestCompile 'com.squareup:fest-android:1.0.+'
+    androidTestCompile 'org.mockito:mockito-all:1.10.5'
+    compile 'com.google.android.gms:play-services:3.1.+'
+}
+
+apply plugin: 'idea'
+
+idea {
+    module {
+        testOutputDir = file('build/test-classes/debug')
+    }
+}
+
 android.libraryVariants.all { variant ->
     task("generate${variant.name}Javadoc", type: Javadoc) {
         description "Generates Javadoc for $variant.name."
@@ -52,14 +126,7 @@ if (isReleaseVersion()) {
         sign configurations.archives
     }
 }
-task androidJavadocs(type: Javadoc) {
-    source = android.sourceSets.main.java
-    classpath += project.files(android.plugin.getBootClasspath().join(File.pathSeparator))
-}
-task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
-    classifier = 'javadoc'
-    from androidJavadocs.destinationDir
-}
+
 task androidSourcesJar(type: Jar) {
     classifier = 'sources'
     //basename = artifact_id

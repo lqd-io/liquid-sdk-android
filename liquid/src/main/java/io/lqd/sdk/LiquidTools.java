@@ -16,17 +16,17 @@
 
 package io.lqd.sdk;
 
-import java.lang.reflect.Field;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+
+import java.lang.reflect.Field;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 
 public class LiquidTools {
 
@@ -37,8 +37,7 @@ public class LiquidTools {
         if (pm.checkPermission(permission, context.getPackageName()) == PackageManager.PERMISSION_GRANTED) {
             return true;
         } else {
-            LQLog.warning( "Requesting permission " + permission
-                    + " but it is not on the AndroidManifest.xml");
+            LQLog.warning( "Requesting permission " + permission + " but it is not on the AndroidManifest.xml");
             return false;
         }
     }

@@ -16,14 +16,14 @@
 
 package io.lqd.sdk.model;
 
-import io.lqd.sdk.LQLog;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import io.lqd.sdk.LQLog;
 
 public class LQValue implements Serializable {
 

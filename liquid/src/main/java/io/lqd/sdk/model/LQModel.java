@@ -16,8 +16,7 @@
 
 package io.lqd.sdk.model;
 
-import io.lqd.sdk.LQLog;
-import io.lqd.sdk.LiquidTools;
+import android.content.Context;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -31,7 +30,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.UUID;
 
-import android.content.Context;
+import io.lqd.sdk.LQLog;
+import io.lqd.sdk.LiquidTools;
 
 public abstract class LQModel implements Serializable {
 
@@ -78,7 +78,7 @@ public abstract class LQModel implements Serializable {
                 (attribute instanceof Number) || (attribute instanceof Boolean) ||
                 (attribute instanceof Date));
         if(!isValid) {
-            LiquidTools.exceptionOrLog(raiseException, "Key: (" + attribute + ") contains invalid chars: (. $ \\0)");
+            LiquidTools.exceptionOrLog(raiseException, "Value (" + attribute + ") with unsupported type. Supported: (String, Number, Boolean, Date)");
         }
         return isValid;
     }

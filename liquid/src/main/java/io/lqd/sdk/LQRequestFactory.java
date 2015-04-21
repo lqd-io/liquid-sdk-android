@@ -16,11 +16,10 @@
 
 package io.lqd.sdk;
 
-import io.lqd.sdk.model.LQDataPoint;
-import io.lqd.sdk.model.LQNetworkRequest;
-
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import io.lqd.sdk.model.LQNetworkRequest;
 
 public class LQRequestFactory {
 

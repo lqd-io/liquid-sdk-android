@@ -16,14 +16,14 @@
 
 package io.lqd.sdk.model;
 
-import io.lqd.sdk.LiquidTools;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import io.lqd.sdk.LiquidTools;
 
 public class LQDataPoint {
 

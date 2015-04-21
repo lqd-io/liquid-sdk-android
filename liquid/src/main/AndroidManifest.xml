@@ -1,7 +1,2 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="io.lqd.sdk">
-
-    <application
-        android:allowBackup="true" />
-
+<manifest package="io.lqd.sdk">
 </manifest>

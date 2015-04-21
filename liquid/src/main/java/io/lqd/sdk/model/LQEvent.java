@@ -16,14 +16,14 @@
 
 package io.lqd.sdk.model;
 
-import io.lqd.sdk.LQLog;
-import io.lqd.sdk.LiquidTools;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Date;
 import java.util.HashMap;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import io.lqd.sdk.LQLog;
+import io.lqd.sdk.LiquidTools;
 
 public class LQEvent extends LQModel {
 
@@ -71,11 +71,11 @@ public class LQEvent extends LQModel {
         return null;
     }
 
-    public static boolean hasvalidName(String name, boolean raiseException) {
-        boolean isValid = name == null || name.length() == 0 || name.charAt(0) != '_';
-        if(!isValid) {
-            LiquidTools.exceptionOrLog(raiseException, "Event can't begin with \' _ \' character ");
+    public static boolean hasValidName(String name, boolean raiseException) {
+        boolean valid = name == null || name.length() == 0 || (name.charAt(0) != '_' && !name.contains("$") && !name.contains(".") && !name.contains("\0"));
+        if(!valid) {
+            LiquidTools.exceptionOrLog(raiseException, "Event name cannot start with \'_\' and cannot contain invalid chars: (. $ \\0)");
         }
-        return isValid;
+        return valid;
     }
 }

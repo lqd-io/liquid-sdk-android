@@ -16,26 +16,6 @@
 
 package io.lqd.sdk;
 
-import io.lqd.sdk.model.LQDataPoint;
-import io.lqd.sdk.model.LQDevice;
-import io.lqd.sdk.model.LQEvent;
-import io.lqd.sdk.model.LQLiquidPackage;
-import io.lqd.sdk.model.LQModel;
-import io.lqd.sdk.model.LQNetworkRequest;
-import io.lqd.sdk.model.LQSession;
-import io.lqd.sdk.model.LQUser;
-import io.lqd.sdk.model.LQValue;
-import io.lqd.sdk.model.LQVariable;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.Manifest.permission;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -49,6 +29,26 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import io.lqd.sdk.model.LQDataPoint;
+import io.lqd.sdk.model.LQDevice;
+import io.lqd.sdk.model.LQEvent;
+import io.lqd.sdk.model.LQLiquidPackage;
+import io.lqd.sdk.model.LQModel;
+import io.lqd.sdk.model.LQNetworkRequest;
+import io.lqd.sdk.model.LQSession;
+import io.lqd.sdk.model.LQUser;
+import io.lqd.sdk.model.LQValue;
+import io.lqd.sdk.model.LQVariable;
 
 
 public class Liquid {
@@ -127,8 +127,7 @@ public class Liquid {
      *
      * @return The Liquid instance.
      */
-    public static Liquid initialize(Context context, String apiToken,
-            boolean developmentMode) {
+    public static Liquid initialize(Context context, String apiToken, boolean developmentMode) {
         if (mInstance == null) {
             mInstance = new Liquid(context, apiToken, developmentMode);
         }
@@ -151,6 +150,7 @@ public class Liquid {
         mQueue = Executors.newSingleThreadExecutor();
         mLoadedLiquidPackage = LQLiquidPackage.loadFromDisk(mContext);
         mHttpQueuer = new LQQueuer(mContext, mApiToken, LQNetworkRequest.loadQueue(mContext, mApiToken));
+        mHttpQueuer.setLiquidInstance(this);
         mHttpQueuer.startFlushTimer();
         isDevelopmentMode = developmentMode;
         if(isDevelopmentMode)
@@ -158,9 +158,7 @@ public class Liquid {
 
         // Get last user and init session
         mPreviousUser = LQUser.load(mContext, mApiToken);
-        identifyUser(mPreviousUser.getIdentifier(),
-                mPreviousUser.getAttributes(), null,
-                mPreviousUser.isIdentified(), false);
+        identifyUser(mPreviousUser.getIdentifier(), mPreviousUser.getAttributes(), mPreviousUser.isIdentified(), false);
 
         LQLog.info("Initialized Liquid with API Token " + apiToken);
     }
@@ -279,7 +277,8 @@ public class Liquid {
      * *******************
      */
 
-    public void setupPushNotifications(String senderID) {
+    public void setupPushNotifications(final String senderID) {
+        LQLog.infoVerbose("Requesting device push token");
         LQPushHandler.registerDevice(mContext, senderID);
     }
 
@@ -294,18 +293,9 @@ public class Liquid {
         mQueue.execute(new Runnable() {
             @Override
             public void run() {
-                LQRequestFactory.createAliasRequest(oldID, newID).sendRequest(mApiToken);
+                mHttpQueuer.addToHttpQueue(LQRequestFactory.createAliasRequest(oldID, newID));
             }
         });
-    }
-
-    /**
-     * Identifies the current user with a generated UUID.
-     *
-     */
-    @Deprecated
-    public void identifyUser() {
-        resetUser();
     }
 
     /**
@@ -313,7 +303,7 @@ public class Liquid {
      */
     public void resetUser() {
         String automaticIdentifier = LQModel.newIdentifier();
-        identifyUser(automaticIdentifier, null, null, false, false);
+        identifyUser(automaticIdentifier, null, false, false);
     }
 
     /**
@@ -323,7 +313,7 @@ public class Liquid {
      *            Custom UUID.
      */
     public void identifyUser(String identifier) {
-        identifyUser(identifier, null, null, true, true);
+        identifyUser(identifier, null, true, true);
     }
 
     /**
@@ -335,7 +325,7 @@ public class Liquid {
      *            user is anonymous.
      */
     public void identifyUser(String identifier, boolean alias) {
-        identifyUser(identifier, null, null, true, alias);
+        identifyUser(identifier, null, true, alias);
     }
 
     /**
@@ -347,7 +337,7 @@ public class Liquid {
      *            Additional user attributes.
      */
     public void identifyUser(String identifier, HashMap<String, Object> attributes) {
-        identifyUser(identifier, attributes, null, true, true);
+        identifyUser(identifier, attributes, true, true);
     }
 
     /**
@@ -362,53 +352,13 @@ public class Liquid {
      *            user is anonymous.
      */
     public void identifyUser(String identifier, HashMap<String, Object> attributes, boolean alias) {
-        identifyUser(identifier, attributes, null, true, alias);
+        identifyUser(identifier, attributes, true, alias);
     }
 
-    /**
-     * Identifies the current user with a custom UUID and additional attributes.
-     *
-     * @deprecated Use {@link #setCurrentLocation(android.location.Location location)}
-     *             instead.</p>
-     * @param identifier
-     *            The custom UUID.
-     * @param location
-     *            User Location.
-     */
-    @Deprecated
-    public void identifyUser(String identifier, Location location) {
-        identifyUser(identifier, null, location, true, true);
-    }
 
-    public void identifyUser(String identifier, Location location, boolean alias) {
-        identifyUser(identifier, null, location, true, alias);
-    }
-
-    /**
-     * Identifies the current user with a custom UUID and additional attributes.
-     *
-     * @deprecated Use {@link #setCurrentLocation(android.location.Location location)}
-     *             instead.</p>
-     * @param identifier
-     *            The custom UUID.
-     * @param attributes
-     *            Additional user attributes.
-     * @param location
-     *            User Location.
-     */
-    @Deprecated
-    public void identifyUser(String identifier, HashMap<String, Object> attributes, Location location) {
-        identifyUser(identifier, attributes, location, true, true);
-    }
-
-    public void identifyUser(String identifier, HashMap<String, Object> attributes, Location location, boolean alias) {
-        identifyUser(identifier, attributes, location, true, alias);
-    }
-
-    private void identifyUser(String identifier, HashMap<String, Object> attributes, Location location, boolean identified, boolean alias) {
+    private void identifyUser(String identifier, HashMap<String, Object> attributes, boolean identified, boolean alias) {
         final String finalIdentifier = identifier;
         final HashMap<String, Object> finalAttributes = LQModel.sanitizeAttributes(attributes, isDevelopmentMode);
-        final Location finalLocation = location;
 
         // invalid identifier, keeps the current user
         if(identifier == null && identifier.length() == 0) {
@@ -425,7 +375,7 @@ public class Liquid {
         destroySession(UniqueTime.newDate());
 
         mPreviousUser = mCurrentUser;
-        mCurrentUser = new LQUser(finalIdentifier, finalAttributes, finalLocation, identified);
+        mCurrentUser = new LQUser(finalIdentifier, finalAttributes, identified);
         newSession(true);
         requestValues();
         mCurrentUser.save(mContext, mApiToken);
@@ -472,25 +422,6 @@ public class Liquid {
     }
 
     /**
-     * Add or update the user location.
-     *
-     * @deprecated Use {@link #setCurrentLocation(android.location.Location location)} instead.
-     * @param location
-     *            User location.
-     */
-    @Deprecated
-    public void setUserLocation(Location location) {
-
-        final Location finalLocation = location;
-        mQueue.execute(new Runnable() {
-            @Override
-            public void run() {
-                mCurrentUser.setLocation(finalLocation);
-            }
-        });
-    }
-
-    /**
      * Add or update the current location.
      *
      * @param location
@@ -501,7 +432,6 @@ public class Liquid {
             @Override
             public void run() {
                 mDevice.setLocation(location);
-                mCurrentUser.save(mContext, mApiToken);
             }
         });
     }
@@ -512,15 +442,26 @@ public class Liquid {
      * @param id
      *            GCM identifier
      */
-    public void setGCMregistrationID(String id) {
-        mDevice.setPushId(id);
+    public void setGCMregistrationID(final String id) {
+        mQueue.execute(new Runnable() {
+            @Override
+            public void run() {
+                mDevice.setPushId(id);
+            }
+        });
     }
 
     /**
      * Remove the GCM registration ID
      */
     public void removeGCMregistrationID() {
-        mDevice.setPushId(null);
+        mQueue.execute(new Runnable() {
+            @Override
+            public void run() {
+                mDevice.setPushId(null);
+            }
+        });
+
     }
 
     private void newSession(boolean runInCurrentThread) {
@@ -563,7 +504,7 @@ public class Liquid {
             long interval = (now.getTime() - mEnterBackgroundtime.getTime()) / 1000;
             if (interval >= mSessionTimeout) {
                 destroySession(mEnterBackgroundtime);
-                newSession(false);
+                newSession(true);
             } else {
                 track("_resumeSession", null, UniqueTime.newDate());
             }
@@ -582,7 +523,7 @@ public class Liquid {
      *            Name of the event.
      */
     public void track(String eventName) {
-        if (LQEvent.hasvalidName(eventName, isDevelopmentMode)) {
+        if (LQEvent.hasValidName(eventName, isDevelopmentMode)) {
             track(eventName, null, UniqueTime.newDate());
         } else {
             LQLog.warning("Event can't begin with \' _ \' character ");
@@ -603,7 +544,7 @@ public class Liquid {
      *            Additional attributes of the event.
      */
     public void track(String eventName, HashMap<String, Object> attributes) {
-        if (LQEvent.hasvalidName(eventName, isDevelopmentMode)) {
+        if (LQEvent.hasValidName(eventName, isDevelopmentMode)) {
             track(eventName, attributes, UniqueTime.newDate());
         }
     }
@@ -715,11 +656,9 @@ public class Liquid {
         }
     }
 
-    private void activityDestroyedCallback(Activity activity) {
-    }
+    private void activityDestroyedCallback(Activity activity) { }
 
-    private void activityCreatedCallback(Activity activity) {
-    }
+    private void activityCreatedCallback(Activity activity) { }
 
     private void activityStopedCallback(Activity activity) {
         if (isApplicationInBackground(activity)) {
@@ -769,14 +708,11 @@ public class Liquid {
             }
 
             @Override
-            public void onActivitySaveInstanceState(Activity activity,
-                    Bundle bundle) {
-            }
+            public void onActivitySaveInstanceState(Activity activity, Bundle bundle) { }
 
             @Override
             public void onActivityResumed(Activity activity) {
                 activityResumedCallback(activity);
-
             }
 
             @Override
@@ -794,7 +730,6 @@ public class Liquid {
                 activityCreatedCallback(activity);
             }
         });
-
     }
 
     /**
@@ -809,22 +744,18 @@ public class Liquid {
                     String dataFromServer = req.sendRequest(mApiToken).getRequestResponse();
                     if (dataFromServer != null) {
                         try {
-                            JSONObject jsonObject = new JSONObject(
-                                    dataFromServer);
-                            LQLiquidPackage liquidPackage = new LQLiquidPackage(
-                                    jsonObject);
+                            JSONObject jsonObject = new JSONObject(dataFromServer);
+                            LQLiquidPackage liquidPackage = new LQLiquidPackage(jsonObject);
                             LQLog.http(jsonObject.toString());
                             liquidPackage.saveToDisk(mContext);
                         } catch (JSONException e) {
-                            LQLog.error("Could not parse JSON "
-                                    + dataFromServer);
+                            LQLog.error("Could not parse JSON (Liquid Variables):" + dataFromServer);
                         }
                         notifyListeners(true);
                         if (mAutoLoadValues) {
                             loadLiquidPackage(false);
                         }
                     }
-
                 }
 
             });
@@ -1122,5 +1053,4 @@ public class Liquid {
         });
 
     }
-
 }

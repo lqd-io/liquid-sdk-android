@@ -16,17 +16,17 @@
 
 package io.lqd.sdk.model;
 
-import io.lqd.sdk.LQLog;
-import io.lqd.sdk.LiquidTools;
-
-import java.util.Date;
-import java.util.HashMap;
+import android.content.Context;
+import android.location.Location;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.content.Context;
-import android.location.Location;
+import java.util.Date;
+import java.util.HashMap;
+
+import io.lqd.sdk.LQLog;
+import io.lqd.sdk.LiquidTools;
 
 public class LQUser extends LQModel {
 
@@ -38,23 +38,23 @@ public class LQUser extends LQModel {
 
 
     public LQUser(String identifier) {
-        this(identifier, new HashMap<String,Object>(), null);
+        this(identifier, new HashMap<String,Object>());
     }
 
     public LQUser(String identifier, boolean identified) {
-        this(identifier, new HashMap<String,Object>(), null, identified);
+        this(identifier, new HashMap<String,Object>(), identified);
     }
 
-    public LQUser(String identifier, HashMap<String, Object> attributes, Location location) {
-        this(identifier, attributes, location, true);
+    public LQUser(String identifier, HashMap<String, Object> attributes) {
+        this(identifier, attributes, true);
     }
 
-    public LQUser(String identifier, HashMap<String, Object> attributes, Location location, boolean identified) {
+    public LQUser(String identifier, HashMap<String, Object> attributes, boolean identified) {
         mIdentifier = identifier;
         mAttributes = attributes;
-        attributesCheck();
-        this.setLocation(location);
         this.setIdentified(identified);
+        attributesCheck();
+
     }
 
     // Attributes
@@ -90,16 +90,6 @@ public class LQUser extends LQModel {
 
     public Object attributeForKey(String key) {
         return mAttributes.get(key);
-    }
-
-    public void setLocation(Location location) {
-        if (location == null) {
-            mAttributes.remove("latitude");
-            mAttributes.remove("longitude");
-        } else {
-            mAttributes.put("latitude", Double.valueOf(location.getLatitude()));
-            mAttributes.put("longitude",Double.valueOf(location.getLongitude()));
-        }
     }
 
     // JSON
