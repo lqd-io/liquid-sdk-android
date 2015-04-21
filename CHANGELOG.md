@@ -1,5 +1,15 @@
 # Liquid Android SDK Change Log
 
+  ## 1.0.0: Push Notifications with title and custom sound
+
+  * **[feature]** Add push notifications custom sound and title (configurable over Liquid dashboard)
+  * **[feature]** Add option to set Logger level
+  * **[bugfix]** Fix custom data points flush interval
+  * **[enhancement]** Support GZIP requests
+  * **[enhancement]** Improve stability and performance
+  * **[enhancement]** Remove deprecated methods
+
+<br>
 ## 0.8.4-beta: Minor Issues
 
 * **[bugfix]** Fix NPE when user is loaded without attributes Hashmap
