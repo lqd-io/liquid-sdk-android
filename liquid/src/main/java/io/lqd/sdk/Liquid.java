@@ -400,6 +400,15 @@ public class Liquid {
     }
 
     /**
+     * Get the device UUID
+     *
+     * @return the device UUID in String format
+     */
+    public String getDeviceIdentifier() {
+        return LQDevice.getDeviceID(mContext);
+    }
+
+    /**
      * Add or update an additional attribute to the user.
      *
      * @param key
