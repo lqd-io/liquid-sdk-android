@@ -1,5 +1,7 @@
 # Liquid Android SDK
 
+Stable:[![Build Status](https://travis-ci.org/lqd-io/liquid-sdk-android.svg?branch=master)](https://travis-ci.org/lqd-io/liquid-sdk-android)
+Dev:
 [![Build Status](https://travis-ci.org/lqd-io/liquid-sdk-android.svg?branch=development)](https://travis-ci.org/lqd-io/liquid-sdk-android)
 <br>
 [![Maven Central](http://img.shields.io/maven-central/v/io.lqd/liquid-android.svg?style=flat)](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22liquid-android%22)

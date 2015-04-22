@@ -170,7 +170,7 @@ uploadArchives {
             }
         }
 
-        if (isReleaseVersion()) {
+        if (isReleaseVersion() && project.hasProperty("sonatypeUsername")) {
 
             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
