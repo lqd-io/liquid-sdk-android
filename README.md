@@ -26,7 +26,7 @@ To integrate Liquid in your app, just follow these simple steps below.
 // build.gradle file
 dependencies {
   // Your Dependencies
-  compile 'io.lqd:liquid-android:1.0.0@aar'
+  compile 'io.lqd:liquid-android:1.0.1@aar'
 }
 ```
 
@@ -37,7 +37,7 @@ dependencies {
 <dependency>
     <groupId>io.lqd</groupId>
     <artifactId>liquid-android</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 
