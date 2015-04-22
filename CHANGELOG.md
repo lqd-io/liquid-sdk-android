@@ -1,6 +1,6 @@
 # Liquid Android SDK Change Log
 
-## 1.0.1: Push Notifications with title and custom sound
+## 1.0.1: Add DeviceID accessor from Liquid to support Appsflyer Integration
 
   * **[feature]** Add DeviceID accessor from Liquid to support Appsflyer Integration
 
