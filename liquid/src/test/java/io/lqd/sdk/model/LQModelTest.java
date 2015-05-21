@@ -11,6 +11,7 @@ import java.util.HashMap;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 
@@ -137,5 +138,12 @@ public class LQModelTest {
         } catch (IllegalArgumentException e) {
             fail("Should not throw exception because is a valid key");
         }
+    }
+
+    // public static String newIdentifier();
+
+    @Test
+    public void testNewIdentifierLength() {
+        assertEquals(47, LQModel.newIdentifier().length());
     }
 }
