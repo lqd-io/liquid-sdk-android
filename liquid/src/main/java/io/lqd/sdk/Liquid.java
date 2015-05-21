@@ -299,11 +299,13 @@ public class Liquid {
     }
 
     /**
-     * Create a new User with a new UUID
+     * Create a new User with a new UUID if the user isn't an identified one
      */
     public void resetUser() {
-        String automaticIdentifier = LQModel.newIdentifier();
-        identifyUser(automaticIdentifier, null, false, false);
+        if(!mCurrentUser.isIdentified()) {
+            String automaticIdentifier = LQModel.newIdentifier();
+            identifyUser(automaticIdentifier, null, false, false);
+        }
     }
 
     /**
