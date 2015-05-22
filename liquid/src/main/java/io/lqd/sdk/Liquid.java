@@ -302,9 +302,11 @@ public class Liquid {
      * Create a new User with a new UUID if the user isn't an identified one
      */
     public void resetUser() {
-        if(!mCurrentUser.isIdentified()) {
-            String automaticIdentifier = LQModel.newIdentifier();
-            identifyUser(automaticIdentifier, null, false, false);
+        if(mCurrentUser.isIdentified()) {
+            identifyUser(LQModel.newIdentifier(), null, false, false);
+        } else {
+            mCurrentUser.clearCustomAttributes();
+            mCurrentUser.save(mContext, mApiToken);
         }
     }
 

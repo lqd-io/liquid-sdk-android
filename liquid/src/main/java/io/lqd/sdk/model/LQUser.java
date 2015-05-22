@@ -75,6 +75,10 @@ public class LQUser extends LQModel {
         return (o instanceof LQUser) && ( this.toJSON().toString().equals(((LQUser) o).toJSON().toString()));
     }
 
+    public void clearCustomAttributes() {
+        setAttributes(new HashMap<String, Object>());
+    }
+
     public HashMap<String, Object> getAttributes() {
         return new HashMap<String, Object>(mAttributes);
     }
