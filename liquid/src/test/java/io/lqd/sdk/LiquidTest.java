@@ -8,6 +8,10 @@ import org.robolectric.annotation.Config;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
+import java.lang.reflect.Field;
+
+import io.lqd.sdk.model.LQSession;
+
 @Config(manifest = "../AndroidManifest.xml")
 @RunWith(RobolectricTestRunner.class)
 public class LiquidTest {
@@ -27,5 +31,14 @@ public class LiquidTest {
         String id = lqd.getUserIdentifier();
         lqd.resetUser();
         assertEquals(id, lqd.getUserIdentifier());
+    }
+
+    public void testKeepSessionOnIdentify() throws NoSuchFieldException, IllegalAccessException {
+        Liquid lqd = Liquid.initialize(Robolectric.application, "le_token");
+        Field f = Liquid.class.getDeclaredField("mCurrentSession");
+        f.setAccessible(true);
+        String session_id = ((LQSession) f.get(lqd)).getIdentifier();
+        lqd.identifyUser("le_user_id");
+        assertEquals(session_id, ((LQSession) f.get(lqd)).getIdentifier());
     }
 }
