@@ -159,6 +159,7 @@ public class Liquid {
         // Get last user and init session
         mPreviousUser = LQUser.load(mContext, mApiToken);
         identifyUser(mPreviousUser.getIdentifier(), mPreviousUser.getAttributes(), mPreviousUser.isIdentified(), false);
+        newSession(true);
 
         LQLog.info("Initialized Liquid with API Token " + apiToken);
     }
@@ -372,11 +373,9 @@ public class Liquid {
             LQLog.infoVerbose("Already identified with user " + finalIdentifier + ". Not identifying again.");
             return;
         }
-        destroySession(UniqueTime.newDate());
 
         mPreviousUser = mCurrentUser;
         mCurrentUser = new LQUser(finalIdentifier, finalAttributes, identified);
-        newSession(true);
         requestValues();
         mCurrentUser.save(mContext, mApiToken);
 
