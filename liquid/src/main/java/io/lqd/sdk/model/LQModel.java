@@ -43,8 +43,8 @@ public abstract class LQModel implements Serializable {
      */
     public static String newIdentifier() {
         String uid = UUID.randomUUID().toString().toUpperCase(Locale.ENGLISH);
-        long timeSince1970 = Calendar.getInstance().getTimeInMillis();
-        return uid + "-" + String.valueOf(timeSince1970).substring(0,10);
+        String epoch = LiquidTools.tenCharEpoch(Calendar.getInstance().getTimeInMillis());
+        return uid + "-" + epoch;
     }
 
     /*
@@ -142,5 +142,4 @@ public abstract class LQModel implements Serializable {
     protected static LQModel load(Context context, String path) {
         return (LQModel) loadObject(context, path);
     }
-
 }

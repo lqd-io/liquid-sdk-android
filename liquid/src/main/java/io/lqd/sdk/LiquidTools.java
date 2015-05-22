@@ -90,4 +90,13 @@ public class LiquidTools {
         }
     }
 
+    public static String tenCharEpoch(long epoch) {
+        String timeSince1970 = String.valueOf(epoch);
+        if(timeSince1970.length() > 10) {
+            return timeSince1970.substring(0, 10);
+        } else {
+            return String.format("%1$10s", timeSince1970).replace(" ", "0");
+        }
+    }
+
 }
