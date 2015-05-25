@@ -87,22 +87,7 @@ public class LQPushHandler extends BroadcastReceiver {
     }
 
 
-    static void registerDevice(Context context, String senderID) {
-        if (Build.VERSION.SDK_INT >= 21) {
-            registerDeviceAPI21(context, senderID);
-        } else {
-            registerDeviceAPIBelow21(context, senderID);
-        }
-    }
-
-    private static void registerDeviceAPIBelow21(final Context context, final String senderID) {
-        Intent registrationIntent = new Intent(SEND_REGISTRATION_TO_GOOGLE);
-        registrationIntent.putExtra("app", PendingIntent.getBroadcast(context, 0, new Intent(), 0));
-        registrationIntent.putExtra("sender", senderID);
-        context.startService(registrationIntent);
-    }
-
-    private static void registerDeviceAPI21(final Context context, final String senderID) {
+    static void registerDevice(final Context context, final String senderID) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
