@@ -1,5 +1,14 @@
 # Liquid Android SDK Change Log
 
+
+## 1.1.0: Better session handling
+
+  * **[feature]** Identifying a user no longer starts a new session
+  * **[feature]** Keep User unique_id when calling `resetUser();` in an anonymous user
+  * **[bugfix]** Fix UUID generation when user is a time traveler
+  * **[bugfix]** Fix push registration in SDK below API 21
+
+<br>
 ## 1.0.1: Add DeviceID accessor from Liquid to support Appsflyer Integration
 
   * **[feature]** Add DeviceID accessor from Liquid to support Appsflyer Integration
