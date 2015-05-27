@@ -123,6 +123,32 @@ configurations {
         extendsFrom configurations.default
     }
 }
+class MyListener implements org.gradle.api.tasks.testing.TestListener
+{
+
+    public void beforeSuite(TestDescriptor suite) {
+        //recordAndOutput('suiteStarting: '+suite.getName())
+    }
+
+    public void afterSuite(TestDescriptor suite, TestResult result) {
+        //recordAndOutput 'suiteFinished: '+suite.getName()
+    }
+
+    public void beforeTest(TestDescriptor test) {
+        //recordAndOutput 'testStarting: '+test.getName()
+    }
+
+    public void afterTest(TestDescriptor test, TestResult result) {
+        recordAndOutput test.getName()+': '+result.getResultType()
+    }
+
+    private void recordAndOutput(String msg) {
+        println msg
+    }
+}
+
+gradle.addListener(new MyListener())
+
 if (isReleaseVersion()) {
     signing {
         required { gradle.taskGraph.hasTask("uploadArchives") }
@@ -144,10 +170,10 @@ uploadArchives {
 
     repositories.mavenDeployer {
         pom.project {
-            name project.name
+            name 'liquid-android'
             packaging 'aar'
-            description 'Liquid Android SDK \n' +
-                    'http://lqd.io/'
+            artifactId 'liquid-android'
+            description 'Liquid Android SDK \n' + 'http://onliquid.com/'
             url 'https://github.com/lqd-io/liquid-sdk-android'
             scm {
                 url 'https://github.com/lqd-io/liquid-sdk-android'

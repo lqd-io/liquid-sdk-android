@@ -1,14 +1,12 @@
 # Liquid Android SDK
 
-Stable:[![Build Status](https://travis-ci.org/lqd-io/liquid-sdk-android.svg?branch=master)](https://travis-ci.org/lqd-io/liquid-sdk-android)
-Dev:
-[![Build Status](https://travis-ci.org/lqd-io/liquid-sdk-android.svg?branch=development)](https://travis-ci.org/lqd-io/liquid-sdk-android)
+[![Build Status](https://travis-ci.org/lqd-io/liquid-sdk-android.svg?branch=master)](https://travis-ci.org/lqd-io/liquid-sdk-android)
 <br>
 [![Maven Central](http://img.shields.io/maven-central/v/io.lqd/liquid-android.svg?style=flat)](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22liquid-android%22)
 
 # Quick Start to Liquid SDK for Android
 
-This document is just a quick start introduction to Liquid SDK for Android. We recommend you to read the full documentation at [https://www.lqd.io/documentation/android](https://www.lqd.io/documentation/android).
+This document is just a quick start introduction to Liquid SDK for Android. We recommend you to read the full documentation at [https://www.onliquid.com/documentation/android](https://www.onliquid.com/documentation/android).
 
 To integrate Liquid in your app, just follow these simple steps below.
 
@@ -129,7 +127,7 @@ mWelcomeMessage.setText(liquid.getStringVariable("welcome_message", "Default Wel
 
 ### Full documentation
 
-We recommend you to read the full documentation at [https://www.lqd.io/documentation/android](https://www.lqd.io/documentation/android).
+We recommend you to read the full documentation at [https://www.lqd.io/documentation/android](https://www.onliquid.com/documentation/android).
 
 
 # Author
