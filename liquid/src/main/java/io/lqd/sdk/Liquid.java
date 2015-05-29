@@ -433,6 +433,20 @@ public class Liquid {
         }
     }
 
+    public void setUserAttributes(final HashMap<String, Object> attributes) {
+        mQueue.execute(new Runnable() {
+            @Override
+            public void run() {
+                for(String key : attributes.keySet()) {
+                    if (LQModel.validKey(key, isDevelopmentMode)) {
+                        mCurrentUser.setAttribute(key, attributes.get(key));
+                    }
+                }
+                mCurrentUser.save(mContext, mApiToken);
+            }
+        });
+    }
+
     /**
      * Add or update the current location.
      *
