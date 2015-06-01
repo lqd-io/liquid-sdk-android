@@ -1049,7 +1049,6 @@ public class Liquid {
 
             @Override
             public void run() {
-                mCurrentSession = null;
                 mDevice = new LQDevice(mContext, LIQUID_VERSION);
                 mEnterBackgroundtime = null;
                 mLoadedLiquidPackage = new LQLiquidPackage();
@@ -1058,6 +1057,7 @@ public class Liquid {
                     mHttpQueuer = new LQQueuer(mContext, mApiToken);
                 }
                 resetUser();
+                newSession(true);
             }
         });
     }
