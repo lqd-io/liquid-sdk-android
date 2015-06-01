@@ -1,5 +1,12 @@
 # Liquid Android SDK Change Log
 
+## 1.2.0: Attributes bulk insert + bug fixes
+
+  * **[feature]** Add setUserAttributes() to set multiple user attributes
+  * **[bugfix]** Fix NPE in softReset()
+  * **[bugfix]** LiquidPackage loading on initialize
+
+<br>
 
 ## 1.1.0: Better session handling
 

@@ -2,7 +2,6 @@ language: java
 
 branches:
   only:
-    - development
     - master
 
 jdk: oraclejdk7
@@ -64,4 +63,3 @@ before_install:
 #install: ./gradlew clean build
 
 script: ./gradlew clean build
-

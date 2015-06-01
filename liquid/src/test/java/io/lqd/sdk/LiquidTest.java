@@ -20,7 +20,8 @@ import io.lqd.sdk.model.LQUser;
 @RunWith(RobolectricTestRunner.class)
 public class LiquidTest {
 
-        private Liquid lqd;
+    private Liquid lqd;
+
     @Before
     public void setUp() {
         lqd = Liquid.initialize(Robolectric.application, "le_token");
