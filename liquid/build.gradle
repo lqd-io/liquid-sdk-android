@@ -30,12 +30,12 @@ android {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE'
     }
-    compileSdkVersion 19
+    compileSdkVersion 21
     buildToolsVersion "19.1.0"
 
     defaultConfig {
         minSdkVersion 9
-        targetSdkVersion 18
+        targetSdkVersion 21
         versionCode 1
         versionName "1.0.1"
         testInstrumentationRunner "com.google.android.apps.common.testing.testrunner.GoogleInstrumentationTestRunner"
