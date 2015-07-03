@@ -17,7 +17,6 @@
 package io.lqd.sdk.model;
 
 import android.content.Context;
-import android.location.Location;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,7 +33,7 @@ public class LQUser extends LQModel {
 
     private String mIdentifier;
     private boolean mIdentified;
-    private HashMap<String, Object> mAttributes = new HashMap<String, Object>();
+    private HashMap<String, Object> mAttributes = new HashMap<>();
 
 
     public LQUser(String identifier) {
@@ -80,7 +79,7 @@ public class LQUser extends LQModel {
     }
 
     public HashMap<String, Object> getAttributes() {
-        return new HashMap<String, Object>(mAttributes);
+        return new HashMap<>(mAttributes);
     }
 
     public void setAttributes(HashMap<String, Object> attributes) {

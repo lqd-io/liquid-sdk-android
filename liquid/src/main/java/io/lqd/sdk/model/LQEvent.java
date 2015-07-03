@@ -37,15 +37,11 @@ public class LQEvent extends LQModel {
     public LQEvent(String name, HashMap<String,Object> attributes, Date date){
         mName = name;
         if(attributes == null){
-            mAttributes = new HashMap<String,Object>();
+            mAttributes = new HashMap<>();
         } else {
             mAttributes = attributes;
         }
         mDate = date;
-    }
-
-    public LQEvent(String name, HashMap<String,Object> attributes) {
-        this(name,attributes, new Date());
     }
 
     // JSON

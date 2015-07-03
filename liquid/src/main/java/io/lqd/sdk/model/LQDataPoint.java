@@ -44,10 +44,6 @@ public class LQDataPoint {
         mTimestamp = date;
     }
 
-    public LQDataPoint(LQUser user, LQDevice device, LQSession session, LQEvent event, ArrayList<LQValue> values) {
-        this(user,device,session,event,values, new Date());
-    }
-
     // JSON
     public JSONObject toJSON() {
         JSONObject json = new JSONObject();
@@ -91,5 +87,4 @@ public class LQDataPoint {
         }
         return new JSONObject();
     }
-
 }

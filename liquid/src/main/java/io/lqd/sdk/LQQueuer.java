@@ -80,8 +80,8 @@ public class LQQueuer {
     public void flush() {
         if (LiquidTools.isNetworkAvailable(mContext)) {
             Date now = Calendar.getInstance().getTime();
-            ArrayList<LQNetworkRequest> failedQueue = new ArrayList<LQNetworkRequest>();
-            LQNetworkResponse result = new LQNetworkResponse();
+            ArrayList<LQNetworkRequest> failedQueue = new ArrayList<>();
+            LQNetworkResponse result;
             while (mHttpQueue.size() > 0) {
                 LQNetworkRequest queuedHttp = mHttpQueue.remove(0);
                 if (queuedHttp.canFlush(now)) {

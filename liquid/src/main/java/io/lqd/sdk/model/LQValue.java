@@ -32,7 +32,6 @@ public class LQValue implements Serializable {
     private String mId;
     private Object mValue;
     private LQVariable mVariable;
-    private boolean mIsDefault;
     private String mTargetId = null;
 
     public LQValue(JSONObject jsonObject){
@@ -69,10 +68,6 @@ public class LQValue implements Serializable {
         return mVariable.getDataType();
     }
 
-    public boolean isDefault() {
-        return mIsDefault;
-    }
-
     public String getTargetId() {
         return mTargetId;
     }
@@ -83,7 +78,7 @@ public class LQValue implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof LQValue && o != null && this.getId().equals(((LQValue) o).getId());
+        return (o instanceof LQValue) && this.getId().equals(((LQValue) o).getId());
     }
 
     public JSONObject toJSON(){
@@ -98,8 +93,8 @@ public class LQValue implements Serializable {
         return null;
     }
 
-    public static HashMap<String,LQValue> convertToHashMap(ArrayList<LQValue> values){
-        HashMap<String,LQValue> hashMap = new HashMap<String, LQValue>();
+    public static HashMap<String,LQValue> convertToHashMapa(ArrayList<LQValue> values){
+        HashMap<String,LQValue> hashMap = new HashMap<>();
         for(LQValue value : values) {
             if(value.getValue() != null){
                 if(value.getVariable().getName() != null){
@@ -113,8 +108,6 @@ public class LQValue implements Serializable {
     @Override
     public String toString() {
         return "LQValue [mIdentifier=" + mId + ", mValue=" + mValue
-                + ", mVariable=" + mVariable + ", mIsDefault=" + mIsDefault
-                + "]";
+                + ", mVariable=" + mVariable + "]";
     }
-
 }

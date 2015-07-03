@@ -29,6 +29,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import io.lqd.sdk.LQLog;
 
@@ -37,24 +38,21 @@ public class LQLiquidPackage implements Serializable{
     private static final long serialVersionUID = 2252438865270376L;
     private static final String LIQUID_PACKAGE_FILENAME = "LiquidPackage";
 
-    private ArrayList<LQValue> mValues = new ArrayList<LQValue>();
+    private ArrayList<LQValue> mValues = new ArrayList<>();
 
-    public LQLiquidPackage() {
+    public LQLiquidPackage() { }
 
-    }
-
-    public LQLiquidPackage(JSONObject jsonObject) {
+    public LQLiquidPackage(String jsonString) {
         try {
-            JSONArray valuesJsonArray = jsonObject.getJSONArray("values");
+            JSONArray valuesJsonArray = new JSONObject(jsonString).getJSONArray("values");
             for(int index = 0; index < valuesJsonArray.length(); index ++){
                 JSONObject valueJson = valuesJsonArray.getJSONObject(index);
                 LQValue v = new LQValue(valueJson);
                 mValues.add(v);
             }
         } catch (JSONException e) {
-            LQLog.error("Parsing LQLiquidPackage: " + e.getMessage());
+            LQLog.error("Could not parse JSON (Liquid Variables):" + jsonString);
         }
-
     }
 
     public boolean isEmpty() {
@@ -63,6 +61,18 @@ public class LQLiquidPackage implements Serializable{
 
     public ArrayList<LQValue> getValues() {
         return mValues;
+    }
+
+    public HashMap<String,LQValue> getValuesHashMap(){
+        HashMap<String,LQValue> hashMap = new HashMap<>();
+        for(LQValue value : getValues()) {
+            if(value.getValue() != null){
+                if(value.getVariable().getName() != null){
+                    hashMap.put(value.getVariable().getName(), value);
+                }
+            }
+        }
+        return hashMap;
     }
 
     public boolean invalidateTargetFromVariableKey(String variableKey) {
@@ -81,7 +91,7 @@ public class LQLiquidPackage implements Serializable{
 
     private boolean invalidateValuesOfTarget(String targetId) {
         int valueItems = mValues.size();
-        ArrayList<LQValue> tempvar =  new ArrayList<LQValue>();
+        ArrayList<LQValue> tempvar =  new ArrayList<>();
 
         for(LQValue value : mValues) {
             if(!targetId.equals(value.getTargetId())) {
@@ -95,7 +105,7 @@ public class LQLiquidPackage implements Serializable{
 
     private boolean invalidateValue(String variableKey) {
         int valueItems = mValues.size();
-        ArrayList<LQValue> tempvar =  new ArrayList<LQValue>();
+        ArrayList<LQValue> tempvar =  new ArrayList<>();
 
         for(LQValue value : mValues) {
             if(!value.getVariable().getName().equals(variableKey)) {

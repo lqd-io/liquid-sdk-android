@@ -39,7 +39,7 @@ public abstract class LQModel implements Serializable {
 
     /**
      * Generate a random unique id
-     * @return
+     * @return A new random identifier
      */
     public static String newIdentifier() {
         String uid = UUID.randomUUID().toString().toUpperCase(Locale.ENGLISH);
@@ -87,7 +87,7 @@ public abstract class LQModel implements Serializable {
         if (attributes == null) {
             return null;
         }
-        HashMap<String, Object> attrs = new HashMap<String, Object>();
+        HashMap<String, Object> attrs = new HashMap<>();
         for (String key : attributes.keySet()) {
             if (LQModel.validKey(key, raiseException) && LQModel.validValue(attributes.get(key), raiseException)) {
                 attrs.put(key, attributes.get(key));

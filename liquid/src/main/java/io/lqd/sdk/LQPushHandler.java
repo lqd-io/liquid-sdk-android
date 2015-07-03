@@ -45,7 +45,6 @@ public class LQPushHandler extends BroadcastReceiver {
 
     private static final String RECVD_REGID_FROM_GOOGLE = "com.google.android.c2dm.intent.REGISTRATION";
     private static final String RECVD_C2DM_MSG_FROM_GOOGLE = "com.google.android.c2dm.intent.RECEIVE";
-    private static final String SEND_REGISTRATION_TO_GOOGLE = "com.google.android.c2dm.intent.REGISTER";
     private static final String PROPERTY_REG_ID = "registration_id";
     private static final String LIQUID_MESSAGE_EXTRA = "lqd_message";
     private static final String LIQUID_PUSH_ID_EXTRA = "lqd_id";

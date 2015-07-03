@@ -60,7 +60,7 @@ public class LQDevice {
 
     // Initialization
     public LQDevice(Context context, String liquidVersion) {
-        mAttributes = new HashMap<String,Object>();
+        mAttributes = new HashMap<>();
         mContext = context;
         mVendor = LQDevice.getDeviceVendor();
         mDeviceModel = LQDevice.getDeviceModel();
@@ -93,8 +93,8 @@ public class LQDevice {
             mAttributes.remove("latitude");
             mAttributes.remove("longitude");
         } else {
-            mAttributes.put("latitude", Double.valueOf(location.getLatitude()));
-            mAttributes.put("longitude",Double.valueOf(location.getLongitude()));
+            mAttributes.put("latitude", location.getLatitude());
+            mAttributes.put("longitude", location.getLongitude());
         }
     }
 
@@ -111,7 +111,7 @@ public class LQDevice {
         // Updating to avoid callbacks
         mInternetConnectivity = LQDevice.getInternetConnectivity(mContext);
 
-        HashMap<String, Object> attrs = new HashMap<String, Object>();
+        HashMap<String, Object> attrs = new HashMap<>();
         if(mAttributes != null) {
             attrs.putAll(mAttributes);
         }
@@ -133,10 +133,8 @@ public class LQDevice {
 
         JSONObject json = new JSONObject();
         try {
-            if(attrs != null){
-                for(String key : attrs.keySet()){
-                    json.put(key, attrs.get(key));
-                }
+            for(String key : attrs.keySet()) {
+                json.put(key, attrs.get(key));
             }
             return json;
         } catch (JSONException e) {
@@ -217,7 +215,6 @@ public class LQDevice {
     private static String getAppName(Context context) {
         int stringId = context.getApplicationInfo().labelRes;
         return stringId == 0 ? "(unknown)" : context.getString(stringId);
-
     }
 
     private static String getAppVersion(Context context) {
@@ -229,7 +226,6 @@ public class LQDevice {
             e.printStackTrace();
         }
         return "";
-
     }
 
     private static int getReleaseVersion(Context context) {
@@ -241,6 +237,5 @@ public class LQDevice {
             e.printStackTrace();
         }
         return 0;
-
     }
 }

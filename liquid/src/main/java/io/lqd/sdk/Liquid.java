@@ -30,7 +30,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -49,7 +48,6 @@ import io.lqd.sdk.model.LQSession;
 import io.lqd.sdk.model.LQUser;
 import io.lqd.sdk.model.LQValue;
 import io.lqd.sdk.model.LQVariable;
-
 
 public class Liquid {
 
@@ -70,9 +68,9 @@ public class Liquid {
     private Context mContext;
     private static Liquid mInstance;
     private LQLiquidPackage mLoadedLiquidPackage;
-    private HashMap<String, LQValue> mAppliedValues = new HashMap<String, LQValue>();
-    private HashMap<String, Activity> mAttachedActivities = new HashMap<String, Activity>();
-    private HashMap<String, LiquidOnEventListener> mListeners = new HashMap<String, LiquidOnEventListener>();
+    private HashMap<String, LQValue> mAppliedValues = new HashMap<>();
+    private HashMap<String, Activity> mAttachedActivities = new HashMap<>();
+    private HashMap<String, LiquidOnEventListener> mListeners = new HashMap<>();
     private ArrayList<String> mBundleVariablesSended;
     private boolean mNeedCallbackCall = false;
     private LQQueuer mHttpQueuer;
@@ -154,7 +152,7 @@ public class Liquid {
         mHttpQueuer.startFlushTimer();
         isDevelopmentMode = developmentMode;
         if(isDevelopmentMode)
-            mBundleVariablesSended = new ArrayList<String>();
+            mBundleVariablesSended = new ArrayList<>();
 
         // Get last user and init session
         mPreviousUser = LQUser.load(mContext, mApiToken);
@@ -324,7 +322,7 @@ public class Liquid {
     /**
      * Identifies the current user with a custom UUID.
      *
-     * @param identifier
+     * @param identifier User unique identifier
      * @param alias
      *            if true, will make an alias with previous user if previous
      *            user is anonymous.
@@ -361,12 +359,11 @@ public class Liquid {
     }
 
 
-    private void identifyUser(String identifier, HashMap<String, Object> attributes, boolean identified, boolean alias) {
-        final String finalIdentifier = identifier;
+    private void identifyUser(final String identifier, HashMap<String, Object> attributes, boolean identified, boolean alias) {
         final HashMap<String, Object> finalAttributes = LQModel.sanitizeAttributes(attributes, isDevelopmentMode);
 
         // invalid identifier, keeps the current user
-        if(identifier == null && identifier.length() == 0) {
+        if(identifier == null || identifier.length() == 0) {
             return;
         }
 
@@ -374,12 +371,12 @@ public class Liquid {
         if (mCurrentUser != null && mCurrentUser.getIdentifier().equals(identifier)) {
             mCurrentUser.setAttributes(finalAttributes);
             mCurrentUser.save(mContext, mApiToken);
-            LQLog.infoVerbose("Already identified with user " + finalIdentifier + ". Not identifying again.");
+            LQLog.infoVerbose("Already identified with user " + identifier + ". Not identifying again.");
             return;
         }
 
         mPreviousUser = mCurrentUser;
-        mCurrentUser = new LQUser(finalIdentifier, finalAttributes, identified);
+        mCurrentUser = new LQUser(identifier, finalAttributes, identified);
         requestValues();
         mCurrentUser.save(mContext, mApiToken);
 
@@ -387,7 +384,7 @@ public class Liquid {
             alias();
         }
 
-        LQLog.info("From now on we're identifying the User by the identifier '" + finalIdentifier + "'");
+        LQLog.info("From now on we're identifying the User by the identifier '" + identifier + "'");
     }
 
     /**
@@ -769,14 +766,10 @@ public class Liquid {
                     LQNetworkRequest req = LQRequestFactory.requestLiquidPackageRequest(mCurrentUser.getIdentifier(), mDevice.getUID());
                     String dataFromServer = req.sendRequest(mApiToken).getRequestResponse();
                     if (dataFromServer != null) {
-                        try {
-                            JSONObject jsonObject = new JSONObject(dataFromServer);
-                            LQLiquidPackage liquidPackage = new LQLiquidPackage(jsonObject);
-                            LQLog.http(jsonObject.toString());
-                            liquidPackage.saveToDisk(mContext);
-                        } catch (JSONException e) {
-                            LQLog.error("Could not parse JSON (Liquid Variables):" + dataFromServer);
-                        }
+                        LQLog.http(dataFromServer);
+                        LQLiquidPackage liquidPackage = new LQLiquidPackage(dataFromServer);
+                        liquidPackage.saveToDisk(mContext);
+
                         notifyListeners(true);
                         if (mAutoLoadValues) {
                             loadLiquidPackage(false);
@@ -823,7 +816,7 @@ public class Liquid {
             @Override
             public void run() {
                 mLoadedLiquidPackage = LQLiquidPackage.loadFromDisk(mContext);
-                mAppliedValues = LQValue.convertToHashMap(mLoadedLiquidPackage.getValues());
+                mAppliedValues = mLoadedLiquidPackage.getValuesHashMap();
                 notifyListeners(false);
             }
         };
@@ -1052,7 +1045,7 @@ public class Liquid {
                 mDevice = new LQDevice(mContext, LIQUID_VERSION);
                 mEnterBackgroundtime = null;
                 mLoadedLiquidPackage = new LQLiquidPackage();
-                mAppliedValues = new HashMap<String, LQValue>();
+                mAppliedValues = new HashMap<>();
                 if(!soft) {
                     mHttpQueuer = new LQQueuer(mContext, mApiToken);
                 }
@@ -1071,7 +1064,7 @@ public class Liquid {
                 boolean removed = mLoadedLiquidPackage.invalidateTargetFromVariableKey(variableKey);
                 if (removed) {
                     LQLog.infoVerbose("invalidated: " + variableKey);
-                    mAppliedValues = LQValue.convertToHashMap(mLoadedLiquidPackage.getValues());
+                    mAppliedValues = mLoadedLiquidPackage.getValuesHashMap();
                     mLoadedLiquidPackage.saveToDisk(mContext);
                     notifyListeners(false);
                 }

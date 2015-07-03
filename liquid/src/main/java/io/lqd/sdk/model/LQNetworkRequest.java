@@ -64,12 +64,15 @@ public class LQNetworkRequest extends LQModel {
     public String getUrl() {
         return mUrl;
     }
+
     public String getHttpMethod() {
         return mHttpMethod;
     }
+
     public String getJSON(){
         return mJson;
     }
+
     public int getNumberOfTries() {
         return mNumberOfTries;
     }
@@ -112,7 +115,7 @@ public class LQNetworkRequest extends LQModel {
         Object result = LQModel.loadObject(context, fileName + ".queue");
         ArrayList<LQNetworkRequest> queue = (ArrayList<LQNetworkRequest>) result;
         if (queue == null) {
-            queue = new ArrayList<LQNetworkRequest>();
+            queue = new ArrayList<>();
         }
         LQLog.infoVerbose("Loading queue with " + queue.size() + " items from disk");
         return queue;
@@ -191,9 +194,9 @@ public class LQNetworkRequest extends LQModel {
             BufferedReader br = new BufferedReader(new InputStreamReader(
                     new GZIPInputStream(stream)));
             StringBuilder sb = new StringBuilder();
-            String line = null;
+            String line;
             while ((line = br.readLine()) != null) {
-                sb.append(line + "\n");
+                sb.append(line).append("\n");
             }
             br.close();
             return sb.toString();

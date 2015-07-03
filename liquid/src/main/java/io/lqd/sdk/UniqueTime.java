@@ -29,5 +29,4 @@ public class UniqueTime {
         mIncrement = (mIncrement + 1) % 200;
         return cal.getTime();
     }
-
 }
