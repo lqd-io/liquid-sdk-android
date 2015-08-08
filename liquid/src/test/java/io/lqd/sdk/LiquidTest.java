@@ -6,15 +6,16 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 
 import io.lqd.sdk.model.LQSession;
 import io.lqd.sdk.model.LQUser;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 
 @Config(manifest = "../AndroidManifest.xml")
 @RunWith(RobolectricTestRunner.class)
@@ -61,7 +62,7 @@ public class LiquidTest {
         assertNotNull(f.get(lqd));
     }
 
-    // public void setUserAttributes(final HashMap<String, Object> attributes)
+    // public void setUserAttributes(final Map<String, Object> attributes)
 
     @Test
     public void testSetAttributes() throws NoSuchFieldException, IllegalAccessException, InterruptedException {

@@ -36,6 +36,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -341,7 +342,7 @@ public class Liquid {
      * @param attributes
      *            Additional user attributes.
      */
-    public void identifyUser(String identifier, HashMap<String, Object> attributes) {
+    public void identifyUser(String identifier, Map<String, Object> attributes) {
         identifyUser(identifier, attributes, true, true);
     }
 
@@ -356,12 +357,12 @@ public class Liquid {
      *            if true, will make an alias with previous user if previous
      *            user is anonymous.
      */
-    public void identifyUser(String identifier, HashMap<String, Object> attributes, boolean alias) {
+    public void identifyUser(String identifier, Map<String, Object> attributes, boolean alias) {
         identifyUser(identifier, attributes, true, alias);
     }
 
 
-    private void identifyUser(String identifier, HashMap<String, Object> attributes, boolean identified, boolean alias) {
+    private void identifyUser(String identifier, Map<String, Object> attributes, boolean identified, boolean alias) {
         final String finalIdentifier = identifier;
         final HashMap<String, Object> finalAttributes = LQModel.sanitizeAttributes(attributes, isDevelopmentMode);
 
@@ -433,7 +434,7 @@ public class Liquid {
         }
     }
 
-    public void setUserAttributes(final HashMap<String, Object> attributes) {
+    public void setUserAttributes(final Map<String, Object> attributes) {
         mQueue.execute(new Runnable() {
             @Override
             public void run() {
@@ -569,13 +570,13 @@ public class Liquid {
      * @param attributes
      *            Additional attributes of the event.
      */
-    public void track(String eventName, HashMap<String, Object> attributes) {
+    public void track(String eventName, Map<String, Object> attributes) {
         if (LQEvent.hasValidName(eventName, isDevelopmentMode)) {
             track(eventName, attributes, UniqueTime.newDate());
         }
     }
 
-    private void track(String eventName, HashMap<String, Object> attributes, Date date) {
+    private void track(String eventName, Map<String, Object> attributes, Date date) {
         if ((eventName == null) || (eventName.length() == 0)) {
             eventName = "unnamedEvent";
         }

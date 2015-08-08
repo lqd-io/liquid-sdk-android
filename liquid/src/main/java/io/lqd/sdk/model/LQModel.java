@@ -28,6 +28,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 import io.lqd.sdk.LQLog;
@@ -83,7 +84,7 @@ public abstract class LQModel implements Serializable {
         return isValid;
     }
 
-    public static HashMap<String, Object> sanitizeAttributes(HashMap<String, Object> attributes, boolean raiseException) {
+    public static HashMap<String, Object> sanitizeAttributes(Map<String, Object> attributes, boolean raiseException) {
         if (attributes == null) {
             return null;
         }
