@@ -367,7 +367,7 @@ public class Liquid {
         final HashMap<String, Object> finalAttributes = LQModel.sanitizeAttributes(attributes, isDevelopmentMode);
 
         // invalid identifier, keeps the current user
-        if(identifier == null && identifier.length() == 0) {
+        if (identifier == null || identifier.isEmpty()) {
             return;
         }
 
