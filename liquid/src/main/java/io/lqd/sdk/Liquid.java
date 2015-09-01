@@ -362,12 +362,11 @@ public class Liquid {
     }
 
 
-    private void identifyUser(String identifier, Map<String, Object> attributes, boolean identified, boolean alias) {
-        final String finalIdentifier = identifier;
+    private void identifyUser(final String identifier, Map<String, Object> attributes, boolean identified, boolean alias) {
         final HashMap<String, Object> finalAttributes = LQModel.sanitizeAttributes(attributes, isDevelopmentMode);
 
         // invalid identifier, keeps the current user
-        if(identifier == null && identifier.length() == 0) {
+        if (identifier == null || identifier.isEmpty()) {
             return;
         }
 
@@ -375,12 +374,12 @@ public class Liquid {
         if (mCurrentUser != null && mCurrentUser.getIdentifier().equals(identifier)) {
             mCurrentUser.setAttributes(finalAttributes);
             mCurrentUser.save(mContext, mApiToken);
-            LQLog.infoVerbose("Already identified with user " + finalIdentifier + ". Not identifying again.");
+            LQLog.infoVerbose("Already identified with user " + identifier + ". Not identifying again.");
             return;
         }
 
         mPreviousUser = mCurrentUser;
-        mCurrentUser = new LQUser(finalIdentifier, finalAttributes, identified);
+        mCurrentUser = new LQUser(identifier, finalAttributes, identified);
         requestValues();
         mCurrentUser.save(mContext, mApiToken);
 
@@ -388,7 +387,7 @@ public class Liquid {
             alias();
         }
 
-        LQLog.info("From now on we're identifying the User by the identifier '" + finalIdentifier + "'");
+        LQLog.info("From now on we're identifying the User by the identifier '" + identifier + "'");
     }
 
     /**
