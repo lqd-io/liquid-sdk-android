@@ -15,7 +15,6 @@
  */
 package io.lqd.sdk;
 
-import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -27,8 +26,8 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.provider.Settings;
+import android.support.v4.app.NotificationCompat;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -70,12 +69,7 @@ public class LQPushHandler extends BroadcastReceiver {
         String title = getPushTitle(intent, context);
         Intent appIntent = getIntent(context);
         PendingIntent contentIntent = PendingIntent.getActivity(context.getApplicationContext(), 0, appIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        if(Build.VERSION.SDK_INT < 11) {
-            sendNotification8(context, contentIntent, icon, push_id, title, message, sound);
-        } else {
-            sendNotification11(context, contentIntent, icon, push_id, title, message, sound);
-        }
-
+        sendNotification(context, contentIntent, icon, push_id, title, message, sound);
     }
 
     private void handleRegistration(Intent intent) {
@@ -115,37 +109,19 @@ public class LQPushHandler extends BroadcastReceiver {
     }
 
     @SuppressWarnings("deprecation")
-    @TargetApi(16)
-    private void sendNotification11(Context c, PendingIntent intent, int icon, int push_id, String title, String body, Uri sound) {
+    private void sendNotification(Context c, PendingIntent intent, int icon, int push_id, String title, String body, Uri sound) {
         NotificationManager nm = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
-        Notification.Builder builder = new Notification.Builder(c);
-        builder.setSmallIcon(icon);
-        builder.setTicker(body);
-        builder.setContentText(body);
-        builder.setWhen(System.currentTimeMillis());
-        builder.setContentTitle(title);
-        builder.setContentIntent(intent);
-        if(sound != null)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(c)
+                .setSmallIcon(icon)
+                .setTicker(body)
+                .setContentText(body)
+                .setWhen(System.currentTimeMillis())
+                .setContentTitle(title)
+                .setContentIntent(intent);
+        if (sound != null)
             builder.setSound(sound);
-        Notification n;
-        if (Build.VERSION.SDK_INT < 16) {
-            n = builder.getNotification();
-        } else {
-            n = builder.build();
-        }
+        Notification n = builder.build();
         n.flags |= Notification.FLAG_AUTO_CANCEL;
-        nm.notify(push_id, n);
-    }
-
-    @SuppressWarnings("deprecation")
-    @TargetApi(8)
-    private void sendNotification8(Context c, PendingIntent intent, int icon, int push_id, String title, String body, Uri sound) {
-        NotificationManager nm = (NotificationManager)c.getSystemService(Context.NOTIFICATION_SERVICE);
-        Notification n = new Notification(icon, body, System.currentTimeMillis());
-        n.flags |= Notification.FLAG_AUTO_CANCEL;
-        n.setLatestEventInfo(c, title, body, intent);
-        if(sound != null)
-            n.sound = sound;
         nm.notify(push_id, n);
     }
 

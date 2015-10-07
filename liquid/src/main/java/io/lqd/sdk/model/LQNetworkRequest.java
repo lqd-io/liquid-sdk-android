@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,8 +18,6 @@ package io.lqd.sdk.model;
 
 import android.content.Context;
 import android.os.Build;
-
-import org.apache.http.entity.StringEntity;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -46,14 +44,14 @@ public class LQNetworkRequest extends LQModel {
     private static final String LOCAL = Locale.getDefault().toString();
     private static final String DEVICE = Build.MANUFACTURER + " " + Build.MODEL;
 
-    private static final String USER_AGENT = "Liquid/"+ Liquid.LIQUID_VERSION + " (Android; Android " + Build.VERSION.RELEASE + "; " + LOCAL + "; " + DEVICE +")";
+    private static final String USER_AGENT = "Liquid/" + Liquid.LIQUID_VERSION + " (Android; Android " + Build.VERSION.RELEASE + "; " + LOCAL + "; " + DEVICE + ")";
     private String mUrl;
     private String mHttpMethod;
     private String mJson;
     private int mNumberOfTries;
     private Date mLastTry;
 
-    public LQNetworkRequest(String url, String httpMethod, String json){
+    public LQNetworkRequest(String url, String httpMethod, String json) {
         mUrl = url;
         mHttpMethod = httpMethod;
         mJson = json;
@@ -67,7 +65,7 @@ public class LQNetworkRequest extends LQModel {
     public String getHttpMethod() {
         return mHttpMethod;
     }
-    public String getJSON(){
+    public String getJSON() {
         return mJson;
     }
     public int getNumberOfTries() {
@@ -101,9 +99,9 @@ public class LQNetworkRequest extends LQModel {
     @Override
     public boolean equals(Object o) {
         return (o instanceof LQNetworkRequest) &&
-                ((LQNetworkRequest)o).getHttpMethod().equals(this.getHttpMethod()) &&
-                ((LQNetworkRequest)o).getUrl().equals(this.getUrl()) &&
-                ((LQNetworkRequest)o).getJSON().equals(this.getJSON());
+                ((LQNetworkRequest) o).getHttpMethod().equals(this.getHttpMethod()) &&
+                ((LQNetworkRequest) o).getUrl().equals(this.getUrl()) &&
+                ((LQNetworkRequest) o).getJSON().equals(this.getJSON());
     }
 
     // File Management
@@ -145,8 +143,8 @@ public class LQNetworkRequest extends LQModel {
                 connection.setDoOutput(true);
                 out = connection.getOutputStream();
                 bout = new BufferedOutputStream(out);
-                final StringEntity stringEntity = new StringEntity(this.getJSON(), "UTF-8");
-                stringEntity.writeTo(bout);
+                final String data = new String(getJSON().getBytes(), "UTF-8");
+                bout.write(data.getBytes());
             }
             responseCode = connection.getResponseCode();
             err = connection.getErrorStream();
