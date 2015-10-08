@@ -21,6 +21,7 @@ import android.os.Build;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -125,9 +126,8 @@ public class LQNetworkRequest extends LQModel {
         String response = null;
         int responseCode = -1;
         InputStream err = null;
-        OutputStream out = null;
-        BufferedOutputStream bout = null;
         BufferedReader boin = null;
+        DataOutputStream outputStream = null;
         HttpURLConnection connection = null;
         try {
             URL url = new URL(this.getUrl());
@@ -141,10 +141,10 @@ public class LQNetworkRequest extends LQModel {
             connection.setDoInput(true);
             if (this.getJSON() != null) {
                 connection.setDoOutput(true);
-                out = connection.getOutputStream();
-                bout = new BufferedOutputStream(out);
                 final String data = new String(getJSON().getBytes(), "UTF-8");
-                bout.write(data.getBytes());
+                outputStream = new DataOutputStream(connection.getOutputStream());
+                outputStream.writeBytes(data);
+                outputStream.flush();
             }
             responseCode = connection.getResponseCode();
             err = connection.getErrorStream();
@@ -158,16 +158,12 @@ public class LQNetworkRequest extends LQModel {
             if(connection != null)
                 connection.disconnect();
             try {
-                if(out != null)
-                    out.close();
+                if(outputStream != null)
+                    outputStream.close();
             } catch (IOException e) {}
             try {
                 if(err != null)
                     err.close();
-            } catch (IOException e) {}
-            try {
-                if(bout != null)
-                    bout.close();
             } catch (IOException e) {}
             try {
                 if (boin != null)
