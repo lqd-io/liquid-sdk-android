@@ -1,5 +1,12 @@
 # Liquid Android SDK Change Log
 
+## 1.2.1: Support Android 6.0 (Marshmallow)
+
+  * **[bugfix]** Push notifications
+  * **[bugfix]** Network Module
+
+<br>
+
 ## 1.2.0: Attributes bulk insert + bug fixes
 
   * **[feature]** Add setUserAttributes() to set multiple user attributes
