@@ -59,7 +59,7 @@ public class Liquid {
     public static final String LIQUID_VERSION = "1.2.1";
     private static final int LIQUID_DEFAULT_SESSION_TIMEOUT = 30;
 
-    private static int mSessionTimeout;
+    private int mSessionTimeout;
     private String mApiToken;
     private LQUser mCurrentUser;
     private LQUser mPreviousUser;
@@ -576,12 +576,10 @@ public class Liquid {
     }
 
     private void track(String eventName, Map<String, Object> attributes, Date date) {
-        if ((eventName == null) || (eventName.length() == 0)) {
-            eventName = "unnamedEvent";
-        }
-        LQLog.infoVerbose("Tracking: " + eventName);
-
         LQEvent event = new LQEvent(eventName, LQModel.sanitizeAttributes(attributes, isDevelopmentMode), date);
+
+        LQLog.infoVerbose("Tracking: " + event.getName());
+
         final String datapoint = new LQDataPoint(mCurrentUser, mDevice, mCurrentSession, event, mLoadedLiquidPackage.getValues(), date).toJSON().toString();
         LQLog.data(datapoint);
 

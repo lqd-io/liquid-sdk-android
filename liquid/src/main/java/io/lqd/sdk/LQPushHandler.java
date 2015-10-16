@@ -80,7 +80,7 @@ public class LQPushHandler extends BroadcastReceiver {
     }
 
 
-    static void registerDevice(final Context context, final String senderID) {
+    protected static void registerDevice(final Context context, final String senderID) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {

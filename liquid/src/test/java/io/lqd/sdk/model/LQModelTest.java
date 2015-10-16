@@ -25,7 +25,7 @@ public class LQModelTest {
 
     private String validkey = "le_valid_key";
 
-    private Object[] validAttributes = { null, new String("string"), Integer.valueOf(1), Double.valueOf(2.2), Long.valueOf(3), Boolean.valueOf(false), new Date()};
+    private Object[] validAttributes = { null, "string", Integer.valueOf(1), Double.valueOf(2.2), Long.valueOf(3), Boolean.FALSE, new Date()};
     private Object[] invalidAttributes = { new Object(), new ArrayList<String>(), new String[2], new LQUser("123") };
 
     @Test

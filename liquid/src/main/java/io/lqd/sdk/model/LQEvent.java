@@ -29,14 +29,17 @@ public class LQEvent extends LQModel {
 
     private static final long serialVersionUID = 4817275328778708775L;
 
+    public static final String UNNAMED_EVENT = "unnamedEvent";
+
     private String mName;
     private HashMap<String,Object> mAttributes;
     private Date mDate;
 
     // Initialization
     public LQEvent(String name, HashMap<String,Object> attributes, Date date){
-        mName = name;
-        if(attributes == null){
+        setName(name);
+
+        if(attributes == null) {
             mAttributes = new HashMap<String,Object>();
         } else {
             mAttributes = attributes;
@@ -46,6 +49,18 @@ public class LQEvent extends LQModel {
 
     public LQEvent(String name, HashMap<String,Object> attributes) {
         this(name,attributes, new Date());
+    }
+
+    public void setName(String name) {
+        if ((name == null) || (name.length() == 0)) {
+            mName = UNNAMED_EVENT;
+        } else {
+            mName = name;
+        }
+    }
+
+    public String getName() {
+        return mName;
     }
 
     // JSON

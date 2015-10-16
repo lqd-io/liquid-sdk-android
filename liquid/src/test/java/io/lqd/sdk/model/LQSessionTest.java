@@ -18,12 +18,11 @@ import static org.junit.Assert.assertTrue;
 @RunWith(RobolectricTestRunner.class)
 public class LQSessionTest {
 
-    private LQSession session;
     private JSONObject json;
 
     @Before
     public void before() {
-        session = FactoryGirl.createSession();
+        LQSession session = FactoryGirl.createSession();
         session.setEndDate(new Date());
         json = session.toJSON();
     }
