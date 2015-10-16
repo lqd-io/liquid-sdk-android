@@ -1,7 +1,6 @@
 package io.lqd.sdk.model;
 
 import org.json.JSONObject;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,7 +56,7 @@ public class LQUserTest {
 
     @Test
     public void testLoadFail() {
-        Assert.assertNotNull(Robolectric.application);
+        assertNotNull(Robolectric.application);
         LQUser prevUser = new LQUser("le_id");
         prevUser.save(Robolectric.application, "le_user");
         Robolectric.application.deleteFile("le_user.user");

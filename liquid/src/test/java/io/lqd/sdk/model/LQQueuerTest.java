@@ -28,7 +28,7 @@ public class LQQueuerTest {
     private ArrayList<LQNetworkRequest> queue = new ArrayList<LQNetworkRequest>();
     private LQUser user = new LQUser("123");
     private LQNetworkRequest q1 = new LQNetworkRequest("url", "get", user.toJSON().toString());
-    LQQueuer queuer;
+    private LQQueuer queuer;
 
     @Before
     public void setUp() {

@@ -20,8 +20,8 @@ import static org.junit.Assert.assertTrue;
 @RunWith(RobolectricTestRunner.class)
 public class LQDeviceTest {
 
-    LQDevice device;
-    JSONObject json;
+    private LQDevice device;
+    private JSONObject json;
 
     @Before
     public void before() {

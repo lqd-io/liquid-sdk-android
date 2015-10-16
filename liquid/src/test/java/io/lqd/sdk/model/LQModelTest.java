@@ -19,14 +19,14 @@ import static org.junit.Assert.fail;
 @RunWith(RobolectricTestRunner.class)
 public class LQModelTest {
 
-    String dollarkey = "le_invalid_$key";
-    String dotkey = "le.invalid_key";
-    String nullcharkey = "le" + '\0' + "key";
+    private String dollarkey = "le_invalid_$key";
+    private String dotkey = "le.invalid_key";
+    private String nullcharkey = "le" + '\0' + "key";
 
-    String validkey = "le_valid_key";
+    private String validkey = "le_valid_key";
 
-    Object[] validAttributes = { null, new String("string"), Integer.valueOf(1), Double.valueOf(2.2), Long.valueOf(3), Boolean.valueOf(false), new Date()};
-    Object[] invalidAttributes = { new Object(), new ArrayList<String>(), new String[2], new LQUser("123") };
+    private Object[] validAttributes = { null, new String("string"), Integer.valueOf(1), Double.valueOf(2.2), Long.valueOf(3), Boolean.valueOf(false), new Date()};
+    private Object[] invalidAttributes = { new Object(), new ArrayList<String>(), new String[2], new LQUser("123") };
 
     @Test
     public void testValidAttributes() {

@@ -54,7 +54,7 @@ import io.lqd.sdk.model.LQVariable;
 
 public class Liquid {
 
-    static final String TAG_LIQUID = "LIQUID";
+    protected static final String TAG_LIQUID = "LIQUID";
 
     public static final String LIQUID_VERSION = "1.2.1";
     private static final int LIQUID_DEFAULT_SESSION_TIMEOUT = 30;

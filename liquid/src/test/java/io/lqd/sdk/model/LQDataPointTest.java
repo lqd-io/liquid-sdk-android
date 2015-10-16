@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(RobolectricTestRunner.class)
 public class LQDataPointTest {
 
-    JSONObject json;
+    private JSONObject json;
 
     @Before
     public void before() {

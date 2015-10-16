@@ -17,7 +17,6 @@
 package io.lqd.sdk.model;
 
 import android.content.Context;
-import android.location.Location;
 
 import org.json.JSONException;
 import org.json.JSONObject;
