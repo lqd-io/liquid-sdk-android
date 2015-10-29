@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme" parent="android:Theme.Material.Light">
+    </style>
+
+    <style name="SlideUpAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_up</item>
+    </style>
+
+    <style name="FadeInOutAnimation">
+        <item name="android:windowEnterAnimation">@anim/fadein</item>
+        <item name="android:windowExitAnimation">@anim/faideout</item>
+    </style>
+</resources>

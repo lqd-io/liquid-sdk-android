@@ -1,1 +1,1 @@
-include ':liquid'
+include ':liquid', ':myapplication'

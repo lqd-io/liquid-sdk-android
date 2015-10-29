@@ -27,6 +27,8 @@ public class LQRequestFactory {
     protected static final String LIQUID_DATAPOINT_URL = LIQUID_SERVER_BASE_URL + "data_points";
     protected static final String LIQUID_ALIAS_URL = LIQUID_SERVER_BASE_URL + "aliases";
     protected static final String LIQUID_LQD_PACKAGE_URL = LIQUID_SERVER_BASE_URL + "users/%s/devices/%s/liquid_package";
+    protected static final String LIQUID_INAPP_MESSAGES_URL = LIQUID_SERVER_BASE_URL + "users/%s/inapp_messages";
+    protected static final String LIQUID_INAPP_MESSAGE_REPORT_URL = LIQUID_SERVER_BASE_URL + "users/%s/formulas/%s/report";
     protected static final String LIQUID_VARIABLES_URL = LIQUID_SERVER_BASE_URL + "variables";
 
 
@@ -55,4 +57,18 @@ public class LQRequestFactory {
         return new LQNetworkRequest(LIQUID_VARIABLES_URL, "POST", variable.toString());
     }
 
+    public static LQNetworkRequest inappMessagesRequest(String userId) {
+        String url = String.format(LIQUID_INAPP_MESSAGES_URL, userId);
+        return new LQNetworkRequest(url, "GET", null);
+    }
+
+    public static LQNetworkRequest inappMessagesReportRequest(String userId, String formulaId, JSONObject payload) {
+        String url = String.format(LIQUID_INAPP_MESSAGE_REPORT_URL, userId, formulaId);
+        return new LQNetworkRequest(url, "POST", payload.toString());
+    }
+
+    public static LQNetworkRequest inappMessagesReportRequest(String userId, String formulaId) {
+        String url = String.format(LIQUID_INAPP_MESSAGE_REPORT_URL, userId, formulaId);
+        return new LQNetworkRequest(url, "POST", null);
+    }
 }

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/Act_SlideUP"
+    tools:context="liquidmixpanel.onliquid.com.test.Modal"
+    android:background="#a2a2a2"
+    android:orientation="vertical"
+    android:layout_gravity="center"
+    android:gravity="bottom">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="bottom"
+        android:gravity="bottom"
+        android:id="@+id/lowest_layout">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry&apos;s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also "
+            android:id="@+id/slideUpText"
+            android:layout_weight="1"
+            android:textSize="12.5sp"
+            android:layout_marginLeft="19dp"
+            android:textIsSelectable="false"
+            android:maxLines="3"
+            android:layout_gravity="center_vertical"
+            android:maxLength="120"
+            android:lineSpacingMultiplier="1.18"
+            android:gravity="center_vertical|start"
+            android:layout_marginRight="19dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            fontPath="fonts/Lato-Regular.ttf"
+            tools:ignore="MissingPrefix" />
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="25dp"
+            android:src="@drawable/arrow"
+            android:layout_weight="0"
+            android:scaleType="fitCenter"
+            android:id="@+id/slideUpArrowButton"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="19dp" />
+
+    </LinearLayout>
+</LinearLayout>

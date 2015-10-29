@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:id="@+id/Act_Cust_Lay"
+    tools:context="liquidmixpanel.onliquid.com.test.Modal"
+
+    android:orientation="vertical"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:background="#80FFFFFF"
+    >
+
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_corners"
+        android:id="@+id/modal_linear_bg_color"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:text="x"
+                android:textColor="#dcdcdc"
+                android:gravity="center_vertical|center_horizontal"
+                android:layout_height="25dp"
+                android:layout_width="35dp" android:textSize="14sp" android:textStyle="normal"
+                android:id="@+id/xClose"
+                android:layout_gravity="right"
+                android:background="@android:color/transparent"
+                android:singleLine="false"
+                android:shadowColor="#3e3e3e"
+                android:shadowDx="1.5"
+                android:shadowDy="1.5"
+                android:shadowRadius="2"
+                android:textAllCaps="false"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.0"
+            android:layout_gravity="center_horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Get Free Shipping Today"
+                android:id="@+id/inAppMessage"
+                android:textColor="#000000"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal"
+                android:maxLength="34"
+                android:maxLines="1"
+                android:layout_marginBottom="5dp"
+                android:textSize="17sp"
+                android:layout_marginTop="5dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry&apos;s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also "
+                android:id="@+id/textView"
+                android:layout_gravity="center_horizontal"
+                android:textColor="#000000"
+                android:textSize="13sp"
+                android:gravity="center_horizontal"
+                android:layout_marginLeft="19dp"
+                android:layout_marginRight="19dp"
+                android:maxLength="120"
+                android:maxLines="3"
+                android:layout_marginBottom="5dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:id="@+id/modal_buttons_container"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.0">
+
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

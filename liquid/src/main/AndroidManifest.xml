@@ -1,2 +1,4 @@
-<manifest package="io.lqd.sdk">
+<?xml version="1.0" encoding="utf-8"?>
+<manifest
+    package="io.lqd.sdk">
 </manifest>
