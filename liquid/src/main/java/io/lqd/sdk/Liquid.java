@@ -30,6 +30,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -40,9 +41,11 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import io.lqd.sdk.model.InappMessageParser;
 import io.lqd.sdk.model.LQDataPoint;
 import io.lqd.sdk.model.LQDevice;
 import io.lqd.sdk.model.LQEvent;
+import io.lqd.sdk.model.LQInAppMessage;
 import io.lqd.sdk.model.LQLiquidPackage;
 import io.lqd.sdk.model.LQModel;
 import io.lqd.sdk.model.LQNetworkRequest;
@@ -50,6 +53,8 @@ import io.lqd.sdk.model.LQSession;
 import io.lqd.sdk.model.LQUser;
 import io.lqd.sdk.model.LQValue;
 import io.lqd.sdk.model.LQVariable;
+import io.lqd.sdk.visual.Modal;
+import io.lqd.sdk.visual.SlideUp;
 
 
 public class Liquid {
@@ -78,6 +83,7 @@ public class Liquid {
     private boolean mNeedCallbackCall = false;
     private LQQueuer mHttpQueuer;
     private boolean isDevelopmentMode;
+    private Activity mCurrentActivity;
 
     /**
      * Retrieves the Liquid shared instance.
@@ -575,6 +581,46 @@ public class Liquid {
         }
     }
 
+    /**
+     * Track the dismissed action of the In-APP message
+     *
+     * @param inAppMessage
+     *              The message itself.
+     */
+    public void trackDismiss(final LQInAppMessage inAppMessage) {
+
+        mQueue.execute(new Runnable() {
+            @Override
+            public void run() {
+               mHttpQueuer.addToHttpQueue(LQRequestFactory.inappMessagesReportRequest(mCurrentUser.getIdentifier(), inAppMessage.getFormulaId()));
+            }
+        });
+        track(inAppMessage.getDismissEventName(), inAppMessage.getDismissAttributes(), UniqueTime.newDate());
+    }
+
+    /**
+     * Track the button click action.
+     *
+     * @param inAppMessageCta
+     *              The button itself.
+     */
+    public void trackCta(final LQInAppMessage.Cta inAppMessageCta){
+        mQueue.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    JSONObject payload = new JSONObject();
+                    payload.put("cta_id", inAppMessageCta.getCtasAttributes().get("cta_id"));
+
+                    mHttpQueuer.addToHttpQueue(LQRequestFactory.inappMessagesReportRequest(mCurrentUser.getIdentifier(), (String) inAppMessageCta.getCtasAttributes().get("formula_id"), payload));
+                } catch (JSONException e) {
+
+                }
+            }
+        });
+        track(inAppMessageCta.getCtasEventName(), inAppMessageCta.getCtasAttributes(), UniqueTime.newDate());
+    }
+
     private void track(String eventName, Map<String, Object> attributes, Date date) {
         LQEvent event = new LQEvent(eventName, LQModel.sanitizeAttributes(attributes, isDevelopmentMode), date);
 
@@ -680,11 +726,17 @@ public class Liquid {
         }
     }
 
-    private void activityDestroyedCallback(Activity activity) { }
+    private void activityDestroyedCallback(Activity activity) {
+        mCurrentActivity = activity;
+    }
 
-    private void activityCreatedCallback(Activity activity) { }
+    private void activityCreatedCallback(Activity activity) {
+        mCurrentActivity = activity;
+    }
 
     private void activityStopedCallback(Activity activity) {
+        mCurrentActivity = activity;
+
         if (isApplicationInBackground(activity)) {
             track("_pauseSession", null, UniqueTime.newDate());
             mEnterBackgroundtime = UniqueTime.newDate();
@@ -696,6 +748,8 @@ public class Liquid {
     }
 
     private void activityStartedCallback(Activity activity) {
+        mCurrentActivity = activity;
+
         mInstance.attachActivity(activity);
         if (mNeedCallbackCall) {
             mNeedCallbackCall = false;
@@ -705,11 +759,15 @@ public class Liquid {
     }
 
     private void activityResumedCallback(Activity activity) {
+        mCurrentActivity = activity;
+
         mInstance.attachActivity(activity);
         mHttpQueuer.startFlushTimer();
     }
 
     private void activityPausedCallback(Activity activity) {
+        mCurrentActivity = activity;
+
         mInstance.detachActivity(activity);
         mHttpQueuer.stopFlushTimer();
     }
@@ -732,7 +790,8 @@ public class Liquid {
             }
 
             @Override
-            public void onActivitySaveInstanceState(Activity activity, Bundle bundle) { }
+            public void onActivitySaveInstanceState(Activity activity, Bundle bundle) {
+            }
 
             @Override
             public void onActivityResumed(Activity activity) {
@@ -782,6 +841,39 @@ public class Liquid {
                     }
                 }
 
+            });
+        }
+    }
+
+    /**
+     * Requests the message from the server
+     * and creates the In-APP message
+     */
+    public void requestInappMessages() {
+        if (mCurrentUser != null) {
+            mQueue.execute(new Runnable() {
+                @Override
+                public void run() {
+                    LQNetworkRequest req = LQRequestFactory.inappMessagesRequest(mCurrentUser.getIdentifier());
+                    String dataFromServer = req.sendRequest(mApiToken).getRequestResponse();
+                    if (dataFromServer != null) {
+                        ArrayList<LQInAppMessage> list = null;
+                        try {
+                            list = InappMessageParser.parse(new JSONArray(dataFromServer));
+                        } catch (JSONException e) {
+                            LQLog.error("Error parsing inapp messages" + e.getMessage());
+                        }
+                        if (list != null) {
+                            for (LQInAppMessage inapp : list) {
+                                if (inapp.getLayout().equals("modal")) {
+                                    new Modal(mContext, mCurrentActivity.findViewById(android.R.id.content).getRootView(), inapp).show();
+                                } else if (inapp.getLayout().equals("slide_up")) {
+                                    new SlideUp(mContext, mCurrentActivity.findViewById(android.R.id.content).getRootView(), inapp).show();
+                                }
+                            }
+                        }
+                    }
+                }
             });
         }
     }
