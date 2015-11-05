@@ -92,7 +92,7 @@ dependencies {
     androidTestCompile 'org.mockito:mockito-all:1.10.5'
     compile 'com.google.android.gms:play-services:[3.1,)'
     compile "com.android.support:support-v4:23.0.0"
-    compile 'com.nineoldandroids:library:2.4.0+'
+    compile 'com.nineoldandroids:library:[2.4.0,)'
     compile 'com.android.support:support-v4:23.1.0'
 }
 
@@ -174,12 +174,12 @@ uploadArchives {
             }
         }
 
-        if (isReleaseVersion() && project.hasProperty("sonatypeUsername")) {
+        if (isReleaseVersion() && project.hasProperty("NEXUS_USERNAME")) {
 
             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
             repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                authentication(userName: sonatypeUsername, password: sonatypePassword)
+                authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
             }
 
         } else {
