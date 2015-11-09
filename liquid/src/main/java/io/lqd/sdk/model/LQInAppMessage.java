@@ -25,7 +25,7 @@ public class LQInAppMessage {
     public LQInAppMessage(JSONObject inapp){
         try {
             mLayout = inapp.optString("layout");
-            if (mLayout.equals("modal"))
+            if ("modal".equals(mLayout))
                 try {
                     mTitle = inapp.getString("title");
                     mTitleColor = inapp.getString("title_color");

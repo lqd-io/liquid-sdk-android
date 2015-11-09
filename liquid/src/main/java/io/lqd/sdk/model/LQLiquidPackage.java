@@ -31,7 +31,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import io.lqd.sdk.LQLog;
-import io.lqd.sdk.visual.Modal;
 
 public class LQLiquidPackage implements Serializable{
 

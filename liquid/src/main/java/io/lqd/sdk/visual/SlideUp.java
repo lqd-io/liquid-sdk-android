@@ -12,7 +12,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -39,15 +38,12 @@ public class SlideUp implements View.OnTouchListener {
     private Context mContext;
     private View mRoot;
     private ViewGroup container;
-    private TextView mViewMessage;
     private int height;
     private PopupWindow mPopupWindow;
-    private ImageView mArrowButton;
     private float mDx;
     private float mDy;
     private int mCurrentX;
     private int mCurrentY;
-    private Intent mIntent;
 
     public SlideUp(Context context, View root, LQInAppMessage slideModel) {
         mInstance = this;
@@ -68,7 +64,7 @@ public class SlideUp implements View.OnTouchListener {
     private void setUpSlideUp() {
         LayoutInflater layoutInflater = (LayoutInflater) mContext.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         container = (ViewGroup) layoutInflater.inflate(R.layout.activity_slide_up, null);
-        mViewMessage = (TextView) container.findViewById(R.id.slideUpText);
+        TextView mViewMessage = (TextView) container.findViewById(R.id.slideUpText);
 
         Typeface RegularLato = Typeface.createFromAsset(mContext.getAssets(), "fonts/Lato-Regular.ttf");
 
@@ -100,7 +96,7 @@ public class SlideUp implements View.OnTouchListener {
     }
 
     public void setUpButton() {
-        mArrowButton = (ImageView) container.findViewById(R.id.slideUpArrowButton);
+       ImageView mArrowButton = (ImageView) container.findViewById(R.id.slideUpArrowButton);
 
         for(final LQInAppMessage.Cta cta : mSlideModel.getCtas()) {
 
@@ -113,7 +109,7 @@ public class SlideUp implements View.OnTouchListener {
             mArrowButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mIntent = new Intent(Intent.ACTION_VIEW);
+                   Intent mIntent = new Intent(Intent.ACTION_VIEW);
                     if (cta.getDeepLink() != null) {
                         try {
                             mIntent.setData(Uri.parse(cta.getDeepLink()));
