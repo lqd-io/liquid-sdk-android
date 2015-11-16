@@ -1,5 +1,12 @@
 # Liquid Android SDK Change Log
 
+## 2.0.0-rc1: Add Inapp Messages
+
+  * **[feature]** Add Modal inapp message.
+  * **[feature]** Add Banner inapp message.
+
+<br>
+
 ## 1.2.1: Support Android 6.0 (Marshmallow)
 
   * **[bugfix]** Push notifications

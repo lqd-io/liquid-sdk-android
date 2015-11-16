@@ -32,13 +32,10 @@ import io.lqd.sdk.model.LQInAppMessage;
 
 public class Modal{
 
-    private Intent mIntent;
     private LQInAppMessage mModalModel;
     private PopupWindow mPopupWindow;
     private ViewGroup container;
     private View mRoot;
-    private Button xClose;
-    private TextView mViewTitle;
     private TextView mViewMessage;
     private Context mContext;
 
@@ -68,7 +65,7 @@ public class Modal{
         LayoutInflater layoutInflater = (LayoutInflater) mContext.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         container = (ViewGroup) layoutInflater.inflate(R.layout.activity_modal, null);
 
-        mViewTitle = (TextView) container.findViewById(R.id.inAppMessage);
+        TextView mViewTitle = (TextView) container.findViewById(R.id.inAppMessage);
         mViewMessage = (TextView) container.findViewById(R.id.textView);
 
         Typeface HeavyLato = Typeface.createFromAsset(mContext.getAssets(), "fonts/Lato-Heavy.ttf");
@@ -95,7 +92,7 @@ public class Modal{
     }
 
     private void setUpButtons() {
-        xClose = (Button) container.findViewById(R.id.xClose);
+        Button xClose = (Button) container.findViewById(R.id.xClose);
         xClose.setTransformationMethod(null);
 
         LinearLayout ctasContainer = (LinearLayout) container.findViewById(R.id.modal_buttons_container);
@@ -133,7 +130,7 @@ public class Modal{
             ctaBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mIntent = new Intent(Intent.ACTION_VIEW);
+                   Intent mIntent = new Intent(Intent.ACTION_VIEW);
                     if (cta.getDeepLink() != null) {
                         try {
                             mIntent.setData(Uri.parse(cta.getDeepLink()));
