@@ -754,6 +754,8 @@ public class Liquid {
     private void activityStartedCallback(Activity activity) {
         mCurrentActivity = activity;
 
+        new LQClickListener(mCurrentActivity.getWindow().getDecorView());
+
         mInstance.attachActivity(activity);
         if (mNeedCallbackCall) {
             mNeedCallbackCall = false;

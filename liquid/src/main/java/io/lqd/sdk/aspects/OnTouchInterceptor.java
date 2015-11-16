@@ -1,6 +1,7 @@
 package io.lqd.sdk.aspects;
 
 import android.graphics.Rect;
+import android.os.Build;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.Button;
@@ -27,6 +28,9 @@ public class OnTouchInterceptor {
     @Before("touchevent()")
     public void onTouchEvent(JoinPoint joinPoint) {
 
+        if (Build.VERSION.SDK_INT >= 16)
+            return;
+
         MotionEvent event = (MotionEvent) joinPoint.getArgs()[1];
 
         if ( joinPoint.getArgs()[0] instanceof Button) {
@@ -49,7 +53,7 @@ public class OnTouchInterceptor {
         }
         else {
             if (event.getAction() == MotionEvent.ACTION_DOWN)
-                LQLog.error("This is not a <Button>, so no tracking for this View...");
+                LQLog.warning("This is not a <Button>, so no tracking for this View...");
         }
     }
 }
