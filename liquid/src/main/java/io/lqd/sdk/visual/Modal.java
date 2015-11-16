@@ -89,6 +89,12 @@ public class Modal{
 
         mPopupWindow = new PopupWindow(container, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, true);
         mPopupWindow.setAnimationStyle(R.style.FadeInOutAnimation);
+        mPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                Liquid.getInstance().showInAppMessages();
+            }
+        });
     }
 
     private void setUpButtons() {

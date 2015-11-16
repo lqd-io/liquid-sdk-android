@@ -93,6 +93,12 @@ public class SlideUp implements View.OnTouchListener {
 
         mPopupWindow.setFocusable(false);
         mPopupWindow.setOutsideTouchable(true);
+        mPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                Liquid.getInstance().showInAppMessages();
+            }
+        });
     }
 
     public void setUpButton() {
