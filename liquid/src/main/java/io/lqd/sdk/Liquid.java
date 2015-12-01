@@ -54,9 +54,9 @@ import io.lqd.sdk.model.LQSession;
 import io.lqd.sdk.model.LQUser;
 import io.lqd.sdk.model.LQValue;
 import io.lqd.sdk.model.LQVariable;
+import io.lqd.sdk.visual.InappMessage;
 import io.lqd.sdk.visual.Modal;
 import io.lqd.sdk.visual.SlideUp;
-
 
 public class Liquid {
 
@@ -85,7 +85,8 @@ public class Liquid {
     private LQQueuer mHttpQueuer;
     private boolean isDevelopmentMode;
     private Activity mCurrentActivity;
-    private LinkedList mInAppMessagesQueue;
+    private LinkedList<InappMessage> mInAppMessagesQueue;
+
 
     /**
      * Retrieves the Liquid shared instance.
@@ -445,7 +446,7 @@ public class Liquid {
         mQueue.execute(new Runnable() {
             @Override
             public void run() {
-                for(String key : attributes.keySet()) {
+                for (String key : attributes.keySet()) {
                     if (LQModel.validKey(key, isDevelopmentMode)) {
                         mCurrentUser.setAttribute(key, attributes.get(key));
                     }
@@ -694,7 +695,6 @@ public class Liquid {
     public void activityStarted(Activity activity) {
         if (Build.VERSION.SDK_INT < 14) {
             activityStartedCallback(activity);
-
         }
     }
 
@@ -850,8 +850,9 @@ public class Liquid {
     }
 
     /**
-     * Requests the message from the server
-     * and creates the In-APP message
+     * Requests the message from the server,
+     * creates the In-APP message and adds it
+     * to queue.
      */
     public void requestInappMessages() {
         if (mCurrentUser != null) {
@@ -881,22 +882,17 @@ public class Liquid {
                 }
             });
         }
-
     }
 
     public void showInAppMessages(){
         mQueue.execute(new Runnable() {
             @Override
             public void run() {
-                try {
-                    Object obj = mInAppMessagesQueue.poll();
-                    if (obj instanceof Modal) {
-                        ((Modal) obj).show();
-                    } else if (obj instanceof SlideUp) {
-                        ((SlideUp) obj).show();
-                    }
-                } catch (Exception e) {
+                InappMessage in_app = mInAppMessagesQueue.poll();
+                if (in_app == null) {
                     LQLog.infoVerbose("Not anymore inapp messages in the queue");
+                } else {
+                    in_app.show();
                 }
             }
         });

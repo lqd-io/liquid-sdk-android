@@ -1,15 +1,10 @@
 package io.lqd.sdk.model;
 
 import org.json.JSONObject;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
-
-import java.util.Date;
-
-import io.lqd.sdk.factory.FactoryGirl;
 
 import static org.junit.Assert.assertTrue;
 
