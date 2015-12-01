@@ -16,6 +16,8 @@
 
 package io.lqd.sdk;
 
+import android.net.Uri;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -49,7 +51,7 @@ public class LQRequestFactory {
     }
 
     public static LQNetworkRequest requestLiquidPackageRequest(String userId, String userDevice) {
-        String url = String.format(LIQUID_LQD_PACKAGE_URL, userId, userDevice);
+            String url = String.format(LIQUID_LQD_PACKAGE_URL, Uri.encode(userId, "UTF-8"), userDevice);
         return new LQNetworkRequest(url, "GET", null);
     }
 
@@ -58,17 +60,17 @@ public class LQRequestFactory {
     }
 
     public static LQNetworkRequest inappMessagesRequest(String userId) {
-        String url = String.format(LIQUID_INAPP_MESSAGES_URL, userId);
+           String url = String.format(LIQUID_INAPP_MESSAGES_URL, Uri.encode(userId, "UTF-8"));
         return new LQNetworkRequest(url, "GET", null);
     }
 
     public static LQNetworkRequest inappMessagesReportRequest(String userId, String formulaId, JSONObject payload) {
-        String url = String.format(LIQUID_INAPP_MESSAGE_REPORT_URL, userId, formulaId);
+            String url = String.format(LIQUID_INAPP_MESSAGE_REPORT_URL, Uri.encode(userId, "UTF-8"), formulaId);
         return new LQNetworkRequest(url, "POST", payload.toString());
     }
 
     public static LQNetworkRequest inappMessagesReportRequest(String userId, String formulaId) {
-        String url = String.format(LIQUID_INAPP_MESSAGE_REPORT_URL, userId, formulaId);
+            String url = String.format(LIQUID_INAPP_MESSAGE_REPORT_URL, Uri.encode(userId, "UTF-8"), formulaId);
         return new LQNetworkRequest(url, "POST", null);
     }
 }
