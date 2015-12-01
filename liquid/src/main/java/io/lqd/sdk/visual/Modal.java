@@ -1,3 +1,19 @@
+/**
+ * Copyright 2014-present Liquid Data Intelligence S.A.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.lqd.sdk.visual;
 
 import android.app.Activity;
@@ -5,6 +21,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
@@ -15,6 +32,7 @@ import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -30,7 +48,7 @@ import io.lqd.sdk.Liquid;
 import io.lqd.sdk.R;
 import io.lqd.sdk.model.LQInAppMessage;
 
-public class Modal{
+public class Modal {
 
     private LQInAppMessage mModalModel;
     private PopupWindow mPopupWindow;
@@ -75,9 +93,9 @@ public class Modal{
         mViewTitle.setTypeface(HeavyLato);
         mViewMessage.setTypeface(RegularLato);
 
-        // Background Color
+        // Set the background Color
         ((GradientDrawable) container.findViewById(R.id.modal_linear_bg_color).getBackground()).
-                    setColor(Color.parseColor(mModalModel.getBgColor()));
+                setColor(Color.parseColor(mModalModel.getBgColor()));
 
         // Set the text
         mViewTitle.setText(mModalModel.getTitle());
@@ -89,10 +107,16 @@ public class Modal{
 
         mPopupWindow = new PopupWindow(container, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, true);
         mPopupWindow.setAnimationStyle(R.style.FadeInOutAnimation);
+        mPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                Liquid.getInstance().showInAppMessages();
+            }
+        });
     }
 
     private void setUpButtons() {
-        Button xClose = (Button) container.findViewById(R.id.xClose);
+        final Button xClose = (Button) container.findViewById(R.id.xClose);
         xClose.setTransformationMethod(null);
 
         LinearLayout ctasContainer = (LinearLayout) container.findViewById(R.id.modal_buttons_container);
@@ -111,9 +135,11 @@ public class Modal{
         Typeface boldLato = Typeface.createFromAsset(mContext.getAssets(), "fonts/Lato-Bold.ttf");
 
         for(final LQInAppMessage.Cta cta : mModalModel.getCtas()) {
-            Button ctaBtn = new Button(mContext);
+            final Button ctaBtn = new Button(mContext);
             ctaBtn.setBackgroundResource(R.drawable.buttonshape);
             ctaBtn.setLayoutParams(params);
+
+            // Set button font
             ctaBtn.setTypeface(boldLato);
             ctaBtn.setTransformationMethod(null);
 
@@ -123,21 +149,49 @@ public class Modal{
             else
                 ctaBtn.setText(cta.getButtonText());
 
+            // Button text size
             ctaBtn.setTextSize(TypedValue.COMPLEX_UNIT_PX, getButtonTextSize());
+
+            // Button background color
             ctaBtn.getBackground().setColorFilter(Color.parseColor(cta.getButtonColor()), PorterDuff.Mode.SRC_IN);
+
+            // Button text color
             ctaBtn.setTextColor(Color.parseColor(cta.getButtonTextColor()));
+
+            if (Build.VERSION.SDK_INT > 15) {
+                ctaBtn.setOnTouchListener(new View.OnTouchListener() {
+                    Rect mRect;
+
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                            mRect = new Rect(ctaBtn.getLeft(), ctaBtn.getTop(), ctaBtn.getRight(), ctaBtn.getBottom());
+                            ViewHelper.setAlpha(ctaBtn, 0.7F);
+                        }
+                        if (event.getAction() == MotionEvent.ACTION_UP) {
+                            ViewHelper.setAlpha(ctaBtn, 1);
+                        }
+                        if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                            if (!mRect.contains(ctaBtn.getLeft() + (int) event.getX(), ctaBtn.getTop() + (int) event.getY())) {
+                                ViewHelper.setAlpha(ctaBtn, 1);
+                            }
+                        }
+                        return false;
+                    }
+                });
+            }
 
             ctaBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                   Intent mIntent = new Intent(Intent.ACTION_VIEW);
+                    Intent mIntent = new Intent(Intent.ACTION_VIEW);
                     if (cta.getDeepLink() != null) {
                         try {
                             mIntent.setData(Uri.parse(cta.getDeepLink()));
                             Liquid.getInstance().trackCta(cta);
                             mContext.startActivity(mIntent);
                         } catch (Exception e) {
-                            LQLog.error("No activity to manage deeplink or typo in the deeplink's name!");
+                            LQLog.infoVerbose("Canceled or not properly assigned to deeplink or URL");
                         }
                     }
                     mPopupWindow.dismiss();

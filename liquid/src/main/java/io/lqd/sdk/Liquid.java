@@ -37,6 +37,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -84,6 +85,7 @@ public class Liquid {
     private LQQueuer mHttpQueuer;
     private boolean isDevelopmentMode;
     private Activity mCurrentActivity;
+    private LinkedList mInAppMessagesQueue;
 
     /**
      * Retrieves the Liquid shared instance.
@@ -692,6 +694,7 @@ public class Liquid {
     public void activityStarted(Activity activity) {
         if (Build.VERSION.SDK_INT < 14) {
             activityStartedCallback(activity);
+
         }
     }
 
@@ -732,6 +735,7 @@ public class Liquid {
 
     private void activityCreatedCallback(Activity activity) {
         mCurrentActivity = activity;
+
     }
 
     private void activityStopedCallback(Activity activity) {
@@ -860,15 +864,16 @@ public class Liquid {
                         ArrayList<LQInAppMessage> list = null;
                         try {
                             list = InappMessageParser.parse(new JSONArray(dataFromServer));
+                            mInAppMessagesQueue = new LinkedList();
                         } catch (JSONException e) {
                             LQLog.error("Error parsing inapp messages" + e.getMessage());
                         }
                         if (list != null) {
                             for (LQInAppMessage inapp : list) {
                                 if (inapp.getLayout().equals("modal")) {
-                                    new Modal(mContext, mCurrentActivity.findViewById(android.R.id.content).getRootView(), inapp).show();
+                                    mInAppMessagesQueue.add(new Modal(mContext, mCurrentActivity.findViewById(android.R.id.content).getRootView(), inapp));
                                 } else if (inapp.getLayout().equals("slide_up")) {
-                                    new SlideUp(mContext, mCurrentActivity.findViewById(android.R.id.content).getRootView(), inapp).show();
+                                    mInAppMessagesQueue.add(new SlideUp(mContext, mCurrentActivity.findViewById(android.R.id.content).getRootView(), inapp));
                                 }
                             }
                         }
@@ -876,7 +881,27 @@ public class Liquid {
                 }
             });
         }
+
     }
+
+    public void showInAppMessages(){
+        mQueue.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Object obj = mInAppMessagesQueue.poll();
+                    if (obj instanceof Modal) {
+                        ((Modal) obj).show();
+                    } else if (obj instanceof SlideUp) {
+                        ((SlideUp) obj).show();
+                    }
+                } catch (Exception e) {
+                    LQLog.infoVerbose("Not anymore inapp messages in the queue");
+                }
+            }
+        });
+    }
+
 
     private void notifyListeners(final boolean received) {
         Handler mainHandler = new Handler(mContext.getMainLooper());

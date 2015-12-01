@@ -1,9 +1,24 @@
+/**
+ * Copyright 2014-present Liquid Data Intelligence S.A.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.lqd.sdk.visual;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
-
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -16,13 +31,12 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
-
-import com.nineoldandroids.view.ViewHelper;
 
 import io.lqd.sdk.LQLog;
 import io.lqd.sdk.Liquid;
@@ -30,7 +44,7 @@ import io.lqd.sdk.R;
 import io.lqd.sdk.model.LQInAppMessage;
 
 
-public class SlideUp implements View.OnTouchListener {
+public class SlideUp implements OnTouchListener {
 
     private final SlideUp mInstance;
     private final LQInAppMessage mSlideModel;
@@ -40,10 +54,10 @@ public class SlideUp implements View.OnTouchListener {
     private ViewGroup container;
     private int height;
     private PopupWindow mPopupWindow;
-    private float mDx;
     private float mDy;
     private int mCurrentX;
     private int mCurrentY;
+
 
     public SlideUp(Context context, View root, LQInAppMessage slideModel) {
         mInstance = this;
@@ -93,10 +107,16 @@ public class SlideUp implements View.OnTouchListener {
 
         mPopupWindow.setFocusable(false);
         mPopupWindow.setOutsideTouchable(true);
+        mPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                Liquid.getInstance().showInAppMessages();
+            }
+        });
     }
 
     public void setUpButton() {
-       ImageView mArrowButton = (ImageView) container.findViewById(R.id.slideUpArrowButton);
+        final  ImageView mArrowButton = (ImageView) container.findViewById(R.id.slideUpArrowButton);
 
         for(final LQInAppMessage.Cta cta : mSlideModel.getCtas()) {
 
@@ -109,14 +129,14 @@ public class SlideUp implements View.OnTouchListener {
             mArrowButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                   Intent mIntent = new Intent(Intent.ACTION_VIEW);
+                    Intent mIntent = new Intent(Intent.ACTION_VIEW);
                     if (cta.getDeepLink() != null) {
                         try {
                             mIntent.setData(Uri.parse(cta.getDeepLink()));
                             Liquid.getInstance().trackCta(cta);
                             mContext.startActivity(mIntent);
                         } catch (Exception e) {
-                            LQLog.error("No activity to manage deeplink or typo in the deeplink's name!");
+                            LQLog.infoVerbose("Canceled or not properly assigned");
                         }
                     }
                     mPopupWindow.dismiss();
@@ -146,17 +166,20 @@ public class SlideUp implements View.OnTouchListener {
         }, milliseconds);
     }
 
+
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            mDx = mCurrentX - event.getRawX();
             mDy = mCurrentY - event.getRawY();
         }
         if (isSlidingDown(event))
             animateDown(event);
-        if (isCancelingSlideDown(event))
-            resetPosition();
-
+        if (isCancelingSlideDown(event)) {
+            if (mCurrentY * 1.5F >= height / 2)
+                dismiss();
+            else
+                resetPosition();
+        }
         return false;
     }
 
@@ -179,9 +202,6 @@ public class SlideUp implements View.OnTouchListener {
                 animateOld(mCurrentX, -mCurrentY, -1, -1, false);
             }
         }
-        if ((mCurrentY * 2) >= height) {
-            dismiss();
-        }
     }
 
     private void resetPosition() {
@@ -201,11 +221,12 @@ public class SlideUp implements View.OnTouchListener {
 
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     private void animateNew(float yCoordinate, int duration) {
-        container.animate().y(yCoordinate * 2).setDuration(duration).start();
+        container.animate().y(yCoordinate * 1.5F).setDuration(duration).start();
     }
 
     private void animateOld(int xCoordinate, int yCoordinate, int width, int height, boolean moveOutside) {
-        mPopupWindow.update(xCoordinate, yCoordinate * 2, width, height);
+        yCoordinate *= 1.5F;
+        mPopupWindow.update(xCoordinate, yCoordinate, width, height);
         mPopupWindow.setClippingEnabled(moveOutside);
     }
 
