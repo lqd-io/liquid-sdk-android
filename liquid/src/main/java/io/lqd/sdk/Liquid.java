@@ -445,7 +445,7 @@ public class Liquid {
         mQueue.execute(new Runnable() {
             @Override
             public void run() {
-                for(String key : attributes.keySet()) {
+                for (String key : attributes.keySet()) {
                     if (LQModel.validKey(key, isDevelopmentMode)) {
                         mCurrentUser.setAttribute(key, attributes.get(key));
                     }
@@ -694,7 +694,6 @@ public class Liquid {
     public void activityStarted(Activity activity) {
         if (Build.VERSION.SDK_INT < 14) {
             activityStartedCallback(activity);
-
         }
     }
 

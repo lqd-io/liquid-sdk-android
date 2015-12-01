@@ -35,7 +35,6 @@ public class LQUser extends LQModel {
     private boolean mIdentified;
     private HashMap<String, Object> mAttributes = new HashMap<String, Object>();
 
-
     public LQUser(String identifier) {
         this(identifier, new HashMap<String,Object>());
     }
@@ -58,6 +57,11 @@ public class LQUser extends LQModel {
 
     // Attributes
     public String getIdentifier() {
+        return mIdentifier;
+    }
+
+    public String setIdentifierForPrefs(String identifier){
+        mIdentifier = identifier;
         return mIdentifier;
     }
 

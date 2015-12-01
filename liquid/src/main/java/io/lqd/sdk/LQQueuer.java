@@ -129,5 +129,4 @@ public class LQQueuer {
             LQLog.infoVerbose("Stopped flush timer");
         }
     }
-
 }

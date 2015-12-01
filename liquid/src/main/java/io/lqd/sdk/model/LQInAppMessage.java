@@ -1,6 +1,7 @@
 package io.lqd.sdk.model;
 
 import android.support.v4.util.ArrayMap;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

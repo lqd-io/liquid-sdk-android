@@ -17,13 +17,17 @@
 package io.lqd.sdk.model;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.Serializable;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -37,6 +41,11 @@ import io.lqd.sdk.LiquidTools;
 public abstract class LQModel implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    public static final String PREF_FILE_NAME = "LQPrefsFile";
+    private static JSONObject tempJsonObject;
+    private static LQUser lqUserObject;
+    private static String[] keys = { "mIdentifier", "mUniqueId" };
+
 
     /**
      * Generate a random unique id
@@ -106,37 +115,75 @@ public abstract class LQModel implements Serializable {
 
     protected void save(Context context, String path) {
         LQLog.data("Saving " + this.getClass().getSimpleName());
-        save(context,path,this);
+        save(context, path, this);
     }
 
     protected static void save(Context context, String path, Object o) {
-        try {
-            FileOutputStream fileOutputStream = context.openFileOutput(path, Context.MODE_PRIVATE);
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(
-                    fileOutputStream);
-            objectOutputStream.writeObject(o);
-            objectOutputStream.flush();
-            objectOutputStream.close();
-        } catch (Exception e) {
-            LQLog.infoVerbose( "Could not save to file " + path);
-        }
+
+        SharedPreferences preferences = context.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor prefsEditor = preferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(o);
+        if (path.contains(".queue"))
+            prefsEditor.putString("Queue", json);
+        else
+            prefsEditor.putString("User", json);
+        LQLog.infoVerbose("Saving " + path + " to shared prefs");
+        prefsEditor.apply();
     }
 
     protected static Object loadObject(Context context, String path) {
-        LQLog.infoVerbose("Loading " + path + "from disk");
-        try {
-            FileInputStream fileInputStream = context.openFileInput(path);
-            ObjectInputStream objectInputStream = new ObjectInputStream(
-                    fileInputStream);
-            Object result = objectInputStream.readObject();
-            objectInputStream.close();
-            return result;
-        } catch (IOException e) {
-            LQLog.infoVerbose("Could not load queue from file " + path);
-            return null;
-        } catch (ClassNotFoundException e) {
-            LQLog.infoVerbose("Could not load queue from file " + path);
-            return null;
+        LQLog.infoVerbose("Loading " + path + " from shared prefs");
+
+        SharedPreferences preferences = context.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE);
+
+        Type type = new TypeToken<ArrayList<LQNetworkRequest>>() {}.getType();
+        Gson gson = new Gson();
+
+        if (path.contains(".user")) {
+            String jsonUserString = preferences.getString("User", "");
+
+            if ("".equals(jsonUserString)){
+                LQLog.infoVerbose("New user, requesting new identifier.");
+                jsonUserString = gson.toJson(new LQUser(newIdentifier(), false));
+            }
+            try {
+                tempJsonObject = new JSONObject(jsonUserString);
+            } catch (JSONException e) {
+                LQLog.error("Couldn't assign temp json " + e.getMessage());
+                e.printStackTrace();
+            }
+
+            try {
+                lqUserObject = gson.fromJson(jsonUserString, LQUser.class);
+            } catch (Exception e) {
+                LQLog.infoVerbose("Error from gson" + e.getMessage() + ". Clearing preferences file.");
+                preferences.edit().clear().commit();
+                return null;
+            }
+            getIdentifierKeyFromPrefs();
+            return lqUserObject;
+        }
+        else {
+            String json = preferences.getString("Queue", "");
+            return gson.fromJson(json, type);
+        }
+    }
+
+    protected static void getIdentifierKeyFromPrefs(){
+        boolean found = false;
+        int i = 0;
+
+        while (i < keys.length && !found) {
+            try {
+                lqUserObject.setIdentifierForPrefs(tempJsonObject.getString(keys[i]));
+                found = true;
+                LQLog.info("Found the key: " + keys[i] + " in the preferences saved file");
+            } catch (JSONException e) {
+                LQLog.info("Did not found the key: " + keys[i] + " in the preferences, trying the next one.");
+            }
+            ++i;
         }
     }
 
