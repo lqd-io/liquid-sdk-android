@@ -171,7 +171,7 @@ public abstract class LQModel implements Serializable {
         }
     }
 
-    protected static void getIdentifierKeyFromPrefs(){
+    protected static void getIdentifierKeyFromPrefs() {
         boolean found = false;
         int i = 0;
 

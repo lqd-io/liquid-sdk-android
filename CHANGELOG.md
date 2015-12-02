@@ -1,5 +1,13 @@
 # Liquid Android SDK Change Log
 
+
+## 2.0.0-rc2: Bufixing
+
+  * **[bugfix]** Banner crash when dismissing.
+  * **[enhancement]** Persistence layer.
+
+<br>
+
 ## 2.0.0-rc1: Add Inapp Messages
 
   * **[feature]** Add Modal inapp message.
