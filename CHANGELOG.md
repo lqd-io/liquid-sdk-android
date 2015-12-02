@@ -1,6 +1,12 @@
 # Liquid Android SDK Change Log
 
 
+## 2.0.0-rc3: Bufixing
+
+  * **[bugfix]** Force default theme.
+
+<br>
+
 ## 2.0.0-rc2: Bufixing
 
   * **[bugfix]** Banner crash when dismissing.
