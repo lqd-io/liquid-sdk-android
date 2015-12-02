@@ -118,9 +118,11 @@ android.libraryVariants.all { variant ->
         }
     }
 }
+
 def isReleaseVersion() {
     return !version.endsWith("SNAPSHOT");
 }
+
 configurations {
     archives {
         extendsFrom configurations.default

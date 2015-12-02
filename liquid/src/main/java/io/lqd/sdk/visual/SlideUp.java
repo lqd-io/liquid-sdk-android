@@ -44,7 +44,7 @@ import io.lqd.sdk.R;
 import io.lqd.sdk.model.LQInAppMessage;
 
 
-public class SlideUp implements OnTouchListener {
+public class SlideUp implements OnTouchListener, InappMessage {
 
     private final SlideUp mInstance;
     private final LQInAppMessage mSlideModel;

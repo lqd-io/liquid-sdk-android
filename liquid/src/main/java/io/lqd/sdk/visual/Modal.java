@@ -48,7 +48,7 @@ import io.lqd.sdk.Liquid;
 import io.lqd.sdk.R;
 import io.lqd.sdk.model.LQInAppMessage;
 
-public class Modal {
+public class Modal implements InappMessage {
 
     private LQInAppMessage mModalModel;
     private PopupWindow mPopupWindow;
