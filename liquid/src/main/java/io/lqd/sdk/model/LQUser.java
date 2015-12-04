@@ -30,6 +30,7 @@ import io.lqd.sdk.LiquidTools;
 public class LQUser extends LQModel {
 
     private static final long serialVersionUID = 1582937331182018907L;
+    private static final String[] RESERVED_KEYS  = {"unique_id", "identified"};
 
     private String mIdentifier;
     private boolean mIdentified;
@@ -121,6 +122,20 @@ public class LQUser extends LQModel {
         return null;
     }
 
+
+
+    public static LQModel fromJSON(JSONObject jsonObject) {
+        try {
+            String unique_id = jsonObject.getString("unique_id");
+            boolean identified = jsonObject.getBoolean("identified");
+            HashMap<String, Object> attrs = attributesFromJSON(jsonObject, RESERVED_KEYS);
+            return new LQUser(unique_id, attrs, identified);
+        } catch (JSONException e) {
+            LQLog.infoVerbose("New user, identifying now...");
+            return new LQUser(LQModel.newIdentifier(), false);
+        }
+    }
+
     protected void attributesCheck() {
         if(mAttributes == null) {
             mAttributes = new HashMap<String, Object>();
@@ -133,12 +148,7 @@ public class LQUser extends LQModel {
     }
 
     public static LQUser load(Context context, String path) {
-        LQUser user = (LQUser) LQModel.load(context, path + ".user");
-        if(user == null) {
-            user = new LQUser(LQModel.newIdentifier(), false);
-        }
-        user.attributesCheck();
-        return user;
+        return (LQUser) fromJSON(retriveFromFile(context, path));
     }
 
 }
