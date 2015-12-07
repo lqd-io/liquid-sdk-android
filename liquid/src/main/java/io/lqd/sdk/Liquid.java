@@ -159,7 +159,7 @@ public class Liquid {
         mDevice = new LQDevice(context, LIQUID_VERSION);
         mQueue = Executors.newSingleThreadExecutor();
         loadLiquidPackage(true);
-        mHttpQueuer = new LQQueuer(mContext, mApiToken, LQNetworkRequest.loadQueue(mContext, mApiToken));
+        mHttpQueuer = LQQueuer.load(mContext, mApiToken);
         mHttpQueuer.setLiquidInstance(this);
         mHttpQueuer.startFlushTimer();
         isDevelopmentMode = developmentMode;
@@ -167,7 +167,7 @@ public class Liquid {
             mBundleVariablesSended = new ArrayList<String>();
 
         // Get last user and init session
-        mPreviousUser = LQUser.load(mContext, mApiToken);
+        mPreviousUser = LQUser.load(mContext, mApiToken + ".user");
         identifyUser(mPreviousUser.getIdentifier(), mPreviousUser.getAttributes(), mPreviousUser.isIdentified(), false);
         newSession(true);
 

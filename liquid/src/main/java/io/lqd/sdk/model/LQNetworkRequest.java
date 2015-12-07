@@ -16,8 +16,10 @@
 
 package io.lqd.sdk.model;
 
-import android.content.Context;
 import android.os.Build;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -26,7 +28,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 import java.util.zip.GZIPInputStream;
@@ -103,23 +104,6 @@ public class LQNetworkRequest extends LQModel {
                 ((LQNetworkRequest) o).getJSON().equals(this.getJSON());
     }
 
-    // File Management
-    @SuppressWarnings("unchecked")
-    public static ArrayList<LQNetworkRequest> loadQueue(Context context, String fileName) {
-        Object result = LQModel.loadObject(context, fileName + ".queue");
-        ArrayList<LQNetworkRequest> queue = (ArrayList<LQNetworkRequest>) result;
-        if (queue == null) {
-            queue = new ArrayList<LQNetworkRequest>();
-        }
-        LQLog.infoVerbose("Loading queue with " + queue.size() + " items from disk");
-        return queue;
-    }
-
-    public static void saveQueue(Context context, ArrayList<LQNetworkRequest> queue, String fileName) {
-        LQLog.data("Saving queue with " + queue.size() + " items to disk");
-        LQModel.save(context, fileName + ".queue", queue);
-    }
-
     public LQNetworkResponse sendRequest(String token) {
         String response = null;
         int responseCode = -1;
@@ -193,6 +177,36 @@ public class LQNetworkRequest extends LQModel {
             return "";
         }
     }
+
+    public static LQModel fromJSON(JSONObject jsonObject) {
+        LQNetworkRequest lqNetworkRequest = null;
+        try {
+            String mUrl = jsonObject.getString("mUrl");
+            String mHttpMethod = jsonObject.getString("mHttpMethod");
+            String mJson = jsonObject.getString("mJson");
+            lqNetworkRequest = new LQNetworkRequest(mUrl, mHttpMethod, mJson);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return lqNetworkRequest;
+    }
+
+    @Override
+    public JSONObject toJSON() {
+        JSONObject json = new JSONObject();
+        try {
+            json.put("mUrl", mUrl);
+            json.put("mHttpMethod", mHttpMethod);
+            json.put("mJson", mJson);
+            json.put("mNumberOfTries", mNumberOfTries);
+            json.put("mLastTry", mLastTry);
+            return json;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }
 
 
