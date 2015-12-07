@@ -1,5 +1,11 @@
 # Liquid Android SDK Change Log
 
+## 2.0.0-rc4: Bufixing
+
+  * **[bugfix]** Persistence layer.
+  * **[change]** Inapp Messages endpoint
+
+<br>
 
 ## 2.0.0-rc3: Bufixing
 
