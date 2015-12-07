@@ -117,11 +117,9 @@ android.libraryVariants.all { variant ->
         }
     }
 }
-
 def isReleaseVersion() {
     return !version.endsWith("SNAPSHOT");
 }
-
 configurations {
     archives {
         extendsFrom configurations.default
@@ -184,7 +182,9 @@ uploadArchives {
             }
 
         } else {
-            snapshotRepository(url: 'file://' + new File(System.getProperty('user.home'), '.m2/repository').absolutePath)
+            snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
+                authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
+            }
         }
     }
 }
