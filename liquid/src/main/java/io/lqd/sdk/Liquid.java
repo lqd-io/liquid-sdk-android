@@ -42,6 +42,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import io.lqd.sdk.gcm.LQClientManager;
 import io.lqd.sdk.model.InappMessageParser;
 import io.lqd.sdk.model.LQDataPoint;
 import io.lqd.sdk.model.LQDevice;
@@ -288,9 +289,22 @@ public class Liquid {
      * *******************
      */
 
-    public void setupPushNotifications(final String senderID) {
+    public void setupPushNotifications(Activity activity, final String senderID) {
         LQLog.infoVerbose("Requesting device push token");
-        LQPushHandler.registerDevice(mContext, senderID);
+        LQClientManager pushClientManager = new LQClientManager(activity, senderID);
+
+        pushClientManager.registerIfNeeded(new LQClientManager.RegistrationCompletedHandler() {
+
+            @Override
+            public void onSuccess(String registrationId, boolean isNewRegistration) {
+                Liquid.getInstance().setGCMregistrationID(registrationId);
+            }
+
+            @Override
+            public void onFailure(String ex) {
+                super.onFailure(ex);
+            }
+        });
     }
 
     public void alias() {
