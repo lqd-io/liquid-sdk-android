@@ -37,6 +37,7 @@ public class LQMessageHandler extends GcmListenerService {
     private static final String LIQUID_PUSH_ID_EXTRA = "lqd_id";
     private static final String LIQUID_SOUND_EXTRA = "lqd_sound";
     private static final String LIQUID_TITLE_EXTRA = "lqd_title";
+    private static final String LIQUID_DEEPLINK_EXTRA = "lqd_deeplink";
 
 
     @Override
@@ -51,8 +52,17 @@ public class LQMessageHandler extends GcmListenerService {
         int icon = getAppIconInt(getApplicationContext());
         Uri sound = getPushSound(data, getApplicationContext());
         String title = getPushTitle(data, getApplicationContext());
+        String deepLinkString = getDeepLink(data);
+
         Intent appIntent = getIntent(getApplicationContext());
-        PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, appIntent, 0);
+        Intent deepLinkIntent = new Intent(Intent.ACTION_VIEW);
+        PendingIntent contentIntent;
+        if (deepLinkString != null) {
+            deepLinkIntent.setData(Uri.parse(deepLinkString));
+            contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, deepLinkIntent, 0);
+        } else {
+            contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, appIntent, 0);
+        }
 
         createNotification(getApplicationContext(), contentIntent, icon, push_id, title, message, sound);
     }
@@ -117,6 +127,10 @@ public class LQMessageHandler extends GcmListenerService {
         } catch (PackageManager.NameNotFoundException e) {
             return "";
         }
+    }
+
+    private static String getDeepLink(Bundle data) {
+        return data.getString(LIQUID_DEEPLINK_EXTRA);
     }
 
 }
