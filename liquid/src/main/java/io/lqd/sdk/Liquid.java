@@ -166,11 +166,12 @@ public class Liquid {
         if(isDevelopmentMode)
             mBundleVariablesSended = new ArrayList<String>();
 
+
         // Get last user and init session
         mPreviousUser = LQUser.load(mContext, mApiToken);
         identifyUser(mPreviousUser.getIdentifier(), mPreviousUser.getAttributes(), mPreviousUser.isIdentified(), false);
         newSession(true);
-
+        mInAppMessagesQueue = new LinkedList();
         LQLog.info("Initialized Liquid with API Token " + apiToken);
     }
 
@@ -505,6 +506,7 @@ public class Liquid {
         Runnable newSessionRunnable = new Runnable() {
             @Override
             public void run() {
+
                 mCurrentSession = new LQSession(mSessionTimeout, now);
                 track("_startSession", null, now);
             }
@@ -754,7 +756,9 @@ public class Liquid {
     private void activityStartedCallback(Activity activity) {
         mCurrentActivity = activity;
 
-        new LQClickListener(mCurrentActivity.getWindow().getDecorView());
+        if(isDevelopmentMode) {
+            new LQClickListener(activity, mCurrentActivity.getWindow().getDecorView());
+        }
 
         mInstance.attachActivity(activity);
         if (mNeedCallbackCall) {
@@ -867,7 +871,6 @@ public class Liquid {
                         ArrayList<LQInAppMessage> list = null;
                         try {
                             list = InappMessageParser.parse(new JSONArray(dataFromServer));
-                            mInAppMessagesQueue = new LinkedList();
                         } catch (JSONException e) {
                             LQLog.error("Error parsing inapp messages" + e.getMessage());
                         }
@@ -886,7 +889,7 @@ public class Liquid {
         }
     }
 
-    public void showInAppMessages(){
+    public void showInAppMessages() {
         mQueue.execute(new Runnable() {
             @Override
             public void run() {

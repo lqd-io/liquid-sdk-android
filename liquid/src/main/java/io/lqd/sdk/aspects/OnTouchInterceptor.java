@@ -5,10 +5,12 @@ import android.os.Build;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.Button;
+
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
+
 import io.lqd.sdk.LQLog;
 import io.lqd.sdk.Liquid;
 
@@ -53,7 +55,7 @@ public class OnTouchInterceptor {
         }
         else {
             if (event.getAction() == MotionEvent.ACTION_DOWN)
-                LQLog.warning("This is not a <Button>, so no tracking for this View...");
+                LQLog.infoVerbose("This is not a <Button>, so no tracking for this View...");
         }
     }
 }
