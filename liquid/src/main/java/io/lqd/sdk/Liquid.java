@@ -757,7 +757,7 @@ public class Liquid {
         mCurrentActivity = activity;
 
         if(isDevelopmentMode) {
-            new LQClickListener(activity, mCurrentActivity.getWindow().getDecorView());
+            new LQClickListener(activity);
         }
 
         mInstance.attachActivity(activity);
