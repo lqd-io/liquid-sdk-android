@@ -1,0 +1,53 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/splash_layout"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#E63A98FC"
+    android:gravity="center_vertical|center_horizontal"
+    android:weightSum="1">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="50dp"
+        android:layout_marginTop="50dp"
+        android:weightSum="2">
+
+        <ImageView android:src="@drawable/splash"
+            android:layout_width="298dp"
+            android:layout_height="272dp"
+            android:layout_weight="1"
+            android:layout_gravity="center_horizontal" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Cycle through all views and long press buttons to start tracking events."
+            android:id="@+id/onelinedocumentation"
+            android:layout_weight="1"
+            android:textColor="#FFFFFF"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="-10dp"
+            android:textSize="20sp"
+            android:shadowColor="#000000"
+            android:shadowDx="0.5"
+            android:shadowDy="0.5"
+            android:shadowRadius="20"/>
+
+        <Button
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:text="Got it!"
+            android:id="@+id/gotit"
+            android:background="@drawable/buttonshape"
+            android:textColor="#FFFFFF"
+            android:layout_gravity="center_horizontal" />
+    </LinearLayout>
+
+
+</LinearLayout>

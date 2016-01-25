@@ -23,6 +23,8 @@ import android.app.Activity;
 import android.app.Application;
 import android.app.Application.ActivityLifecycleCallbacks;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.location.Location;
@@ -50,10 +52,12 @@ import io.lqd.sdk.model.LQInAppMessage;
 import io.lqd.sdk.model.LQLiquidPackage;
 import io.lqd.sdk.model.LQModel;
 import io.lqd.sdk.model.LQNetworkRequest;
-import io.lqd.sdk.model.LQSession;
 import io.lqd.sdk.model.LQUser;
 import io.lqd.sdk.model.LQValue;
 import io.lqd.sdk.model.LQVariable;
+import io.lqd.sdk.oneline.LQClickListener;
+import io.lqd.sdk.oneline.LQDevelopmentMode;
+import io.lqd.sdk.oneline.LQUiElement;
 import io.lqd.sdk.visual.InappMessage;
 import io.lqd.sdk.visual.Modal;
 import io.lqd.sdk.visual.SlideUp;
@@ -62,16 +66,17 @@ public class Liquid {
 
     protected static final String TAG_LIQUID = "LIQUID";
 
-    public static final String LIQUID_VERSION = "2.0.0-rc3";
+    public static final String LIQUID_VERSION = "2.0.0";
     private static final int LIQUID_DEFAULT_SESSION_TIMEOUT = 30;
+
+    private SharedPreferences mPreferences;
+    public static final String PREF_BUTTONS_FILE = "LQUiElements";
 
     private int mSessionTimeout;
     private String mApiToken;
     private LQUser mCurrentUser;
     private LQUser mPreviousUser;
     private LQDevice mDevice;
-    private LQSession mCurrentSession;
-    private Date mEnterBackgroundtime;
     protected ExecutorService mQueue;
     private boolean mAutoLoadValues;
     private Context mContext;
@@ -86,7 +91,12 @@ public class Liquid {
     private boolean isDevelopmentMode;
     private Activity mCurrentActivity;
     private LinkedList<InappMessage> mInAppMessagesQueue;
-
+    private LQClickListener mLQClickListener;
+    private boolean isStarted;
+    private Handler uiElementsHandler;
+    private Boolean isSplashShown = false;
+    private boolean enteredDevMode = false;
+    private String mDevToken;
 
     /**
      * Retrieves the Liquid shared instance.
@@ -163,14 +173,13 @@ public class Liquid {
         mHttpQueuer.setLiquidInstance(this);
         mHttpQueuer.startFlushTimer();
         isDevelopmentMode = developmentMode;
+        isStarted = false;
         if(isDevelopmentMode)
             mBundleVariablesSended = new ArrayList<String>();
-
 
         // Get last user and init session
         mPreviousUser = LQUser.load(mContext, mApiToken);
         identifyUser(mPreviousUser.getIdentifier(), mPreviousUser.getAttributes(), mPreviousUser.isIdentified(), false);
-        newSession(true);
         mInAppMessagesQueue = new LinkedList();
         LQLog.info("Initialized Liquid with API Token " + apiToken);
     }
@@ -380,7 +389,7 @@ public class Liquid {
             return;
         }
 
-        // same id -> just update attributes
+        // same mUIElementsID -> just update attributes
         if (mCurrentUser != null && mCurrentUser.getIdentifier().equals(identifier)) {
             mCurrentUser.setAttributes(finalAttributes);
             mCurrentUser.save(mContext, mApiToken);
@@ -500,54 +509,6 @@ public class Liquid {
 
     }
 
-    private void newSession(boolean runInCurrentThread) {
-        final Date now = UniqueTime.newDate();
-        LQLog.infoVerbose("Open Session: " + now.toString());
-        Runnable newSessionRunnable = new Runnable() {
-            @Override
-            public void run() {
-
-                mCurrentSession = new LQSession(mSessionTimeout, now);
-                track("_startSession", null, now);
-            }
-        };
-        if (runInCurrentThread) {
-            newSessionRunnable.run();
-        } else {
-            mQueue.execute(newSessionRunnable);
-        }
-    }
-
-    /**
-     * Closes the current session and opens a new one
-     */
-    public void destroySession() {
-        destroySession(UniqueTime.newDate());
-        newSession(false);
-    }
-
-    private void destroySession(Date closeDate) {
-        if ((mCurrentUser != null) && (mCurrentSession != null)
-                && mCurrentSession.getEndDate() == null) {
-            LQLog.infoVerbose("Close Session: " + closeDate.toString());
-            mCurrentSession.setEndDate(closeDate);
-            track("_endSession", null, closeDate);
-        }
-    }
-
-    private void checkSessionTimeout() {
-        if ((mCurrentSession != null) && (mEnterBackgroundtime != null)) {
-            Date now = UniqueTime.newDate();
-            long interval = (now.getTime() - mEnterBackgroundtime.getTime()) / 1000;
-            if (interval >= mSessionTimeout) {
-                destroySession(mEnterBackgroundtime);
-                newSession(true);
-            } else {
-                track("_resumeSession", null, UniqueTime.newDate());
-            }
-        }
-    }
-
     /**
      * Track an event.
      *
@@ -597,7 +558,7 @@ public class Liquid {
         mQueue.execute(new Runnable() {
             @Override
             public void run() {
-               mHttpQueuer.addToHttpQueue(LQRequestFactory.inappMessagesReportRequest(mCurrentUser.getIdentifier(), inAppMessage.getFormulaId()));
+                mHttpQueuer.addToHttpQueue(LQRequestFactory.inappMessagesReportRequest(mCurrentUser.getIdentifier(), inAppMessage.getFormulaId()));
             }
         });
         track(inAppMessage.getDismissEventName(), inAppMessage.getDismissAttributes(), UniqueTime.newDate());
@@ -631,7 +592,7 @@ public class Liquid {
 
         LQLog.infoVerbose("Tracking: " + event.getName());
 
-        final String datapoint = new LQDataPoint(mCurrentUser, mDevice, mCurrentSession, event, mLoadedLiquidPackage.getValues(), date).toJSON().toString();
+        final String datapoint = new LQDataPoint(mCurrentUser, mDevice, event, mLoadedLiquidPackage.getValues(), date).toJSON().toString();
         LQLog.data(datapoint);
 
         mQueue.execute(new Runnable() {
@@ -732,51 +693,81 @@ public class Liquid {
     }
 
     private void activityDestroyedCallback(Activity activity) {
-        mCurrentActivity = activity;
+       // mCurrentActivity = activity;
     }
 
     private void activityCreatedCallback(Activity activity) {
         mCurrentActivity = activity;
-
     }
 
     private void activityStopedCallback(Activity activity) {
-        mCurrentActivity = activity;
+       // mCurrentActivity = activity;
 
         if (isApplicationInBackground(activity)) {
-            track("_pauseSession", null, UniqueTime.newDate());
-            mEnterBackgroundtime = UniqueTime.newDate();
+            track("_appInBackground", null, UniqueTime.newDate());
             flush();
             requestValues();
-        } else {
-            mEnterBackgroundtime = null;
+            isStarted = false;
         }
     }
 
     private void activityStartedCallback(Activity activity) {
+
         mCurrentActivity = activity;
 
-        if(isDevelopmentMode) {
-            new LQClickListener(activity);
-        }
-
         mInstance.attachActivity(activity);
+
         if (mNeedCallbackCall) {
             mNeedCallbackCall = false;
             notifyListeners(false);
         }
-        checkSessionTimeout();
     }
 
-    private void activityResumedCallback(Activity activity) {
+    private void activityResumedCallback(final Activity activity) {
         mCurrentActivity = activity;
 
+        mPreferences = mCurrentActivity.getSharedPreferences(PREF_BUTTONS_FILE, Context.MODE_PRIVATE);
+        requestUiElementsToTrack();
+
         mInstance.attachActivity(activity);
+        mLQClickListener = new LQClickListener(activity);
+
+        uiElementsHandler = new Handler();
+        uiElementsHandler.postDelayed(searchUiElements(mCurrentActivity, enteredDevMode), 0);
+
+        if (enteredDevMode && isStarted)
+            developmentModeON();
+
+        if(!isApplicationInBackground(activity) && !isStarted) {
+            track("_appInForeground", null, UniqueTime.newDate());
+            isStarted = true;
+
+            try {
+                Intent intent = mCurrentActivity.getIntent();
+                if(intent != null && intent.getAction().equals(Intent.ACTION_VIEW)) {
+                    if("lqd".equals(intent.getData().getScheme().substring(0, 3))
+                            && "edit".equals(intent.getData().getHost())) {
+                        mDevToken = intent.getData().getQueryParameter("token");
+                        developmentModeON();
+                    }
+                }
+            } catch (Exception e) {
+                LQLog.info("No intent in this activity");
+            }
+        }
+
         mHttpQueuer.startFlushTimer();
     }
 
     private void activityPausedCallback(Activity activity) {
         mCurrentActivity = activity;
+
+        if (mLQClickListener != null)
+            mLQClickListener.removeBorderLayouts();
+
+        if(uiElementsHandler != null) {
+            uiElementsHandler.removeCallbacksAndMessages(null);
+        }
 
         mInstance.detachActivity(activity);
         mHttpQueuer.stopFlushTimer();
@@ -826,6 +817,42 @@ public class Liquid {
     }
 
     /**
+     * (Constantly) Searching for uielements
+     */
+    public Runnable searchUiElements(final Activity activity, final boolean in_devmode) {
+        return new Runnable() {
+            @Override
+            public void run() {
+                if (in_devmode) {
+                    mLQClickListener.removeBorderLayouts();
+                    requestUiElementsToTrack();
+                }
+                mLQClickListener = new LQClickListener(activity);
+                if (Build.VERSION.SDK_INT > 10) {
+                    mLQClickListener.searchForButtons(activity.getWindow().getDecorView(), in_devmode);
+                } else {
+                    mLQClickListener.searchForButtonsLower(activity.getWindow().getDecorView(), in_devmode);
+                }
+                uiElementsHandler.postDelayed(this, 1000);
+            }
+        };
+    }
+
+    /**
+     * Enters the app into Event Tracking Mode
+     */
+    public void developmentModeON() {
+        enteredDevMode = true;
+        LQDevelopmentMode lqDevelopmentMode = new LQDevelopmentMode();
+        if (uiElementsHandler != null)
+            uiElementsHandler.removeCallbacksAndMessages(null);
+        uiElementsHandler.postDelayed(searchUiElements(mCurrentActivity, enteredDevMode), 0);
+        lqDevelopmentMode.enterDevelopmentMode(mCurrentActivity, isSplashShown);
+        isSplashShown = true; // for not showing the splashscreen in other activities
+    }
+
+
+    /**
      * Request values from the server.
      */
     public void requestValues() {
@@ -850,7 +877,6 @@ public class Liquid {
                         }
                     }
                 }
-
             });
         }
     }
@@ -901,6 +927,66 @@ public class Liquid {
                 }
             }
         });
+    }
+
+    /**
+     * Request the ui elements to be tracked from the server.
+     */
+    private void requestUiElementsToTrack() {
+
+        if (mCurrentUser != null) {
+            mQueue.execute(new Runnable() {
+                @Override
+                public void run() {
+                    LQNetworkRequest uielemenetsreq = LQRequestFactory.uiElementsToTrackRequest(mDevToken);
+                    String dataFromServer = uielemenetsreq.sendRequest(mApiToken).getRequestResponse();
+                    if (dataFromServer != null) {
+                        ArrayList<LQUiElement> list = null;
+                        try {
+                            list = LQUiElement.parse(new JSONArray(dataFromServer));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        if (list != null) {
+                            mPreferences.edit().clear().apply();
+                            for (LQUiElement uielement : list) {
+                                mPreferences.edit().putString(uielement.getIdentifier(), uielement.getEventName()).apply();
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * @param identifier
+     *      The path of the ui element along with the identifier name.
+     * @param eventname
+     *      The event name to be triggered when the element is clicked.
+     */
+    public void addElementToTrack(final String identifier, final String eventname) {
+        if (mCurrentUser != null) {
+            mQueue.execute(new Runnable() {
+                @Override
+                public void run() {
+                    LQNetworkRequest uielement = LQRequestFactory.uiElementsAdd(identifier, eventname);
+                    uielement.sendRequest(mApiToken);
+                }
+            });
+        }
+    }
+
+    public void removeElementFromTracking(final String identifier) {
+        if (mCurrentUser != null) {
+            mQueue.execute(new Runnable() {
+                @Override
+                public void run() {
+                    LQNetworkRequest uielement = LQRequestFactory.uiElementsRemove(identifier);
+                    uielement.sendRequest(mApiToken);
+                }
+            });
+        }
     }
 
 
@@ -1166,14 +1252,12 @@ public class Liquid {
             @Override
             public void run() {
                 mDevice = new LQDevice(mContext, LIQUID_VERSION);
-                mEnterBackgroundtime = null;
                 mLoadedLiquidPackage = new LQLiquidPackage();
                 mAppliedValues = new HashMap<String, LQValue>();
                 if(!soft) {
                     mHttpQueuer = new LQQueuer(mContext, mApiToken);
                 }
                 resetUser();
-                newSession(true);
             }
         });
     }

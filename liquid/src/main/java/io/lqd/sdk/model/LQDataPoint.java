@@ -30,22 +30,20 @@ public class LQDataPoint {
 
     private LQUser mUser;
     private LQDevice mDevice;
-    private LQSession mSession;
     private LQEvent mEvent;
     private ArrayList<LQValue> mValues;
     private Date mTimestamp;
 
-    public LQDataPoint(LQUser user, LQDevice device, LQSession session, LQEvent event, ArrayList<LQValue> values, Date date) {
+    public LQDataPoint(LQUser user, LQDevice device, LQEvent event, ArrayList<LQValue> values, Date date) {
         mUser = user;
         mDevice = device;
-        mSession = session;
         mEvent = event;
         mValues = values;
         mTimestamp = date;
     }
 
-    public LQDataPoint(LQUser user, LQDevice device, LQSession session, LQEvent event, ArrayList<LQValue> values) {
-        this(user,device,session,event,values, new Date());
+    public LQDataPoint(LQUser user, LQDevice device, LQEvent event, ArrayList<LQValue> values) {
+        this(user,device,event,values, new Date());
     }
 
     // JSON
@@ -60,11 +58,6 @@ public class LQDataPoint {
             JSONObject deviceJSON = mDevice.toJSON();
             if(deviceJSON != null){
                 json.put("device", deviceJSON);
-            }
-
-            JSONObject sessionJSON = mSession.toJSON();
-            if(sessionJSON != null){
-                json.put("session", sessionJSON);
             }
 
             JSONObject eventJSON = mEvent.toJSON();
