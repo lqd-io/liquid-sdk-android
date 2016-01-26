@@ -26,6 +26,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 
@@ -162,7 +163,12 @@ public class LQPushHandler extends BroadcastReceiver {
     private static int getAppIconInt(Context context) {
         PackageManager manager = context.getPackageManager();
         try {
-            ApplicationInfo appinfo = manager.getApplicationInfo(context.getPackageName(), 0);
+            ApplicationInfo appinfo = manager.getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+
+            Bundle b = appinfo.metaData;
+            if(b != null && b.getInt("io.lqd.sdk.notification_icon",0) > 0)
+                return b.getInt("io.lqd.sdk.notification_icon");
+
             return appinfo.icon;
         } catch (NameNotFoundException e) {
             return android.R.drawable.sym_def_app_icon;
