@@ -765,6 +765,10 @@ public class Liquid {
     private void activityResumedCallback(Activity activity) {
         mCurrentActivity = activity;
 
+        requestInappMessages();
+
+        showInAppMessages();
+
         mInstance.attachActivity(activity);
         mHttpQueuer.startFlushTimer();
     }
