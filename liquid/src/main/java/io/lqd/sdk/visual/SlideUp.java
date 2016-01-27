@@ -225,8 +225,8 @@ public class SlideUp implements OnTouchListener, InappMessage {
     }
 
     private void animateOld(int xCoordinate, int yCoordinate, int width, int height, boolean moveOutside) {
-        yCoordinate *= 1.5F;
-        mPopupWindow.update(xCoordinate, yCoordinate, width, height);
+        int yCoordinateUpdated = (int) (yCoordinate * 1.5F);
+        mPopupWindow.update(xCoordinate, yCoordinateUpdated, width, height);
         mPopupWindow.setClippingEnabled(moveOutside);
     }
 
