@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -72,6 +73,7 @@ public class LQMessageHandler extends GcmListenerService {
         NotificationManager nm = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(c)
                 .setSmallIcon(icon)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), icon))
                 .setTicker(body)
                 .setContentText(body)
                 .setWhen(System.currentTimeMillis())
@@ -87,7 +89,12 @@ public class LQMessageHandler extends GcmListenerService {
     private static int getAppIconInt(Context context) {
         PackageManager manager = context.getPackageManager();
         try {
-            ApplicationInfo appinfo = manager.getApplicationInfo(context.getPackageName(), 0);
+            ApplicationInfo appinfo = manager.getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+
+            Bundle b = appinfo.metaData;
+            if(b != null && b.getInt("io.lqd.sdk.notification_icon",0) > 0)
+                return b.getInt("io.lqd.sdk.notification_icon");
+
             return appinfo.icon;
         } catch (PackageManager.NameNotFoundException e) {
             return android.R.drawable.sym_def_app_icon;
