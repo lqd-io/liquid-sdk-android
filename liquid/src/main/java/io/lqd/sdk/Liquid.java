@@ -707,7 +707,7 @@ public class Liquid {
         // mCurrentActivity = activity;
 
         if (isApplicationInBackground(activity)) {
-            track("_appInBackground", null, UniqueTime.newDate());
+            track("app background", null, UniqueTime.newDate());
             flush();
             requestValues();
             isStarted = false;
@@ -734,7 +734,7 @@ public class Liquid {
         mInstance.attachActivity(activity);
 
         if(!isApplicationInBackground(activity) && !isStarted) {
-            track("_appInForeground", null, UniqueTime.newDate());
+            track("app foreground", null, UniqueTime.newDate());
             isStarted = true;
         }
 
