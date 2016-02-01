@@ -43,16 +43,6 @@ public class LiquidTest {
     }
 
 
-    public void testKeepSessionOnIdentify() throws NoSuchFieldException, IllegalAccessException {
-        Field f = Liquid.class.getDeclaredField("mCurrentSession");
-        f.setAccessible(true);
-        String session_id = ((LQSession) f.get(lqd)).getIdentifier();
-        lqd.identifyUser("le_user_id");
-        assertEquals(session_id, ((LQSession) f.get(lqd)).getIdentifier());
-    }
-
-    // public void softReset()
-
     @Test
     public void testnewSessionAfterReset() throws NoSuchFieldException, IllegalAccessException, InterruptedException {
         Field f = Liquid.class.getDeclaredField("mCurrentSession");

@@ -28,16 +28,13 @@ public class FactoryGirl {
         return new LQEvent(randomString(), null);
     }
 
-    public static LQSession createSession() {
-        return new LQSession(30);
-    }
 
     public static LQDevice createDevice(Context c) {
         return new LQDevice(c, Liquid.LIQUID_VERSION);
     }
 
     public static LQDataPoint createDataPoint(Context c) {
-        return new LQDataPoint(createUser(), createDevice(c), createSession(), createEvent(), new ArrayList<LQValue>());
+        return new LQDataPoint(createUser(), createDevice(c), createEvent(), new ArrayList<LQValue>());
     }
 
     public static LQEvent createEvent(HashMap<String, Object> attrs) {
