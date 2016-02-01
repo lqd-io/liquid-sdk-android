@@ -16,6 +16,10 @@ public final class AnimatorProxy extends Animation {
     /** Whether or not the current running platform needs to be proxied. */
     public static final boolean NEEDS_PROXY = Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB;
 
+    private final WeakReference<View> mView;
+
+    private float mAlpha = 1;
+
     private static final WeakHashMap<View, AnimatorProxy> PROXIES =
             new WeakHashMap<View, AnimatorProxy>();
 
@@ -36,10 +40,6 @@ public final class AnimatorProxy extends Animation {
         }
         return proxy;
     }
-
-    private final WeakReference<View> mView;
-
-    private float mAlpha = 1;
 
     private AnimatorProxy(View view) {
         setDuration(0); //perform transformation immediately

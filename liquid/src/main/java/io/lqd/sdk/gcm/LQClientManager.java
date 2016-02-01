@@ -85,7 +85,6 @@ public class LQClientManager {
                         mGCM = GoogleCloudMessaging.getInstance(getContext());
                     }
                     InstanceID instanceID = InstanceID.getInstance(getContext());
-                    String newIID = InstanceID.getInstance(getContext()).getId();
                     mRegid = instanceID.getToken(mSenderId, GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
                     LQLog.info("Registration ID: " + mRegid);
 

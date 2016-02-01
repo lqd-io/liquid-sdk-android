@@ -21,11 +21,11 @@ public final class ViewHelper {
     }
 
     private static final class Honeycomb {
-        static float getAlpha(View view) {
+        private static float getAlpha(View view) {
             return view.getAlpha();
         }
 
-        static void setAlpha(View view, float alpha) {
+        private static void setAlpha(View view, float alpha) {
             view.setAlpha(alpha);
         }
     }
