@@ -12,7 +12,6 @@ import io.lqd.sdk.model.LQDataPoint;
 import io.lqd.sdk.model.LQDevice;
 import io.lqd.sdk.model.LQEvent;
 import io.lqd.sdk.model.LQNetworkRequest;
-import io.lqd.sdk.model.LQSession;
 import io.lqd.sdk.model.LQUser;
 import io.lqd.sdk.model.LQValue;
 
