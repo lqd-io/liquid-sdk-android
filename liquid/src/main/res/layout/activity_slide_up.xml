@@ -30,7 +30,7 @@
             android:textIsSelectable="false"
             android:maxLines="3"
             android:layout_gravity="center_vertical"
-            android:maxLength="120"
+            android:maxLength="140"
             android:lineSpacingMultiplier="1.18"
             android:gravity="center_vertical|start"
             android:layout_marginRight="19dp"
