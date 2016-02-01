@@ -51,7 +51,6 @@ import io.lqd.sdk.model.LQInAppMessage;
 import io.lqd.sdk.model.LQLiquidPackage;
 import io.lqd.sdk.model.LQModel;
 import io.lqd.sdk.model.LQNetworkRequest;
-import io.lqd.sdk.model.LQSession;
 import io.lqd.sdk.model.LQUser;
 import io.lqd.sdk.model.LQValue;
 import io.lqd.sdk.model.LQVariable;
@@ -71,8 +70,6 @@ public class Liquid {
     private LQUser mCurrentUser;
     private LQUser mPreviousUser;
     private LQDevice mDevice;
-    private LQSession mCurrentSession;
-    private Date mEnterBackgroundtime;
     protected ExecutorService mQueue;
     private boolean mAutoLoadValues;
     private Context mContext;
@@ -87,6 +84,7 @@ public class Liquid {
     private boolean isDevelopmentMode;
     private Activity mCurrentActivity;
     private LinkedList<InappMessage> mInAppMessagesQueue;
+    private boolean isStarted;
 
 
     /**
@@ -164,13 +162,13 @@ public class Liquid {
         mHttpQueuer.setLiquidInstance(this);
         mHttpQueuer.startFlushTimer();
         isDevelopmentMode = developmentMode;
+        isStarted = false;
         if(isDevelopmentMode)
             mBundleVariablesSended = new ArrayList<String>();
 
         // Get last user and init session
         mPreviousUser = LQUser.load(mContext, mApiToken + ".user");
         identifyUser(mPreviousUser.getIdentifier(), mPreviousUser.getAttributes(), mPreviousUser.isIdentified(), false);
-        newSession(true);
 
         LQLog.info("Initialized Liquid with API Token " + apiToken);
     }
@@ -513,53 +511,6 @@ public class Liquid {
 
     }
 
-    private void newSession(boolean runInCurrentThread) {
-        final Date now = UniqueTime.newDate();
-        LQLog.infoVerbose("Open Session: " + now.toString());
-        Runnable newSessionRunnable = new Runnable() {
-            @Override
-            public void run() {
-                mCurrentSession = new LQSession(mSessionTimeout, now);
-                track("_startSession", null, now);
-            }
-        };
-        if (runInCurrentThread) {
-            newSessionRunnable.run();
-        } else {
-            mQueue.execute(newSessionRunnable);
-        }
-    }
-
-    /**
-     * Closes the current session and opens a new one
-     */
-    public void destroySession() {
-        destroySession(UniqueTime.newDate());
-        newSession(false);
-    }
-
-    private void destroySession(Date closeDate) {
-        if ((mCurrentUser != null) && (mCurrentSession != null)
-                && mCurrentSession.getEndDate() == null) {
-            LQLog.infoVerbose("Close Session: " + closeDate.toString());
-            mCurrentSession.setEndDate(closeDate);
-            track("_endSession", null, closeDate);
-        }
-    }
-
-    private void checkSessionTimeout() {
-        if ((mCurrentSession != null) && (mEnterBackgroundtime != null)) {
-            Date now = UniqueTime.newDate();
-            long interval = (now.getTime() - mEnterBackgroundtime.getTime()) / 1000;
-            if (interval >= mSessionTimeout) {
-                destroySession(mEnterBackgroundtime);
-                newSession(true);
-            } else {
-                track("_resumeSession", null, UniqueTime.newDate());
-            }
-        }
-    }
-
     /**
      * Track an event.
      *
@@ -643,7 +594,7 @@ public class Liquid {
 
         LQLog.infoVerbose("Tracking: " + event.getName());
 
-        final String datapoint = new LQDataPoint(mCurrentUser, mDevice, mCurrentSession, event, mLoadedLiquidPackage.getValues(), date).toJSON().toString();
+        final String datapoint = new LQDataPoint(mCurrentUser, mDevice, event, mLoadedLiquidPackage.getValues(), date).toJSON().toString();
         LQLog.data(datapoint);
 
         mQueue.execute(new Runnable() {
@@ -744,7 +695,7 @@ public class Liquid {
     }
 
     private void activityDestroyedCallback(Activity activity) {
-        mCurrentActivity = activity;
+        //mCurrentActivity = activity;
     }
 
     private void activityCreatedCallback(Activity activity) {
@@ -753,15 +704,13 @@ public class Liquid {
     }
 
     private void activityStopedCallback(Activity activity) {
-        mCurrentActivity = activity;
+        // mCurrentActivity = activity;
 
         if (isApplicationInBackground(activity)) {
-            track("_pauseSession", null, UniqueTime.newDate());
-            mEnterBackgroundtime = UniqueTime.newDate();
+            track("_appInBackground", null, UniqueTime.newDate());
             flush();
             requestValues();
-        } else {
-            mEnterBackgroundtime = null;
+            isStarted = false;
         }
     }
 
@@ -773,7 +722,6 @@ public class Liquid {
             mNeedCallbackCall = false;
             notifyListeners(false);
         }
-        checkSessionTimeout();
     }
 
     private void activityResumedCallback(Activity activity) {
@@ -784,6 +732,12 @@ public class Liquid {
         showInAppMessages();
 
         mInstance.attachActivity(activity);
+
+        if(!isApplicationInBackground(activity) && !isStarted) {
+            track("_appInForeground", null, UniqueTime.newDate());
+            isStarted = true;
+        }
+
         mHttpQueuer.startFlushTimer();
     }
 
@@ -1179,14 +1133,12 @@ public class Liquid {
             @Override
             public void run() {
                 mDevice = new LQDevice(mContext, LIQUID_VERSION);
-                mEnterBackgroundtime = null;
                 mLoadedLiquidPackage = new LQLiquidPackage();
                 mAppliedValues = new HashMap<String, LQValue>();
                 if(!soft) {
                     mHttpQueuer = new LQQueuer(mContext, mApiToken);
                 }
                 resetUser();
-                newSession(true);
             }
         });
     }

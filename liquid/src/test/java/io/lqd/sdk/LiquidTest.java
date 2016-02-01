@@ -10,7 +10,6 @@ import org.robolectric.annotation.Config;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 
-import io.lqd.sdk.model.LQSession;
 import io.lqd.sdk.model.LQUser;
 
 import static org.junit.Assert.assertEquals;
