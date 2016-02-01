@@ -879,11 +879,11 @@ public class Liquid {
                 public void run() {
                     LQNetworkRequest req = LQRequestFactory.inappMessagesRequest(mCurrentUser.getIdentifier());
                     String dataFromServer = req.sendRequest(mApiToken).getRequestResponse();
+                    mInAppMessagesQueue = new LinkedList();
                     if (dataFromServer != null) {
                         ArrayList<LQInAppMessage> list = null;
                         try {
                             list = InappMessageParser.parse(new JSONArray(dataFromServer));
-                            mInAppMessagesQueue = new LinkedList();
                         } catch (JSONException e) {
                             LQLog.error("Error parsing inapp messages" + e.getMessage());
                         }
