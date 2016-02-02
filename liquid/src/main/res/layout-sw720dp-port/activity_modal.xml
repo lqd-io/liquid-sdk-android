@@ -8,8 +8,7 @@
     android:orientation="vertical"
     android:layout_gravity="center"
     android:gravity="center"
-    android:background="#80FFFFFF"
-    >
+    android:background="#80000000">
 
 
     <LinearLayout
