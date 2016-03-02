@@ -727,15 +727,17 @@ public class Liquid {
     private void activityResumedCallback(Activity activity) {
         mCurrentActivity = activity;
 
-        requestInappMessages();
 
-        showInAppMessages();
 
         mInstance.attachActivity(activity);
 
         if(!isApplicationInBackground(activity) && !isStarted) {
             track("app foreground", null, UniqueTime.newDate());
             isStarted = true;
+
+            requestInappMessages();
+
+            showInAppMessages();
         }
 
         mHttpQueuer.startFlushTimer();
