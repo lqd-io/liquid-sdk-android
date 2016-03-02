@@ -1,5 +1,11 @@
 # Liquid Android SDK Change Log
 
+## 2.0.2: Reduce the amount of requests made for inapps
+
+  * **[enhancement]** Request Inapps Messages only when the applications starts.
+
+<br>
+
 ## 2.0.1: Bugfix Inapp Messages deeplink
 
   * **[bugfix]** Inapp Messages deeplink.
