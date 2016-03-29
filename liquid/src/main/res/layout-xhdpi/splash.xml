@@ -80,8 +80,8 @@
             android:layout_gravity="center_horizontal"
             android:textSize="18sp"
             android:textColor="#ffffff"
-            android:layout_weight="1"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:layout_weight="1" />
 
     </LinearLayout>
 

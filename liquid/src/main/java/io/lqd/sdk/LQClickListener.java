@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.lqd.sdk.oneline;
+package io.lqd.sdk;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -22,12 +22,14 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityEvent;
+import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
@@ -35,12 +37,12 @@ import android.widget.RelativeLayout;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 
-import io.lqd.sdk.LQLog;
-import io.lqd.sdk.Liquid;
+import io.lqd.sdk.oneline.CompositeOnTouchListener;
+import io.lqd.sdk.oneline.LQOnTouchListener;
 
 public class LQClickListener {
 
-    public static final String PREF_BUTTONS_FILE = "LQUiElements";
+    public static final String PREF_UIELEMENTS_FILE = "LQUiElements";
 
     private final Activity mActivity;
     private final SharedPreferences mPreferences;
@@ -57,7 +59,7 @@ public class LQClickListener {
     public LQClickListener(Activity activity) {
         mActivity = activity;
         mPreferences = mActivity.getApplicationContext()
-                .getSharedPreferences(PREF_BUTTONS_FILE, Context.MODE_PRIVATE);
+                .getSharedPreferences(PREF_UIELEMENTS_FILE, Context.MODE_PRIVATE);
         mHashMap = (HashMap<String, String>) mPreferences.getAll();
         mViewGr = (ViewGroup) mActivity.getWindow().getDecorView();
 
@@ -65,36 +67,31 @@ public class LQClickListener {
     }
 
     // Searches for clickable views in the layout
-    public void searchForButtons(final View parent, Boolean indevelopment) {
-        if (parent.isClickable()) {
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    protected void searchForButtons(final View parent, Boolean indevelopment) {
+        if (parent.isClickable() && parent.getVisibility() == View.VISIBLE
+                && !(parent instanceof WebView) && !(parent instanceof EditText)) {
 
             try {
                 mElementIdentifier = parent.getResources().getResourceEntryName(parent.getId());
-            } catch (Exception e) {
+            } catch (Resources.NotFoundException e) {
                 mElementIdentifier = "element" + i;
                 i++;
             }
 
-            checkIfTracked(parent, mElementIdentifier);
-            checkIfInDevelopment(parent, indevelopment);
+            if (!indevelopment)
+                checkIfTracked(parent, mElementIdentifier);
+            else {
+                PopupMenu mPopup = new PopupMenu(mActivity, parent);
+
+                addPopupMenu(parent, mPopup, mElementIdentifier);
+            }
         }
 
         if (parent instanceof ViewGroup) {
             ViewGroup group = (ViewGroup) parent;
             for (int i = 0; i < group.getChildCount(); i++)
                 searchForButtons(group.getChildAt(i), indevelopment);
-        }
-    }
-
-    // Checks if the app is in Development Mode and adds border and popup
-    // menu to trackable ui elements.
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    private void checkIfInDevelopment(View parent, Boolean indevelopment) {
-        if (indevelopment) {
-
-            PopupMenu mPopup = new PopupMenu(mActivity, parent);
-
-            addPopupMenu(parent, mPopup, mElementIdentifier);
         }
     }
 
@@ -162,11 +159,10 @@ public class LQClickListener {
         } else {
             view.setOnTouchListener(mLQTouchListener);
         }
-
     }
 
     // Stop tracking the element
-    private void dontTrack(View view, String elementidentifier) {
+    private void dontTrack(View view) {
 
         if (Build.VERSION.SDK_INT >= 14) {
             mViewGr.removeView(mHashMapLayout.get(view));
@@ -182,7 +178,6 @@ public class LQClickListener {
                 view.setOnTouchListener(mGroupListener);
             }
         }
-        remove(elementidentifier);
     }
 
     // Saves the ui element to be tracked in the shared preferences and
@@ -193,7 +188,7 @@ public class LQClickListener {
         mHashMap.put(identifier, eventname);
         mPreferences.edit().putString(identifier, eventname).apply();
 
-        Liquid.getInstance().addElementToTrack(identifier, eventname);
+        Liquid.getInstance().uiElementAdd(identifier, eventname);
     }
 
     // Removes the ui element from the shared preferences and from the server list
@@ -201,9 +196,23 @@ public class LQClickListener {
         String identifier = getElementsPathName(elementidentifier);
 
         mHashMap.remove(identifier);
-        mPreferences.edit().remove(getElementsPathName(elementidentifier)).apply();
+        mPreferences.edit().remove(identifier).apply();
 
-        Liquid.getInstance().removeElementFromTracking(identifier);
+        Liquid.getInstance().uiElementsRemove(identifier);
+    }
+
+    // Basically it's remove() then save() followed by element change command
+    // for websocket
+    private void change(String elementidentifier, String eventname) {
+        String identifier = getElementsPathName(elementidentifier);
+
+        mHashMap.remove(identifier);
+        mPreferences.edit().remove(identifier).apply();
+
+        mHashMap.put(identifier, eventname);
+        mPreferences.edit().putString(identifier, eventname).apply();
+
+        Liquid.getInstance().uiElementsChange(identifier, eventname);
     }
 
     // Adds border around the trackable ui elements, red if it's tracked
@@ -247,11 +256,12 @@ public class LQClickListener {
     private void addPopupMenu(final View view, final PopupMenu popupmenu, final String elementidentifier) {
 
         if (!isTracked(elementidentifier)) {
-            popupmenu.getMenu().add(0, 1, 0, "Track");
+            popupmenu.getMenu().add(0, 1, 0, "Add event");
             addBorder(mActivity, view, false);
         }
         else {
-            popupmenu.getMenu().add(0, 1, 0, "Don't track");
+            popupmenu.getMenu().add(0, 1, 0, "Remove event");
+            popupmenu.getMenu().add(0, 2, 0, "Rename event");
             addBorder(mActivity, view, true);
         }
         view.setOnLongClickListener(new View.OnLongClickListener() {
@@ -267,9 +277,13 @@ public class LQClickListener {
                                 if (!isTracked(elementidentifier)) {
                                     chooseEventName(v, popupmenu, elementidentifier);
                                 } else {
-                                    dontTrack(v, elementidentifier);
-                                    popupmenu.getMenu().getItem(0).setTitle("Track");
+                                    remove(elementidentifier);
+                                    popupmenu.getMenu().getItem(0).setTitle("Add event");
+                                    popupmenu.getMenu().removeItem(1);
                                 }
+                                break;
+                            case 2:
+                                changeEventName(v, elementidentifier);
                                 break;
                             default:
                                 break;
@@ -284,25 +298,47 @@ public class LQClickListener {
         });
     }
 
-    // Set the event name to track
-    private void chooseEventName(final View v, final PopupMenu popupmenu, final String elementidentifier) {
+    private void changeEventName(final View v, final String elementidentifier) {
         AlertDialog.Builder alert = new AlertDialog.Builder(mActivity);
-
-        alert.setMessage("Set the event name to track");
+        alert.setTitle("Set the event name");
+        alert.setMessage("Element Identifier: " + getElementsPathName(elementidentifier));
 
         final EditText input = new EditText(mActivity);
         alert.setView(input);
-        input.setText(elementidentifier);
-        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        input.setText(mHashMap.get(getElementsPathName(elementidentifier)));
+        alert.setPositiveButton("RENAME", new DialogInterface.OnClickListener() {
             @TargetApi(Build.VERSION_CODES.HONEYCOMB)
             public void onClick(DialogInterface dialog, int whichButton) {
-                popupmenu.getMenu().getItem(0).setTitle("Don't track");
-                track(v, input.getText().toString());
+                change(elementidentifier, input.getText().toString());
+            }
+        });
+
+        alert.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                // Canceled.
+            }
+        });
+
+        alert.show();
+    }
+
+    // Set the event name to track
+    private void chooseEventName(final View v, final PopupMenu popupmenu, final String elementidentifier) {
+        AlertDialog.Builder alert = new AlertDialog.Builder(mActivity);
+        final EditText input = new EditText(mActivity);
+
+        alert.setTitle("Set the event name");
+        alert.setMessage("Element Identifier: " + getElementsPathName(elementidentifier));
+        alert.setView(input);
+        alert.setPositiveButton("ADD", new DialogInterface.OnClickListener() {
+            @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+            public void onClick(DialogInterface dialog, int whichButton) {
+                popupmenu.getMenu().getItem(0).setTitle("Remove event");
                 save(elementidentifier, input.getText().toString());
             }
         });
 
-        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        alert.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 // Canceled.
             }
@@ -375,10 +411,12 @@ public class LQClickListener {
 
     private void addPopupMenuLower(View view, final android.support.v7.widget.PopupMenu popupmenu, final String elementidentifier) {
 
-        if (!isTracked(elementidentifier))
-            popupmenu.getMenu().add(0, 1, 0, "Track");
+        if (!isTracked(elementidentifier)) {
+            popupmenu.getMenu().add(0, 1, 0, "Add event");
+        }
         else {
-            popupmenu.getMenu().add(0, 1, 0, "Don't track");
+            popupmenu.getMenu().add(0, 1, 0, "Remove event");
+            popupmenu.getMenu().add(0, 2, 0, "Rename event");
         }
 
         view.setOnLongClickListener(new View.OnLongClickListener() {
@@ -394,9 +432,13 @@ public class LQClickListener {
                                 if (!isTracked(elementidentifier)) {
                                     chooseEventNameLower(v, popupmenu, elementidentifier);
                                 } else {
-                                    dontTrack(v, elementidentifier);
-                                    popupmenu.getMenu().getItem(0).setTitle("Track");
+                                    remove(elementidentifier);
+                                    popupmenu.getMenu().getItem(0).setTitle("Add event");
+                                    popupmenu.getMenu().removeItem(1);
                                 }
+                                break;
+                            case 2:
+                                changeEventName(v, elementidentifier);
                                 break;
                             default:
                                 break;
@@ -413,21 +455,19 @@ public class LQClickListener {
 
     private void chooseEventNameLower(final View v, final android.support.v7.widget.PopupMenu popupmenu, final String elementidentifier) {
         AlertDialog.Builder alert = new AlertDialog.Builder(mActivity);
-
-        alert.setMessage("Set the event name to track");
-
         final EditText input = new EditText(mActivity);
+
+        alert.setTitle("Set the event name");
+        alert.setMessage("Element Identifier: " + getElementsPathName(elementidentifier));
         alert.setView(input);
-        input.setText(elementidentifier);
-        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        alert.setPositiveButton("ADD", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                popupmenu.getMenu().getItem(0).setTitle("Don't track");
-                track(v, input.getText().toString());
+                popupmenu.getMenu().getItem(0).setTitle("Remove event");
                 save(elementidentifier, input.getText().toString());
             }
         });
 
-        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        alert.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 // Canceled.
             }

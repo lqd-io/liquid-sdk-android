@@ -33,8 +33,6 @@ public class LQRequestFactory {
     protected static final String LIQUID_INAPP_MESSAGE_REPORT_URL = LIQUID_SERVER_BASE_URL + "formulas/%s/users/%s/report";
     protected static final String LIQUID_VARIABLES_URL = LIQUID_SERVER_BASE_URL + "variables";
     protected static final String LIQUID_UIELEMENTS_URL = LIQUID_SERVER_BASE_URL + "ui_elements/";
-    protected static final String LIQUID_UIELEMENTS_ADD_URL = LIQUID_UIELEMENTS_URL + "add";
-    protected static final String LIQUID_UIELEMENTS_REMOVE_URL = LIQUID_UIELEMENTS_URL + "remove";
 
     public static LQNetworkRequest createAliasRequest(String oldId, String newId) {
         JSONObject json;
@@ -82,31 +80,4 @@ public class LQRequestFactory {
         else
             return new LQNetworkRequest(LIQUID_UIELEMENTS_URL + "?platform=android&token=" + token, "GET", null);
     }
-
-    public static LQNetworkRequest uiElementsAdd(String identifier, String eventname) {
-        JSONObject payload = new JSONObject();
-        try {
-            payload.put("identifier", identifier );
-            payload.put("event_name", eventname);
-            payload.put("platform", "android");
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return new LQNetworkRequest(LIQUID_UIELEMENTS_ADD_URL, "POST", payload.toString());
-    }
-
-    public static LQNetworkRequest uiElementsRemove(String identifier) {
-        JSONObject payload = new JSONObject();
-        try {
-            payload.put("identifier", identifier );
-            payload.put("platform", "android");
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return new LQNetworkRequest(LIQUID_UIELEMENTS_REMOVE_URL, "POST", payload.toString());
-
-    }
-
 }

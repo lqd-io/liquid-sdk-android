@@ -187,10 +187,12 @@ public class Modal implements InappMessage {
                     Intent mIntent = new Intent(Intent.ACTION_VIEW);
                     if (cta.getDeepLink() != null) {
                         try {
+                            mIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             mIntent.setData(Uri.parse(cta.getDeepLink()));
                             Liquid.getInstance().trackCta(cta);
                             mContext.startActivity(mIntent);
                         } catch (Exception e) {
+                            e.printStackTrace();
                             LQLog.infoVerbose("Canceled or not properly assigned to deeplink or URL");
                         }
                     }

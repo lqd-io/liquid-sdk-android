@@ -11,62 +11,60 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
-        android:layout_marginBottom="30dp"
-        android:layout_marginTop="30dp"
-        android:weightSum="4">
+        android:weightSum="4"
+        android:layout_margin="60dp">
 
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
+            android:layout_gravity="center"
             android:layout_weight="1">
 
             <ImageButton
                 android:src="@drawable/check"
                 android:scaleType="fitCenter"
                 android:adjustViewBounds="true"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:id="@+id/checkcircle"
-                android:layout_gravity="center_horizontal"
-                android:background="#00ffffff" />
+                android:layout_gravity="center"
+                android:background="#00ffffff"
+                android:layout_weight="1" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Start tracking events now!"
                 android:id="@+id/start_tracking_text"
-                android:layout_gravity="center_horizontal"
-                android:textSize="22dp"
+                android:layout_gravity="center"
+                android:textSize="40sp"
                 android:textColor="#808080"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:layout_weight="1" />
         </LinearLayout>
 
         <ImageView
             android:src="@drawable/mobileview"
             android:scaleType="fitCenter"
             android:adjustViewBounds="true"
-            android:layout_width="match_parent"
-            android:layout_height="230dp"
+            android:layout_width="841dp"
+            android:layout_height="442dp"
             android:id="@+id/mobileview"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp"
-            android:layout_weight="1" />
+            android:layout_marginBottom="20dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Tap and hold the element you want to track and give it an event name"
             android:id="@+id/tap_and_hold_text"
-            android:textSize="18sp"
-            android:layout_gravity="center_horizontal"
-            android:gravity="center_horizontal"
-            android:layout_marginBottom="30dp"
+            android:textSize="35sp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_marginBottom="20dp"
             android:layout_marginTop="10dp"
             android:layout_weight="1"
             android:textColor="#000000" />
@@ -78,9 +76,9 @@
             android:text="LET&apos;S GO"
             android:id="@+id/lets_go"
             android:layout_gravity="center_horizontal"
-            android:textSize="18sp"
+            android:textSize="30sp"
             android:textColor="#ffffff"
-            android:layout_weight="1"
+            android:layout_weight="0.30"
             android:textStyle="bold" />
 
     </LinearLayout>

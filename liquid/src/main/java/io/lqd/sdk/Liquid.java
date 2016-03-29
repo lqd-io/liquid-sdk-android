@@ -28,6 +28,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -55,8 +56,6 @@ import io.lqd.sdk.model.LQNetworkRequest;
 import io.lqd.sdk.model.LQUser;
 import io.lqd.sdk.model.LQValue;
 import io.lqd.sdk.model.LQVariable;
-import io.lqd.sdk.oneline.LQClickListener;
-import io.lqd.sdk.oneline.LQDevelopmentMode;
 import io.lqd.sdk.oneline.LQUiElement;
 import io.lqd.sdk.visual.InappMessage;
 import io.lqd.sdk.visual.Modal;
@@ -70,7 +69,7 @@ public class Liquid {
     private static final int LIQUID_DEFAULT_SESSION_TIMEOUT = 30;
 
     private SharedPreferences mPreferences;
-    public static final String PREF_BUTTONS_FILE = "LQUiElements";
+    public static final String PREF_UIELEMENTS_FILE = "LQUiElements";
 
     private int mSessionTimeout;
     private String mApiToken;
@@ -93,10 +92,12 @@ public class Liquid {
     private LinkedList<InappMessage> mInAppMessagesQueue;
     private LQClickListener mLQClickListener;
     private boolean isStarted;
-    private Handler uiElementsHandler;
+    private Handler mUIElementsHandler;
     private Boolean isSplashShown = false;
     private boolean enteredDevMode = false;
     private String mDevToken;
+    private LQWebSocket mLQWebSocket;
+    private LQDevelopmentMode mLQDevelopmentMode;
 
     /**
      * Retrieves the Liquid shared instance.
@@ -726,33 +727,34 @@ public class Liquid {
     private void activityResumedCallback(final Activity activity) {
         mCurrentActivity = activity;
 
-        mPreferences = mCurrentActivity.getSharedPreferences(PREF_BUTTONS_FILE, Context.MODE_PRIVATE);
-        requestUiElementsToTrack();
+        mPreferences = mCurrentActivity.getSharedPreferences(PREF_UIELEMENTS_FILE, Context.MODE_PRIVATE);
 
         mInstance.attachActivity(activity);
         mLQClickListener = new LQClickListener(activity);
 
-        uiElementsHandler = new Handler();
-        uiElementsHandler.postDelayed(searchUiElements(mCurrentActivity, enteredDevMode), 0);
+        mUIElementsHandler = new Handler();
+        mUIElementsHandler.postDelayed(searchUiElements(mCurrentActivity, enteredDevMode), 0);
 
-        if (enteredDevMode && isStarted)
-            developmentModeON();
+        if (enteredDevMode) {
+            mLQWebSocket.setActivity(mCurrentActivity);
+            eventTrackingModeON();
+        }
 
         if(!isApplicationInBackground(activity) && !isStarted) {
             track("_appInForeground", null, UniqueTime.newDate());
             isStarted = true;
+            requestUiElementsToTrack();
 
             try {
                 Intent intent = mCurrentActivity.getIntent();
-                if(intent != null && intent.getAction().equals(Intent.ACTION_VIEW)) {
-                    if("lqd".equals(intent.getData().getScheme().substring(0, 3))
-                            && "edit".equals(intent.getData().getHost())) {
-                        mDevToken = intent.getData().getQueryParameter("token");
-                        developmentModeON();
-                    }
+                if (intent.getAction().equals(Intent.ACTION_VIEW)
+                        && "lqd".equals(intent.getData().getScheme().substring(0, 3))
+                        && "edit".equals(intent.getData().getHost())) {
+                    mDevToken = intent.getData().getQueryParameter("token");
+                    new AsyncWebSocket().execute();
                 }
             } catch (Exception e) {
-                LQLog.info("No intent in this activity");
+                e.getMessage();
             }
         }
 
@@ -762,11 +764,8 @@ public class Liquid {
     private void activityPausedCallback(Activity activity) {
         mCurrentActivity = activity;
 
-        if (mLQClickListener != null)
-            mLQClickListener.removeBorderLayouts();
-
-        if(uiElementsHandler != null) {
-            uiElementsHandler.removeCallbacksAndMessages(null);
+        if(mUIElementsHandler != null) {
+            mUIElementsHandler.removeCallbacksAndMessages(null);
         }
 
         mInstance.detachActivity(activity);
@@ -819,35 +818,33 @@ public class Liquid {
     /**
      * (Constantly) Searching for uielements
      */
-    public Runnable searchUiElements(final Activity activity, final boolean in_devmode) {
+    protected Runnable searchUiElements(final Activity activity, final boolean in_devmode) {
         return new Runnable() {
             @Override
             public void run() {
-                if (in_devmode) {
+                if (in_devmode)
                     mLQClickListener.removeBorderLayouts();
-                    requestUiElementsToTrack();
-                }
                 mLQClickListener = new LQClickListener(activity);
                 if (Build.VERSION.SDK_INT > 10) {
                     mLQClickListener.searchForButtons(activity.getWindow().getDecorView(), in_devmode);
                 } else {
                     mLQClickListener.searchForButtonsLower(activity.getWindow().getDecorView(), in_devmode);
                 }
-                uiElementsHandler.postDelayed(this, 1000);
+                mUIElementsHandler.postDelayed(this, 1000);
             }
         };
     }
 
     /**
-     * Enters the app into Event Tracking Mode
+     * Enables Event Tracking Mode.
      */
-    public void developmentModeON() {
+    protected void eventTrackingModeON() {
         enteredDevMode = true;
-        LQDevelopmentMode lqDevelopmentMode = new LQDevelopmentMode();
-        if (uiElementsHandler != null)
-            uiElementsHandler.removeCallbacksAndMessages(null);
-        uiElementsHandler.postDelayed(searchUiElements(mCurrentActivity, enteredDevMode), 0);
-        lqDevelopmentMode.enterDevelopmentMode(mCurrentActivity, isSplashShown);
+
+        if (mUIElementsHandler != null)
+            mUIElementsHandler.removeCallbacksAndMessages(null);
+        mUIElementsHandler.postDelayed(searchUiElements(mCurrentActivity, enteredDevMode), 1000);
+        mLQDevelopmentMode.enterDevelopmentMode(mCurrentActivity, isSplashShown);
         isSplashShown = true; // for not showing the splashscreen in other activities
     }
 
@@ -921,7 +918,7 @@ public class Liquid {
             public void run() {
                 InappMessage in_app = mInAppMessagesQueue.poll();
                 if (in_app == null) {
-                    LQLog.infoVerbose("Not anymore inapp messages in the queue");
+                    LQLog.infoVerbose("Not any more inapp messages in the queue");
                 } else {
                     in_app.show();
                 }
@@ -954,36 +951,6 @@ public class Liquid {
                             }
                         }
                     }
-                }
-            });
-        }
-    }
-
-    /**
-     * @param identifier
-     *      The path of the ui element along with the identifier name.
-     * @param eventname
-     *      The event name to be triggered when the element is clicked.
-     */
-    public void addElementToTrack(final String identifier, final String eventname) {
-        if (mCurrentUser != null) {
-            mQueue.execute(new Runnable() {
-                @Override
-                public void run() {
-                    LQNetworkRequest uielement = LQRequestFactory.uiElementsAdd(identifier, eventname);
-                    uielement.sendRequest(mApiToken);
-                }
-            });
-        }
-    }
-
-    public void removeElementFromTracking(final String identifier) {
-        if (mCurrentUser != null) {
-            mQueue.execute(new Runnable() {
-                @Override
-                public void run() {
-                    LQNetworkRequest uielement = LQRequestFactory.uiElementsRemove(identifier);
-                    uielement.sendRequest(mApiToken);
                 }
             });
         }
@@ -1254,7 +1221,7 @@ public class Liquid {
                 mDevice = new LQDevice(mContext, LIQUID_VERSION);
                 mLoadedLiquidPackage = new LQLiquidPackage();
                 mAppliedValues = new HashMap<String, LQValue>();
-                if(!soft) {
+                if (!soft) {
                     mHttpQueuer = new LQQueuer(mContext, mApiToken);
                 }
                 resetUser();
@@ -1278,5 +1245,50 @@ public class Liquid {
             }
         });
 
+    }
+
+
+    /**
+     * Sends the information for adding a ui_element through the socket.
+     * @param identifier the identifier/path of the element
+     * @param eventname the event name bound to the element
+     */
+    protected void uiElementAdd(String identifier, String eventname) {
+        mLQWebSocket.uiElementAdd(identifier, eventname);
+    }
+
+    /**
+     * Sends the information for removing a ui_element through the socket.
+     * @param identifier the identifier/path of the element
+     */
+    protected void uiElementsRemove(String identifier) {
+        mLQWebSocket.uiElementsRemove(identifier);
+    }
+
+    /**
+     * Sends the information for changing the event name bound to the ui _element.
+     * @param identifier the identifier/path of the element
+     * @param eventname the event name bound to the element
+     */
+    protected void uiElementsChange(String identifier, String eventname) {
+        mLQWebSocket.uiElementsChange(identifier, eventname);
+    }
+
+    /**
+     * Sets the default values before restarting the app on exiting dev mode.
+     */
+    protected void updateDevModeBooleans() {
+        enteredDevMode = false;
+        isSplashShown = false;
+    }
+
+    class AsyncWebSocket extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            mLQDevelopmentMode = new LQDevelopmentMode();
+            mLQWebSocket = new LQWebSocket(mDevToken, mCurrentActivity, mLQDevelopmentMode);
+            return null;
+        }
     }
 }

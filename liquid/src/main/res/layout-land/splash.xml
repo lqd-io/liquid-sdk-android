@@ -1,0 +1,114 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/splash_layout"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F1F8FE"
+    android:gravity="center_vertical|center_horizontal">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="30dp"
+        android:layout_marginTop="30dp">
+
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal">
+
+                    <ImageButton
+                        android:src="@drawable/check"
+                        android:scaleType="fitCenter"
+                        android:adjustViewBounds="true"
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:id="@+id/checkcircle"
+                        android:background="#00ffffff"
+                        android:layout_marginRight="5dp"
+                        android:layout_gravity="center_vertical" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Start tracking events now!"
+                        android:id="@+id/start_tracking_text"
+                        android:layout_gravity="center_vertical"
+                        android:textSize="23sp"
+                        android:textColor="#808080"
+                        android:textStyle="bold"
+                        android:gravity="center_horizontal" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tap and hold the element you want to track and give it an event name."
+                    android:id="@+id/tap_and_hold_text"
+                    android:textSize="19sp"
+                    android:layout_weight="1"
+                    android:textColor="#000000"
+                    android:layout_marginLeft="25dp"
+                    android:layout_marginRight="30dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="10dp">
+
+                <ImageView
+                    android:src="@drawable/mobileview"
+                    android:scaleType="fitCenter"
+                    android:adjustViewBounds="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/mobileview"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginRight="10dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/custom_state"
+            android:text="LET&apos;S GO"
+            android:id="@+id/lets_go"
+            android:layout_gravity="center_horizontal"
+            android:textSize="18sp"
+            android:textColor="#ffffff"
+            android:textStyle="bold"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp" />
+
+    </LinearLayout>
+
+
+</LinearLayout>
