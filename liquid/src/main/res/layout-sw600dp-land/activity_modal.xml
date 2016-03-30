@@ -8,7 +8,7 @@
     android:orientation="vertical"
     android:layout_gravity="center"
     android:gravity="center"
-    android:background="#80FFFFFF"
+    android:background="#80000000"
     >
 
 
@@ -60,10 +60,12 @@
                 android:layout_gravity="center_horizontal"
                 android:gravity="center_horizontal"
                 android:maxLength="34"
-                android:maxLines="1"
+                android:maxLines="2"
                 android:layout_marginBottom="10dp"
                 android:textSize="28sp"
-                android:layout_marginTop="5dp" />
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="19dp"
+                android:layout_marginRight="19dp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -77,7 +79,7 @@
                 android:gravity="center_horizontal"
                 android:layout_marginLeft="19dp"
                 android:layout_marginRight="19dp"
-                android:maxLength="120"
+                android:maxLength="140"
                 android:maxLines="3"
                 android:maxWidth="650dp" />
         </LinearLayout>

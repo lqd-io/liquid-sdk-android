@@ -45,6 +45,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import io.lqd.sdk.gcm.LQClientManager;
 import io.lqd.sdk.model.InappMessageParser;
 import io.lqd.sdk.model.LQDataPoint;
 import io.lqd.sdk.model.LQDevice;
@@ -91,13 +92,13 @@ public class Liquid {
     private Activity mCurrentActivity;
     private LinkedList<InappMessage> mInAppMessagesQueue;
     private LQClickListener mLQClickListener;
-    private boolean isStarted;
     private Handler mUIElementsHandler;
     private Boolean isSplashShown = false;
     private boolean enteredDevMode = false;
     private String mDevToken;
     private LQWebSocket mLQWebSocket;
     private LQDevelopmentMode mLQDevelopmentMode;
+    private boolean isStarted;
 
     /**
      * Retrieves the Liquid shared instance.
@@ -170,7 +171,7 @@ public class Liquid {
         mDevice = new LQDevice(context, LIQUID_VERSION);
         mQueue = Executors.newSingleThreadExecutor();
         loadLiquidPackage(true);
-        mHttpQueuer = new LQQueuer(mContext, mApiToken, LQNetworkRequest.loadQueue(mContext, mApiToken));
+        mHttpQueuer = LQQueuer.load(mContext, mApiToken);
         mHttpQueuer.setLiquidInstance(this);
         mHttpQueuer.startFlushTimer();
         isDevelopmentMode = developmentMode;
@@ -179,7 +180,7 @@ public class Liquid {
             mBundleVariablesSended = new ArrayList<String>();
 
         // Get last user and init session
-        mPreviousUser = LQUser.load(mContext, mApiToken);
+        mPreviousUser = LQUser.load(mContext, mApiToken + ".user");
         identifyUser(mPreviousUser.getIdentifier(), mPreviousUser.getAttributes(), mPreviousUser.isIdentified(), false);
         mInAppMessagesQueue = new LinkedList();
         LQLog.info("Initialized Liquid with API Token " + apiToken);
@@ -299,9 +300,22 @@ public class Liquid {
      * *******************
      */
 
-    public void setupPushNotifications(final String senderID) {
+    public void setupPushNotifications(Activity activity, final String senderID) {
         LQLog.infoVerbose("Requesting device push token");
-        LQPushHandler.registerDevice(mContext, senderID);
+        LQClientManager pushClientManager = new LQClientManager(activity, senderID);
+
+        pushClientManager.registerIfNeeded(new LQClientManager.RegistrationCompletedHandler() {
+
+            @Override
+            public void onSuccess(String registrationId, boolean isNewRegistration) {
+                Liquid.getInstance().setGCMregistrationID(registrationId);
+            }
+
+            @Override
+            public void onFailure(String ex) {
+                super.onFailure(ex);
+            }
+        });
     }
 
     public void alias() {
@@ -702,10 +716,8 @@ public class Liquid {
     }
 
     private void activityStopedCallback(Activity activity) {
-       // mCurrentActivity = activity;
-
         if (isApplicationInBackground(activity)) {
-            track("_appInBackground", null, UniqueTime.newDate());
+            track("app background", null, UniqueTime.newDate());
             flush();
             requestValues();
             isStarted = false;
@@ -726,7 +738,6 @@ public class Liquid {
 
     private void activityResumedCallback(final Activity activity) {
         mCurrentActivity = activity;
-
         mPreferences = mCurrentActivity.getSharedPreferences(PREF_UIELEMENTS_FILE, Context.MODE_PRIVATE);
 
         mInstance.attachActivity(activity);
@@ -741,7 +752,7 @@ public class Liquid {
         }
 
         if(!isApplicationInBackground(activity) && !isStarted) {
-            track("_appInForeground", null, UniqueTime.newDate());
+            track("app foreground", null, UniqueTime.newDate());
             isStarted = true;
             requestUiElementsToTrack();
 
@@ -757,7 +768,6 @@ public class Liquid {
                 e.getMessage();
             }
         }
-
         mHttpQueuer.startFlushTimer();
     }
 
@@ -890,6 +900,7 @@ public class Liquid {
                 public void run() {
                     LQNetworkRequest req = LQRequestFactory.inappMessagesRequest(mCurrentUser.getIdentifier());
                     String dataFromServer = req.sendRequest(mApiToken).getRequestResponse();
+                    mInAppMessagesQueue = new LinkedList();
                     if (dataFromServer != null) {
                         ArrayList<LQInAppMessage> list = null;
                         try {

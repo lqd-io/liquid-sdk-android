@@ -1,13 +1,29 @@
 # Liquid Android SDK Change Log
 
+## 2.0.0-rc5: Update GCM handlers & bugfixing
 
-## 2.0.0-rc3: Bufixing
+  * **[enhancement]** Update GCM handler.
+  * **[bugix]** NPE when no inapp messages.
+  * **[feature]** declare on your manifest the push notification icon.
+  * **[change]** Drop sessions (controlled in Liquid frontoffice).
+
+<br>
+
+
+## 2.0.0-rc4: Bugfixing
+
+  * **[bugfix]** Persistence layer.
+  * **[change]** Inapp Messages endpoint.
+
+<br>
+
+## 2.0.0-rc3: Bugfixing
 
   * **[bugfix]** Force default theme.
 
 <br>
 
-## 2.0.0-rc2: Bufixing
+## 2.0.0-rc2: Bugfixing
 
   * **[bugfix]** Banner crash when dismissing.
   * **[enhancement]** Persistence layer.

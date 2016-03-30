@@ -171,10 +171,9 @@ public class Modal implements InappMessage {
                         if (event.getAction() == MotionEvent.ACTION_UP) {
                             ViewHelper.setAlpha(ctaBtn, 1);
                         }
-                        if (event.getAction() == MotionEvent.ACTION_MOVE) {
-                            if (!mRect.contains(ctaBtn.getLeft() + (int) event.getX(), ctaBtn.getTop() + (int) event.getY())) {
+                        if (event.getAction() == MotionEvent.ACTION_MOVE &&
+                                !mRect.contains(ctaBtn.getLeft() + (int) event.getX(), ctaBtn.getTop() + (int) event.getY())) {
                                 ViewHelper.setAlpha(ctaBtn, 1);
-                            }
                         }
                         return false;
                     }

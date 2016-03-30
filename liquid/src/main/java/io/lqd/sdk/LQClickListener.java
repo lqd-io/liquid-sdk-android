@@ -24,15 +24,24 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.GradientDrawable;
+import android.media.Image;
 import android.os.Build;
+import android.support.v7.view.menu.ActionMenuItem;
+import android.support.v7.view.menu.ActionMenuItemView;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityEvent;
 import android.webkit.WebView;
+import android.widget.ActionMenuView;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -69,15 +78,22 @@ public class LQClickListener {
     // Searches for clickable views in the layout
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     protected void searchForButtons(final View parent, Boolean indevelopment) {
-        if (parent.isClickable() && parent.getVisibility() == View.VISIBLE
+        if (parent.isClickable() && parent.getVisibility() == View.VISIBLE)
                 && !(parent instanceof WebView) && !(parent instanceof EditText)) {
-
             try {
                 mElementIdentifier = parent.getResources().getResourceEntryName(parent.getId());
             } catch (Resources.NotFoundException e) {
                 mElementIdentifier = "element" + i;
                 i++;
             }
+
+            parent.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    LQLog.error("Class: " + parent.getClass() );
+                    return false;
+                }
+            });
 
             if (!indevelopment)
                 checkIfTracked(parent, mElementIdentifier);
@@ -94,6 +110,8 @@ public class LQClickListener {
                 searchForButtons(group.getChildAt(i), indevelopment);
         }
     }
+
+
 
     // Checks if the ui element is tracked
     private void checkIfTracked(View view, String elementidentifier) {

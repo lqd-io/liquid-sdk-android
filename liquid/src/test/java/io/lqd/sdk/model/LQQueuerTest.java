@@ -38,23 +38,23 @@ public class LQQueuerTest {
         queuer = new LQQueuer(Robolectric.application, "le_token");
     }
 
-    @Test
-    public void testLoadFail() {
-        Robolectric.application.deleteFile("filename.queue");
-
-        ArrayList<LQNetworkRequest> savedQueue = LQNetworkRequest.loadQueue(Robolectric.application, "filename");
-        assertTrue(savedQueue.size() == 0);
-    }
-
-    @Test
-    public void testSaveSuccess() {
-        LQNetworkRequest.saveQueue(Robolectric.application, queue, "filename");
-
-        ArrayList<LQNetworkRequest> savedQueue = LQNetworkRequest.loadQueue(Robolectric.application, "filename");
-        Log.e("teste", savedQueue.get(0).getJSON());
-        System.out.println(savedQueue.get(0).getJSON());
-        assertEquals(queue.get(0), savedQueue.get(0));
-    }
+//    @Test
+//    public void testLoadFail() {
+//        Robolectric.application.deleteFile("filename.queue");
+//
+//        ArrayList<LQNetworkRequest> savedQueue = LQNetworkRequest.loadQueue(Robolectric.application, "filename");
+//        assertTrue(savedQueue.size() == 0);
+//    }
+//
+//    @Test
+//    public void testSaveSuccess() {
+//        LQNetworkRequest.saveQueue(Robolectric.application, queue, "filename");
+//
+//        ArrayList<LQNetworkRequest> savedQueue = LQNetworkRequest.loadQueue(Robolectric.application, "filename");
+//        Log.e("teste", savedQueue.get(0).getJSON());
+//        System.out.println(savedQueue.get(0).getJSON());
+//        assertEquals(queue.get(0), savedQueue.get(0));
+//    }
 
     /**
      * Test that queuer removes the successful requests and keep the bad requests to retry

@@ -19,18 +19,18 @@ package io.lqd.sdk.model;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
@@ -41,11 +41,7 @@ import io.lqd.sdk.LiquidTools;
 public abstract class LQModel implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    public static final String PREF_FILE_NAME = "LQPrefsFile";
-    private static JSONObject tempJsonObject;
-    private static LQUser lqUserObject;
-    private static String[] keys = { "mIdentifier", "mUniqueId" };
-
+    private static final String PREF_FILE_NAME = "LQPrefs";
 
     /**
      * Generate a random unique id
@@ -106,88 +102,94 @@ public abstract class LQModel implements Serializable {
         return attrs;
     }
 
-
-    /*
-     * *******************
-     * File Management
-     * *******************
-     */
-
-    protected void save(Context context, String path) {
-        LQLog.data("Saving " + this.getClass().getSimpleName());
-        save(context, path, this);
-    }
-
-    protected static void save(Context context, String path, Object o) {
+    public void save(Context context, String path) {
+        String serializedObject = toJSON().toString();
 
         SharedPreferences preferences = context.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE);
-
         SharedPreferences.Editor prefsEditor = preferences.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(o);
-        if (path.contains(".queue"))
-            prefsEditor.putString("Queue", json);
-        else
-            prefsEditor.putString("User", json);
-        LQLog.infoVerbose("Saving " + path + " to shared prefs");
+
+        String[] split = path.split("\\.");
+
+        prefsEditor.putString(split[1], serializedObject);
+
+        LQLog.infoVerbose("Saving " + split[1] + " to shared prefs");
         prefsEditor.apply();
     }
 
-    protected static Object loadObject(Context context, String path) {
-        LQLog.infoVerbose("Loading " + path + " from shared prefs");
+    public static JSONObject retriveFromFile(Context context, String path) {
+        String retrivedData;
 
         SharedPreferences preferences = context.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE);
 
-        Type type = new TypeToken<ArrayList<LQNetworkRequest>>() {}.getType();
-        Gson gson = new Gson();
+        String[] split = path.split("\\.");
 
-        if (path.contains(".user")) {
-            String jsonUserString = preferences.getString("User", "");
+        retrivedData = preferences.getString(split[1], "");
 
-            if ("".equals(jsonUserString)){
-                LQLog.infoVerbose("New user, requesting new identifier.");
-                jsonUserString = gson.toJson(new LQUser(newIdentifier(), false));
+        try {
+            return new JSONObject(retrivedData);
+        } catch (JSONException e) {
+            LQLog.infoVerbose("Couldn't retrieve " + split[1] + " from file, probably new user");
+        }
+        return new JSONObject();
+    }
+
+    protected static HashMap<String, Object> attributesFromJSON(JSONObject object, String[] excludedKeys) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+
+        if(object != JSONObject.NULL)
+            hashMap = toHashMap(object, excludedKeys);
+        return hashMap;
+    }
+
+
+    private static HashMap<String, Object> toHashMap(JSONObject object, String[] excludedKeys) {
+        HashMap<String, Object> hashmap = new HashMap<>();
+
+        Iterator<String> keysItr = object.keys();
+
+        while(keysItr.hasNext()) {
+            String key = keysItr.next();
+            if (!Arrays.asList(excludedKeys).contains(key)) {
+                Object value = null;
+                try {
+                    value = object.get(key);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                if (value instanceof JSONArray) {
+                    value = toList((JSONArray) value, excludedKeys);
+                } else if (value instanceof JSONObject) {
+                    value = toHashMap((JSONObject) value, excludedKeys);
+                }
+                hashmap.put(key, value);
             }
+        }
+        return hashmap;
+    }
+
+    public static List<Object> toList(JSONArray array, String[] excludedKeys) {
+        List<Object> list = new ArrayList<>();
+
+        for(int i = 0; i < array.length(); i++) {
+            Object value = null;
             try {
-                tempJsonObject = new JSONObject(jsonUserString);
+                value = array.get(i);
             } catch (JSONException e) {
-                LQLog.error("Couldn't assign temp json " + e.getMessage());
                 e.printStackTrace();
             }
-
-            try {
-                lqUserObject = gson.fromJson(jsonUserString, LQUser.class);
-            } catch (Exception e) {
-                LQLog.infoVerbose("Error from gson" + e.getMessage() + ". Clearing preferences file.");
-                preferences.edit().clear().commit();
-                return null;
+            if(value instanceof JSONArray) {
+                value = toList((JSONArray) value, excludedKeys);
             }
-            getIdentifierKeyFromPrefs();
-            return lqUserObject;
-        }
-        else {
-            String json = preferences.getString("Queue", "");
-            return gson.fromJson(json, type);
-        }
-    }
 
-    protected static void getIdentifierKeyFromPrefs() {
-        boolean found = false;
-        int i = 0;
-
-        while (i < keys.length && !found) {
-            try {
-                lqUserObject.setIdentifierForPrefs(tempJsonObject.getString(keys[i]));
-                found = true;
-                LQLog.info("Found the key: " + keys[i] + " in the preferences saved file");
-            } catch (JSONException e) {
-                LQLog.info("Did not found the key: " + keys[i] + " in the preferences, trying the next one.");
+            else if(value instanceof JSONObject) {
+                value = toHashMap((JSONObject) value, excludedKeys);
             }
-            ++i;
+            list.add(value);
         }
+        return list;
     }
 
-    protected static LQModel load(Context context, String path) {
-        return (LQModel) loadObject(context, path);
-    }
+
+    public abstract JSONObject toJSON();
 }
