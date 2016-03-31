@@ -1,12 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="Theme.Transparent" parent="android:Theme">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@drawable/border</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+
     <style name="SlideUpAnimation">
-        <item name="android:windowEnterAnimation">@anim/slide_up</item>
-        <item name="android:windowExitAnimation">@anim/slide_down</item>
+        <item name="android:windowEnterAnimation">@anim/lqslide_up</item>
+        <item name="android:windowExitAnimation">@anim/lqslide_down</item>
     </style>
 
     <style name="FadeInOutAnimation">
-        <item name="android:windowEnterAnimation">@anim/fadein</item>
-        <item name="android:windowExitAnimation">@anim/fadeout</item>
+        <item name="android:windowEnterAnimation">@anim/lqfadein</item>
+        <item name="android:windowExitAnimation">@anim/lqfadeout</item>
+    </style>
+
+    <style name="DevModeFadeInOutAnimation">
+        <item name="android:windowEnterAnimation">@anim/lqdev_mode_fadein</item>
+        <item name="android:windowExitAnimation">@anim/lqdev_mode_fadeout</item>
     </style>
 </resources>

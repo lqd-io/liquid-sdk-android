@@ -101,10 +101,8 @@ public class LQValue implements Serializable {
     public static HashMap<String,LQValue> convertToHashMap(ArrayList<LQValue> values){
         HashMap<String,LQValue> hashMap = new HashMap<String, LQValue>();
         for(LQValue value : values) {
-            if(value.getValue() != null){
-                if(value.getVariable().getName() != null){
-                    hashMap.put(value.getVariable().getName(), value);
-                }
+            if(value.getValue() != null && value.getVariable().getName() != null){
+                hashMap.put(value.getVariable().getName(), value);
             }
         }
         return hashMap;

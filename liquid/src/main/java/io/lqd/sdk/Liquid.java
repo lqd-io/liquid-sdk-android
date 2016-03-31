@@ -23,9 +23,12 @@ import android.app.Activity;
 import android.app.Application;
 import android.app.Application.ActivityLifecycleCallbacks;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -54,6 +57,7 @@ import io.lqd.sdk.model.LQNetworkRequest;
 import io.lqd.sdk.model.LQUser;
 import io.lqd.sdk.model.LQValue;
 import io.lqd.sdk.model.LQVariable;
+import io.lqd.sdk.oneline.LQUiElement;
 import io.lqd.sdk.visual.InappMessage;
 import io.lqd.sdk.visual.Modal;
 import io.lqd.sdk.visual.SlideUp;
@@ -64,6 +68,9 @@ public class Liquid {
 
     public static final String LIQUID_VERSION = "2.0.2";
     private static final int LIQUID_DEFAULT_SESSION_TIMEOUT = 30;
+
+    private SharedPreferences mPreferences;
+    public static final String PREF_UIELEMENTS_FILE = "LQUiElements";
 
     private int mSessionTimeout;
     private String mApiToken;
@@ -84,8 +91,14 @@ public class Liquid {
     private boolean isDevelopmentMode;
     private Activity mCurrentActivity;
     private LinkedList<InappMessage> mInAppMessagesQueue;
+    private LQClickListener mLQClickListener;
+    private Handler mUIElementsHandler;
+    private Boolean isSplashShown = false;
+    private boolean enteredDevMode = false;
+    private String mDevToken;
+    private LQWebSocket mLQWebSocket;
+    private LQDevelopmentMode mLQDevelopmentMode;
     private boolean isStarted;
-
 
     /**
      * Retrieves the Liquid shared instance.
@@ -169,7 +182,7 @@ public class Liquid {
         // Get last user and init session
         mPreviousUser = LQUser.load(mContext, mApiToken + ".user");
         identifyUser(mPreviousUser.getIdentifier(), mPreviousUser.getAttributes(), mPreviousUser.isIdentified(), false);
-
+        mInAppMessagesQueue = new LinkedList();
         LQLog.info("Initialized Liquid with API Token " + apiToken);
     }
 
@@ -391,7 +404,7 @@ public class Liquid {
             return;
         }
 
-        // same id -> just update attributes
+        // same mUIElementsID -> just update attributes
         if (mCurrentUser != null && mCurrentUser.getIdentifier().equals(identifier)) {
             mCurrentUser.setAttributes(finalAttributes);
             mCurrentUser.save(mContext, mApiToken);
@@ -560,7 +573,7 @@ public class Liquid {
         mQueue.execute(new Runnable() {
             @Override
             public void run() {
-               mHttpQueuer.addToHttpQueue(LQRequestFactory.inappMessagesReportRequest(mCurrentUser.getIdentifier(), inAppMessage.getFormulaId()));
+                mHttpQueuer.addToHttpQueue(LQRequestFactory.inappMessagesReportRequest(mCurrentUser.getIdentifier(), inAppMessage.getFormulaId()));
             }
         });
         track(inAppMessage.getDismissEventName(), inAppMessage.getDismissAttributes(), UniqueTime.newDate());
@@ -695,17 +708,14 @@ public class Liquid {
     }
 
     private void activityDestroyedCallback(Activity activity) {
-        //mCurrentActivity = activity;
+       // mCurrentActivity = activity;
     }
 
     private void activityCreatedCallback(Activity activity) {
         mCurrentActivity = activity;
-
     }
 
     private void activityStopedCallback(Activity activity) {
-        // mCurrentActivity = activity;
-
         if (isApplicationInBackground(activity)) {
             track("app background", null, UniqueTime.newDate());
             flush();
@@ -715,36 +725,62 @@ public class Liquid {
     }
 
     private void activityStartedCallback(Activity activity) {
+
         mCurrentActivity = activity;
 
         mInstance.attachActivity(activity);
+
         if (mNeedCallbackCall) {
             mNeedCallbackCall = false;
             notifyListeners(false);
         }
     }
 
-    private void activityResumedCallback(Activity activity) {
+    private void activityResumedCallback(final Activity activity) {
         mCurrentActivity = activity;
-
-
+        mPreferences = mCurrentActivity.getSharedPreferences(PREF_UIELEMENTS_FILE, Context.MODE_PRIVATE);
 
         mInstance.attachActivity(activity);
+        mLQClickListener = new LQClickListener(activity);
+
+        mUIElementsHandler = new Handler();
+        mUIElementsHandler.postDelayed(searchUiElements(mCurrentActivity, enteredDevMode), 0);
+
+
+        if (enteredDevMode) {
+            mLQWebSocket.setActivity(mCurrentActivity);
+            eventTrackingModeON();
+        }
 
         if(!isApplicationInBackground(activity) && !isStarted) {
             track("app foreground", null, UniqueTime.newDate());
             isStarted = true;
 
+            requestUiElementsToTrack();
+
             requestInappMessages();
-
             showInAppMessages();
+            try {
+                Intent intent = mCurrentActivity.getIntent();
+                if (intent.getAction().equals(Intent.ACTION_VIEW)
+                        && "lqd".equals(intent.getData().getScheme().substring(0, 3))
+                        && "edit".equals(intent.getData().getHost())) {
+                    mDevToken = intent.getData().getQueryParameter("token");
+                    new AsyncWebSocket().execute();
+                }
+            } catch (Exception e) {
+                e.getMessage();
+            }
         }
-
         mHttpQueuer.startFlushTimer();
     }
 
     private void activityPausedCallback(Activity activity) {
         mCurrentActivity = activity;
+
+        if(mUIElementsHandler != null) {
+            mUIElementsHandler.removeCallbacksAndMessages(null);
+        }
 
         mInstance.detachActivity(activity);
         mHttpQueuer.stopFlushTimer();
@@ -794,6 +830,40 @@ public class Liquid {
     }
 
     /**
+     * (Constantly) Searching for uielements
+     */
+    protected Runnable searchUiElements(final Activity activity, final boolean in_devmode) {
+        return new Runnable() {
+            @Override
+            public void run() {
+                if (in_devmode)
+                    mLQClickListener.removeBorderLayouts();
+                mLQClickListener = new LQClickListener(activity);
+                if (Build.VERSION.SDK_INT > 10) {
+                    mLQClickListener.searchForButtons(activity.getWindow().getDecorView(), in_devmode);
+                } else {
+                    mLQClickListener.searchForButtonsLower(activity.getWindow().getDecorView(), in_devmode);
+                }
+                mUIElementsHandler.postDelayed(this, 1000);
+            }
+        };
+    }
+
+    /**
+     * Enables Event Tracking Mode.
+     */
+    protected void eventTrackingModeON() {
+        enteredDevMode = true;
+
+        if (mUIElementsHandler != null)
+            mUIElementsHandler.removeCallbacksAndMessages(null);
+        mUIElementsHandler.postDelayed(searchUiElements(mCurrentActivity, enteredDevMode), 1000);
+        mLQDevelopmentMode.enterDevelopmentMode(mCurrentActivity, isSplashShown);
+        isSplashShown = true; // for not showing the splashscreen in other activities
+    }
+
+
+    /**
      * Request values from the server.
      */
     public void requestValues() {
@@ -818,7 +888,6 @@ public class Liquid {
                         }
                     }
                 }
-
             });
         }
     }
@@ -858,18 +927,48 @@ public class Liquid {
         }
     }
 
-    public void showInAppMessages(){
+    public void showInAppMessages() {
         mQueue.execute(new Runnable() {
             @Override
             public void run() {
                 InappMessage in_app = mInAppMessagesQueue.poll();
                 if (in_app == null) {
-                    LQLog.infoVerbose("Not anymore inapp messages in the queue");
+                    LQLog.infoVerbose("Not any more inapp messages in the queue");
                 } else {
                     in_app.show();
                 }
             }
         });
+    }
+
+    /**
+     * Request the ui elements to be tracked from the server.
+     */
+    private void requestUiElementsToTrack() {
+
+        if (mCurrentUser != null) {
+            mQueue.execute(new Runnable() {
+                @Override
+                public void run() {
+                    LQNetworkRequest uielemenetsreq = LQRequestFactory.uiElementsToTrackRequest(mDevToken);
+                    String dataFromServer = uielemenetsreq.sendRequest(mApiToken).getRequestResponse();
+                    if (dataFromServer != null) {
+                        ArrayList<LQUiElement> list = null;
+                        try {
+                            list = LQUiElement.parse(new JSONArray(dataFromServer));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        if (list != null) {
+                            mPreferences.edit().clear().apply();
+                            for (LQUiElement uielement : list) {
+                                mPreferences.edit().putString(uielement.getIdentifier(), uielement.getEventName()).apply();
+                            }
+                        }
+                    }
+                }
+            });
+        }
     }
 
 
@@ -1137,7 +1236,7 @@ public class Liquid {
                 mDevice = new LQDevice(mContext, LIQUID_VERSION);
                 mLoadedLiquidPackage = new LQLiquidPackage();
                 mAppliedValues = new HashMap<String, LQValue>();
-                if(!soft) {
+                if (!soft) {
                     mHttpQueuer = new LQQueuer(mContext, mApiToken);
                 }
                 resetUser();
@@ -1161,5 +1260,50 @@ public class Liquid {
             }
         });
 
+    }
+
+
+    /**
+     * Sends the information for adding a ui_element through the socket.
+     * @param identifier the identifier/path of the element
+     * @param eventname the event name bound to the element
+     */
+    protected void uiElementAdd(String identifier, String eventname) {
+        mLQWebSocket.uiElementAdd(identifier, eventname);
+    }
+
+    /**
+     * Sends the information for removing a ui_element through the socket.
+     * @param identifier the identifier/path of the element
+     */
+    protected void uiElementsRemove(String identifier) {
+        mLQWebSocket.uiElementsRemove(identifier);
+    }
+
+    /**
+     * Sends the information for changing the event name bound to the ui _element.
+     * @param identifier the identifier/path of the element
+     * @param eventname the event name bound to the element
+     */
+    protected void uiElementsChange(String identifier, String eventname) {
+        mLQWebSocket.uiElementsChange(identifier, eventname);
+    }
+
+    /**
+     * Sets the default values before restarting the app on exiting dev mode.
+     */
+    protected void updateDevModeBooleans() {
+        enteredDevMode = false;
+        isSplashShown = false;
+    }
+
+    class AsyncWebSocket extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            mLQDevelopmentMode = new LQDevelopmentMode();
+            mLQWebSocket = new LQWebSocket(mDevToken, mCurrentActivity, mLQDevelopmentMode);
+            return null;
+        }
     }
 }

@@ -32,7 +32,7 @@ public class LQRequestFactory {
     protected static final String LIQUID_INAPP_MESSAGES_URL = LIQUID_SERVER_BASE_URL + "users/%s/inapp_messages";
     protected static final String LIQUID_INAPP_MESSAGE_REPORT_URL = LIQUID_SERVER_BASE_URL + "formulas/%s/users/%s/report";
     protected static final String LIQUID_VARIABLES_URL = LIQUID_SERVER_BASE_URL + "variables";
-
+    protected static final String LIQUID_UIELEMENTS_URL = LIQUID_SERVER_BASE_URL + "ui_elements/";
 
     public static LQNetworkRequest createAliasRequest(String oldId, String newId) {
         JSONObject json;
@@ -72,5 +72,12 @@ public class LQRequestFactory {
     public static LQNetworkRequest inappMessagesReportRequest(String userId, String formulaId) {
             String url = String.format(LIQUID_INAPP_MESSAGE_REPORT_URL, formulaId, Uri.encode(userId, "UTF-8"));
         return new LQNetworkRequest(url, "POST", null);
+    }
+
+    public static LQNetworkRequest uiElementsToTrackRequest(String token) {
+        if (token == null)
+            return new LQNetworkRequest(LIQUID_UIELEMENTS_URL + "?platform=android", "GET", null);
+        else
+            return new LQNetworkRequest(LIQUID_UIELEMENTS_URL + "?platform=android&token=" + token, "GET", null);
     }
 }

@@ -1,0 +1,89 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/splash_layout"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F1F8FE"
+    android:gravity="center_vertical|center_horizontal"
+    android:weightSum="1">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="30dp"
+        android:layout_marginTop="30dp"
+        android:weightSum="4">
+
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="1">
+
+            <ImageButton
+                android:src="@drawable/check"
+                android:scaleType="fitCenter"
+                android:adjustViewBounds="true"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:id="@+id/checkcircle"
+                android:layout_gravity="center_horizontal"
+                android:background="#00ffffff" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Start tracking events now!"
+                android:id="@+id/start_tracking_text"
+                android:layout_gravity="center_horizontal"
+                android:textSize="22dp"
+                android:textColor="#808080"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <ImageView
+            android:src="@drawable/mobileview"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            android:layout_width="match_parent"
+            android:layout_height="230dp"
+            android:id="@+id/mobileview"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tap and hold the element you want to track and give it an event name"
+            android:id="@+id/tap_and_hold_text"
+            android:textSize="18sp"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
+            android:layout_marginBottom="30dp"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:textColor="#000000" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/custom_state"
+            android:text="LET&apos;S GO"
+            android:id="@+id/lets_go"
+            android:layout_gravity="center_horizontal"
+            android:textSize="18sp"
+            android:textColor="#ffffff"
+            android:textStyle="bold"
+            android:layout_weight="1" />
+
+    </LinearLayout>
+
+
+</LinearLayout>
