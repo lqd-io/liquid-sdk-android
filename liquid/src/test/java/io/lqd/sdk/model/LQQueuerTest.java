@@ -1,7 +1,5 @@
 package io.lqd.sdk.model;
 
-import android.util.Log;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,7 +14,6 @@ import io.lqd.sdk.LQQueuer;
 import io.lqd.sdk.factory.FactoryGirl;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 

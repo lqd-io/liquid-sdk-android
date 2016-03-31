@@ -41,10 +41,9 @@ public class LQOnTouchListener implements View.OnTouchListener {
         if (event.getAction() == MotionEvent.ACTION_UP && shouldClick) {
             Liquid.getInstance().track(mEventname);
         }
-        if (event.getAction() == MotionEvent.ACTION_MOVE) {
-            if (!mRect.contains(v.getLeft() + (int) event.getX(), v.getTop() + (int) event.getY())) {
-                shouldClick = false;
-            }
+        if (event.getAction() == MotionEvent.ACTION_MOVE &&
+                !mRect.contains(v.getLeft() + (int) event.getX(), v.getTop() + (int) event.getY())) {
+            shouldClick = false;
         }
         return false;
     }

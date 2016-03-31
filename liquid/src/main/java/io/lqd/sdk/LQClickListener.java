@@ -24,24 +24,16 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.GradientDrawable;
-import android.media.Image;
 import android.os.Build;
-import android.support.v7.view.menu.ActionMenuItem;
-import android.support.v7.view.menu.ActionMenuItemView;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityEvent;
 import android.webkit.WebView;
-import android.widget.ActionMenuView;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
-import android.widget.Spinner;
-import android.widget.TextView;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -56,8 +48,8 @@ public class LQClickListener {
     private final Activity mActivity;
     private final SharedPreferences mPreferences;
     private final ViewGroup mViewGr;
-    HashMap<String, String> mHashMap = new HashMap<>();
-    HashMap<View, RelativeLayout> mHashMapLayout = new HashMap<>();
+    private HashMap<String, String> mHashMap = new HashMap<>();
+    private HashMap<View, RelativeLayout> mHashMapLayout = new HashMap<>();
 
     private int i;
     private android.support.v7.widget.PopupMenu mPopupLowerApi;
@@ -293,7 +285,7 @@ public class LQClickListener {
                         switch (item.getItemId()) {
                             case 1:
                                 if (!isTracked(elementidentifier)) {
-                                    chooseEventName(v, popupmenu, elementidentifier);
+                                    chooseEventName(popupmenu, elementidentifier);
                                 } else {
                                     remove(elementidentifier);
                                     popupmenu.getMenu().getItem(0).setTitle("Add event");
@@ -301,7 +293,7 @@ public class LQClickListener {
                                 }
                                 break;
                             case 2:
-                                changeEventName(v, elementidentifier);
+                                changeEventName(elementidentifier);
                                 break;
                             default:
                                 break;
@@ -316,7 +308,7 @@ public class LQClickListener {
         });
     }
 
-    private void changeEventName(final View v, final String elementidentifier) {
+    private void changeEventName(final String elementidentifier) {
         AlertDialog.Builder alert = new AlertDialog.Builder(mActivity);
         alert.setTitle("Set the event name");
         alert.setMessage("Element Identifier: " + getElementsPathName(elementidentifier));
@@ -341,7 +333,7 @@ public class LQClickListener {
     }
 
     // Set the event name to track
-    private void chooseEventName(final View v, final PopupMenu popupmenu, final String elementidentifier) {
+    private void chooseEventName(final PopupMenu popupmenu, final String elementidentifier) {
         AlertDialog.Builder alert = new AlertDialog.Builder(mActivity);
         final EditText input = new EditText(mActivity);
 
@@ -448,7 +440,7 @@ public class LQClickListener {
                         switch (item.getItemId()) {
                             case 1:
                                 if (!isTracked(elementidentifier)) {
-                                    chooseEventNameLower(v, popupmenu, elementidentifier);
+                                    chooseEventNameLower(popupmenu, elementidentifier);
                                 } else {
                                     remove(elementidentifier);
                                     popupmenu.getMenu().getItem(0).setTitle("Add event");
@@ -456,7 +448,7 @@ public class LQClickListener {
                                 }
                                 break;
                             case 2:
-                                changeEventName(v, elementidentifier);
+                                changeEventName(elementidentifier);
                                 break;
                             default:
                                 break;
@@ -471,7 +463,7 @@ public class LQClickListener {
         });
     }
 
-    private void chooseEventNameLower(final View v, final android.support.v7.widget.PopupMenu popupmenu, final String elementidentifier) {
+    private void chooseEventNameLower(final android.support.v7.widget.PopupMenu popupmenu, final String elementidentifier) {
         AlertDialog.Builder alert = new AlertDialog.Builder(mActivity);
         final EditText input = new EditText(mActivity);
 
