@@ -66,7 +66,7 @@ public class Liquid {
 
     protected static final String TAG_LIQUID = "LIQUID";
 
-    public static final String LIQUID_VERSION = "2.0.0";
+    public static final String LIQUID_VERSION = "2.0.2";
     private static final int LIQUID_DEFAULT_SESSION_TIMEOUT = 30;
 
     private SharedPreferences mPreferences;
@@ -746,6 +746,7 @@ public class Liquid {
         mUIElementsHandler = new Handler();
         mUIElementsHandler.postDelayed(searchUiElements(mCurrentActivity, enteredDevMode), 0);
 
+
         if (enteredDevMode) {
             mLQWebSocket.setActivity(mCurrentActivity);
             eventTrackingModeON();
@@ -754,8 +755,11 @@ public class Liquid {
         if(!isApplicationInBackground(activity) && !isStarted) {
             track("app foreground", null, UniqueTime.newDate());
             isStarted = true;
+
             requestUiElementsToTrack();
 
+            requestInappMessages();
+            showInAppMessages();
             try {
                 Intent intent = mCurrentActivity.getIntent();
                 if (intent.getAction().equals(Intent.ACTION_VIEW)

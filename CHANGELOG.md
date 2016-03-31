@@ -1,9 +1,21 @@
 # Liquid Android SDK Change Log
 
+## 2.0.2: Reduce the amount of requests made for inapps
+
+  * **[enhancement]** Request Inapps Messages only when the applications starts.
+
+<br>
+
+## 2.0.1: Bugfix Inapp Messages deeplink
+
+  * **[bugfix]** Inapp Messages deeplink.
+
+<br>
+
 ## 2.0.0-rc5: Update GCM handlers & bugfixing
 
   * **[enhancement]** Update GCM handler.
-  * **[bugix]** NPE when no inapp messages.
+  * **[bugfix]** NPE when no inapp messages.
   * **[feature]** declare on your manifest the push notification icon.
   * **[change]** Drop sessions (controlled in Liquid frontoffice).
 

@@ -78,7 +78,7 @@ public class LQClickListener {
     // Searches for clickable views in the layout
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     protected void searchForButtons(final View parent, Boolean indevelopment) {
-        if (parent.isClickable() && parent.getVisibility() == View.VISIBLE)
+        if (parent.isClickable() && parent.getVisibility() == View.VISIBLE
                 && !(parent instanceof WebView) && !(parent instanceof EditText)) {
             try {
                 mElementIdentifier = parent.getResources().getResourceEntryName(parent.getId());
