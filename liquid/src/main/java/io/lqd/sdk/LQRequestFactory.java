@@ -59,11 +59,6 @@ public class LQRequestFactory {
         return new LQNetworkRequest(LIQUID_VARIABLES_URL, "POST", variable.toString());
     }
 
-    public static LQNetworkRequest inappMessagesRequest(String userId) {
-           String url = String.format(LIQUID_INAPP_MESSAGES_URL, Uri.encode(userId, "UTF-8"));
-        return new LQNetworkRequest(url, "GET", null);
-    }
-
     public static LQNetworkRequest inappMessagesReportRequest(String userId, String formulaId, JSONObject payload) {
             String url = String.format(LIQUID_INAPP_MESSAGE_REPORT_URL, formulaId, Uri.encode(userId, "UTF-8"));
         return new LQNetworkRequest(url, "POST", payload.toString());

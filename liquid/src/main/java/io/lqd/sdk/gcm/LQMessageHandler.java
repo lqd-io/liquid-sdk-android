@@ -52,13 +52,8 @@ public class LQMessageHandler extends GcmListenerService {
     @Override
     public void onMessageReceived(String from, Bundle data) {
         String inapp = data.getString(LIQUID_INAPP_EXTRA);
-        if(inapp != null && Liquid.isInitialized()) {
-            try {
-                Liquid.getInstance().addInapp(new LQInAppMessage(new JSONObject(inapp)));
-                Liquid.getInstance().showInAppMessages();
-            } catch (JSONException e) {
-                LQLog.error("Error parsing inapp message.");
-            }
+        if(inapp != null) {
+            buildInapp(inapp);
         }
         else {
             String message = data.getString(LIQUID_MESSAGE_EXTRA);
@@ -83,6 +78,17 @@ public class LQMessageHandler extends GcmListenerService {
                 contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, appIntent, 0);
             }
             createNotification(getApplicationContext(), contentIntent, icon, push_id, title, message, sound);
+        }
+    }
+
+    private void buildInapp(String inapp) {
+        if (Liquid.isInitialized()) {
+            try {
+                Liquid.getInstance().addInapp(new LQInAppMessage(new JSONObject(inapp)));
+                Liquid.getInstance().showInAppMessages();
+            } catch (JSONException e) {
+                LQLog.error("Error parsing inapp message.");
+            }
         }
     }
 

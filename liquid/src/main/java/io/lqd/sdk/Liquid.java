@@ -30,7 +30,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -43,7 +42,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import io.lqd.sdk.gcm.LQClientManager;
-import io.lqd.sdk.model.InappMessageParser;
 import io.lqd.sdk.model.LQDataPoint;
 import io.lqd.sdk.model.LQDevice;
 import io.lqd.sdk.model.LQEvent;
@@ -162,6 +160,7 @@ public class Liquid {
         mDevice = new LQDevice(context, LIQUID_VERSION);
         mQueue = Executors.newSingleThreadExecutor();
         loadLiquidPackage(true);
+        mInAppMessagesQueue = new LinkedList<>();
         mHttpQueuer = LQQueuer.load(mContext, mApiToken);
         mHttpQueuer.setLiquidInstance(this);
         mHttpQueuer.startFlushTimer();
@@ -560,7 +559,6 @@ public class Liquid {
      *              The message itself.
      */
     public void trackDismiss(final LQInAppMessage inAppMessage) {
-
         mQueue.execute(new Runnable() {
             @Override
             public void run() {
@@ -739,8 +737,6 @@ public class Liquid {
             track("app foreground", null, UniqueTime.newDate());
             isStarted = true;
 
-            requestInappMessages();
-
             showInAppMessages();
         }
 
@@ -823,37 +819,6 @@ public class Liquid {
                     }
                 }
 
-            });
-        }
-    }
-
-    /**
-     * Requests the message from the server,
-     * creates the In-APP message and adds it
-     * to queue.
-     */
-    public void requestInappMessages() {
-        if (mCurrentUser != null) {
-            mQueue.execute(new Runnable() {
-                @Override
-                public void run() {
-                    LQNetworkRequest req = LQRequestFactory.inappMessagesRequest(mCurrentUser.getIdentifier());
-                    String dataFromServer = req.sendRequest(mApiToken).getRequestResponse();
-                    mInAppMessagesQueue = new LinkedList();
-                    if (dataFromServer != null) {
-                        ArrayList<LQInAppMessage> list = null;
-                        try {
-                            list = InappMessageParser.parse(new JSONArray(dataFromServer));
-                        } catch (JSONException e) {
-                            LQLog.error("Error parsing inapp messages" + e.getMessage());
-                        }
-                        if (list != null) {
-                            for (LQInAppMessage inapp : list) {
-                                addInapp(inapp);
-                            }
-                        }
-                    }
-                }
             });
         }
     }
