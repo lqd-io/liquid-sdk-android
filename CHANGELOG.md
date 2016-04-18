@@ -1,5 +1,11 @@
 # Liquid Android SDK Change Log
 
+## 2.1.0: RealTime inapps
+
+  * **[feature]** Send realtime inapps (via GCM instead of HTTP request).
+
+<br>
+
 ## 2.0.2: Reduce the amount of requests made for inapps
 
   * **[enhancement]** Request Inapps Messages only when the applications starts.
