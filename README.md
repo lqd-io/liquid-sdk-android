@@ -1,5 +1,7 @@
 # Liquid Android SDK
 
+[![Join the chat at https://gitter.im/lqd-io/liquid-sdk-android](https://badges.gitter.im/lqd-io/liquid-sdk-android.svg)](https://gitter.im/lqd-io/liquid-sdk-android?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Build Status](https://travis-ci.org/lqd-io/liquid-sdk-android.svg?branch=master)](https://travis-ci.org/lqd-io/liquid-sdk-android) [![Codacy Badge](https://api.codacy.com/project/badge/abc35fcee53b4e12b1858e2a3dadca9e)](https://www.codacy.com/app/letz/liquid-sdk-android)
 <br>
 [![Maven Central](http://img.shields.io/maven-central/v/io.lqd/liquid-android.svg?style=flat)](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22liquid-android%22)
