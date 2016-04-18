@@ -28,6 +28,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.zip.GZIPInputStream;
@@ -50,6 +52,7 @@ public class LQNetworkRequest extends LQModel {
     private String mJson;
     private int mNumberOfTries;
     private Date mLastTry;
+    private SimpleDateFormat mDateFormat;
 
     public LQNetworkRequest(String url, String httpMethod, String json) {
         mUrl = url;
@@ -57,6 +60,7 @@ public class LQNetworkRequest extends LQModel {
         mJson = json;
         mNumberOfTries = 0;
         mLastTry = null;
+        mDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
     }
 
     public String getUrl() {
@@ -106,6 +110,7 @@ public class LQNetworkRequest extends LQModel {
 
     public LQNetworkResponse sendRequest(String token) {
         String response = null;
+        String date = mDateFormat.format(Calendar.getInstance().getTime());
         int responseCode = -1;
         InputStream err = null;
         BufferedReader boin = null;
@@ -115,6 +120,7 @@ public class LQNetworkRequest extends LQModel {
             URL url = new URL(this.getUrl());
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod(this.getHttpMethod());
+            connection.setRequestProperty("Date", date);
             connection.setRequestProperty("Authorization", "Token " + token);
             connection.setRequestProperty("User-Agent", USER_AGENT);
             connection.setRequestProperty("Accept", "application/vnd.lqd.v1+json");

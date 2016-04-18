@@ -35,7 +35,7 @@ import io.lqd.sdk.model.LQNetworkResponse;
 public class LQQueuer extends LQModel {
 
     private static final int LIQUID_QUEUE_SIZE_LIMIT = 500;
-    private static final int LIQUID_DEFAULT_FLUSH_INTERVAL = 15;
+    private static final int LIQUID_DEFAULT_FLUSH_INTERVAL = 1;
     private static final int LIQUID_MAX_NUMBER_OF_TRIES = 10;
     private static final String PREF_FILE_NAME = "LQPrefs" ;
 
