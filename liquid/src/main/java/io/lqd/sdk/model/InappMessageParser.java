@@ -16,7 +16,7 @@ public class InappMessageParser {
         ArrayList<LQInAppMessage> list = new ArrayList<>();
 
         int length = array.length();
-        for(int i = 0; i < length ; ++i) {
+        for (int i = 0; i < length; ++i) {
             try {
                 JSONObject inapp = array.getJSONObject(i);
                 list.add(new LQInAppMessage(inapp));

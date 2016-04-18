@@ -30,42 +30,60 @@ import android.support.v4.app.NotificationCompat;
 
 import com.google.android.gms.gcm.GcmListenerService;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import io.lqd.sdk.LQLog;
+import io.lqd.sdk.Liquid;
+import io.lqd.sdk.model.LQInAppMessage;
 
 public class LQMessageHandler extends GcmListenerService {
 
+    // Notification keys
     private static final String LIQUID_MESSAGE_EXTRA = "lqd_message";
     private static final String LIQUID_PUSH_ID_EXTRA = "lqd_id";
     private static final String LIQUID_SOUND_EXTRA = "lqd_sound";
     private static final String LIQUID_TITLE_EXTRA = "lqd_title";
     private static final String LIQUID_DEEPLINK_EXTRA = "lqd_deeplink";
 
+    // Inapp keys
+    private static final String LIQUID_INAPP_EXTRA = "lqd_inapp";
 
     @Override
     public void onMessageReceived(String from, Bundle data) {
-        String message = data.getString(LIQUID_MESSAGE_EXTRA);
-        int push_id = 0;
-        try {
-            push_id = Integer.parseInt(data.getString(LIQUID_PUSH_ID_EXTRA));
-        } catch (NumberFormatException e) {
-            LQLog.error("push_id is not an int: " + data.getString(LIQUID_PUSH_ID_EXTRA));
+        String inapp = data.getString(LIQUID_INAPP_EXTRA);
+        if(inapp != null && Liquid.isInitialized()) {
+            try {
+                Liquid.getInstance().addInapp(new LQInAppMessage(new JSONObject(inapp)));
+                Liquid.getInstance().showInAppMessages();
+            } catch (JSONException e) {
+                LQLog.error("Error parsing inapp message.");
+            }
         }
-        int icon = getAppIconInt(getApplicationContext());
-        Uri sound = getPushSound(data, getApplicationContext());
-        String title = getPushTitle(data, getApplicationContext());
-        String deepLinkString = getDeepLink(data);
+        else {
+            String message = data.getString(LIQUID_MESSAGE_EXTRA);
+            int push_id = 0;
+            try {
+                push_id = Integer.parseInt(data.getString(LIQUID_PUSH_ID_EXTRA));
+            } catch (NumberFormatException e) {
+                LQLog.error("push_id is not an int: " + data.getString(LIQUID_PUSH_ID_EXTRA));
+            }
+            int icon = getAppIconInt(getApplicationContext());
+            Uri sound = getPushSound(data, getApplicationContext());
+            String title = getPushTitle(data, getApplicationContext());
+            String deepLinkString = getDeepLink(data);
 
-        Intent appIntent = getIntent(getApplicationContext());
-        Intent deepLinkIntent = new Intent(Intent.ACTION_VIEW);
-        PendingIntent contentIntent;
-        if (deepLinkString != null) {
-            deepLinkIntent.setData(Uri.parse(deepLinkString));
-            contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, deepLinkIntent, 0);
-        } else {
-            contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, appIntent, 0);
+            Intent appIntent = getIntent(getApplicationContext());
+            Intent deepLinkIntent = new Intent(Intent.ACTION_VIEW);
+            PendingIntent contentIntent;
+            if (deepLinkString != null) {
+                deepLinkIntent.setData(Uri.parse(deepLinkString));
+                contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, deepLinkIntent, 0);
+            } else {
+                contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, appIntent, 0);
+            }
+            createNotification(getApplicationContext(), contentIntent, icon, push_id, title, message, sound);
         }
-
-        createNotification(getApplicationContext(), contentIntent, icon, push_id, title, message, sound);
     }
 
     // Creates notification based on title and body received

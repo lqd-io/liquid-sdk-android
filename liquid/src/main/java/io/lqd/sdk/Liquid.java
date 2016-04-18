@@ -116,7 +116,7 @@ public class Liquid {
      * @return A Liquid instance.
      */
     public static Liquid initialize(Context context, String apiToken) {
-        if (mInstance == null) {
+        if (!isInitialized()) {
             mInstance = new Liquid(context, apiToken, false);
         }
         mInstance.mContext = context;
@@ -137,11 +137,15 @@ public class Liquid {
      * @return The Liquid instance.
      */
     public static Liquid initialize(Context context, String apiToken, boolean developmentMode) {
-        if (mInstance == null) {
+        if (!isInitialized()) {
             mInstance = new Liquid(context, apiToken, developmentMode);
         }
         mInstance.mContext = context;
         return mInstance;
+    }
+
+    public static boolean isInitialized() {
+        return mInstance != null;
     }
 
     private Liquid(Context context, String apiToken, boolean developmentMode) {
@@ -845,16 +849,22 @@ public class Liquid {
                         }
                         if (list != null) {
                             for (LQInAppMessage inapp : list) {
-                                if (inapp.getLayout().equals("modal")) {
-                                    mInAppMessagesQueue.add(new Modal(mContext, mCurrentActivity.findViewById(android.R.id.content).getRootView(), inapp));
-                                } else if (inapp.getLayout().equals("slide_up")) {
-                                    mInAppMessagesQueue.add(new SlideUp(mContext, mCurrentActivity.findViewById(android.R.id.content).getRootView(), inapp));
-                                }
+                                addInapp(inapp);
                             }
                         }
                     }
                 }
             });
+        }
+    }
+
+    public void addInapp(LQInAppMessage inapp) {
+        if(mCurrentActivity == null)
+            return;
+        if (inapp.getLayout().equals("modal")) {
+            mInAppMessagesQueue.add(new Modal(mContext, mCurrentActivity.findViewById(android.R.id.content).getRootView(), inapp));
+        } else if (inapp.getLayout().equals("slide_up")) {
+            mInAppMessagesQueue.add(new SlideUp(mContext, mCurrentActivity.findViewById(android.R.id.content).getRootView(), inapp));
         }
     }
 
