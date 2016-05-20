@@ -1,5 +1,11 @@
 # Liquid Android SDK Change Log
 
+## 2.1.1: Add support for special characters in UTF-8
+
+  * **[bugfix]** Add support for special characters in UTF-8
+
+<br>
+
 ## 2.1.0: RealTime inapps
 
   * **[feature]** Send realtime inapps (via GCM instead of HTTP request).
