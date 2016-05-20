@@ -22,10 +22,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -129,10 +131,11 @@ public class LQNetworkRequest extends LQModel {
             connection.setDoInput(true);
             if (this.getJSON() != null) {
                 connection.setDoOutput(true);
-                final String data = new String(getJSON().getBytes(), "UTF-8");
                 outputStream = new DataOutputStream(connection.getOutputStream());
-                outputStream.writeBytes(data);
-                outputStream.flush();
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+                writer.write(this.getJSON());
+                writer.close();
+                outputStream.close();
             }
             responseCode = connection.getResponseCode();
             err = connection.getErrorStream();
